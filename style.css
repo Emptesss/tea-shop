@@ -1,0 +1,1603 @@
+/* ========================
+   СБРОС СТИЛЕЙ И ПЕРЕМЕННЫЕ
+   ======================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:           #09150F;  /* Основной фон страницы */
+  --color-header:       #09150F;  /* Фон хедера */
+  --color-accent-red:   #5B3E3E;  /* Тёмно-красный акцент */
+  --color-accent-green: #337B57;  /* Зелёный акцент */
+  --color-dark-green:   #0D2719;  /* Тёмно-зелёный */
+  --color-card:         #5B3E3E;  /* Фон карточки товара */
+  --color-white:        #ffffff;
+
+  /* Внутренние отступы страницы — 100px по бокам */
+  --page-margin: 100px;
+}
+
+html, body {
+  width: 100%;                    /* Адаптивно под любой экран */
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ========================
+   ХЕДЕР
+   Фиксированный, высота 100px, фон #09150F
+   Структура: [Лого] | [Навигация + Соцсети по центру] | [Иконки действий]
+   ======================== */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;                    /* Растягивается на весь экран */
+  height: 100px;
+  background-color: var(--color-header);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--page-margin);
+  z-index: 1000;
+  gap: 32px;
+}
+
+/* Логотип — круг 64×64 в левом углу.
+   Замените на <img src="logo.png" width="64" height="64" /> */
+.header-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-accent-green);
+  flex-shrink: 0;
+}
+
+/* Центральная зона: навигация + соцсети вместе, по центру хедера */
+.header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+}
+
+/* Навигационное меню */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.header-nav a {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;               /* Montserrat Medium */
+  font-size: 18px;
+  color: var(--color-white);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-nav a:hover { opacity: 0.75; }
+
+/* Иконки соцсетей — 40×40, идут сразу после «Контакты» */
+.header-socials {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Правая часть хедера: сердце, корзина, аккаунт */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex-shrink: 0;
+}
+
+/* Общий стиль иконки — 40×40 */
+.header-icon {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  /* Замените содержимое на <img src="icon.png" width="40" height="40" /> */
+}
+
+/* SVG-иконки — белые */
+.header-icon svg {
+  width: 26px;
+  height: 26px;
+  fill: white;
+  stroke: white;
+}
+
+/* ========================
+   HERO SECTION
+   Полная ширина × 567px
+   ======================== */
+.hero-section {
+  position: relative;
+  margin-top: 100px;              /* Отступ под фиксированный хедер */
+  width: 100%;
+  height: 567px;
+  overflow: hidden;
+}
+
+/* Фоновое изображение Hero.
+   Замените div на <img> или задайте background-image:
+   background-image: url('hero.jpg'); background-size: cover; background-position: center; */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-color: #2a3a30;
+}
+
+/* Градиентный оверлей: чёрный сверху → #5B3E3E снизу, 66% */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.66) 0%,
+    rgba(91, 62, 62, 0.66) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 40px 120px 40px;
+}
+
+/* Главный заголовок — Montserrat Alternates SemiBold 48 */
+.hero-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 48px;
+  color: var(--color-white);
+  text-align: center;
+}
+
+/* Подзаголовок — Montserrat Alternates Regular 32 */
+.hero-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--color-white);
+  text-align: center;
+}
+
+/* Кнопка «Каталог» — 318×82, скругление 100, зелёный градиент */
+.hero-btn {
+  width: 180px;
+  height: 50px;
+  border-radius: 100px;
+  border: none;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--color-white);
+  cursor: pointer;
+  margin-top: 5px;
+  position: absolute; bottom: 80px
+}
+
+.hero-btn:hover { opacity: 0.9; }
+
+/* ========================
+   СЕКЦИЯ "ТОВАРЫ МЕСЯЦА"
+   Поток документа — всё выровнено по центру страницы
+   ======================== */
+.products-section {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 80px;              /* Небольшой отступ от Hero  */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Разделительная линия — ширина 727px, #5B3E3E, высота 5, скруглённые концы */
+.divider-line {
+  width: 727px;
+  max-width: 100%;
+  height: 5px;
+  background-color: #5B3E3E;
+  border-radius: 100px;
+  margin-bottom: 40px;
+}
+
+/* «Товары месяца» — Montserrat Alternates Regular 40, белый, по центру */
+.section-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* Подпись — Montserrat Regular 20, белый, по центру */
+.section-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* «марте» — зелёный SemiBold */
+.highlight-green {
+  color: #337B57;
+  font-weight: 600;
+}
+
+/* Ряд из трёх карточек — горизонтально, по центру */
+.cards-row {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ========================
+   КАРТОЧКА ТОВАРА
+   270×452, скругление 25, #5B3E3E
+   ======================== */
+
+.product-card {
+  width: 270px;
+  height: 452px;
+  background-color: var(--color-card);
+  border-radius: 25px;
+  overflow: visible;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Фото товара */
+.card-image {
+  width: 270px;
+  height: 264px;
+  border-radius: 25px 25px 0 0;
+  object-fit: cover;
+  display: block;
+  background-color: #3a2a2a;
+}
+
+/* Бейдж */
+.card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: rgba(9, 21, 15, 0.80);
+  border-radius: 43px;
+  padding: 8px 18px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--color-white);
+  white-space: nowrap;
+  z-index: 2;
+}
+
+/* Нижняя часть карточки */
+.card-body {
+  padding: 12px 14px 14px 14px;
+  height: 188px; /* 452 - 264 = 188 */
+  position: relative;
+}
+
+/* Название */
+.card-name {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+/* Описание */
+.card-desc {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--color-white);
+  text-align: left;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+/* Цена */
+.card-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-align: left;
+  position: absolute;
+  bottom: 90px; /* Над кнопкой */
+  left: 14px;
+}
+
+/* Кнопка — прижата к низу */
+.card-btn {
+  width: 140.31px;
+  height: 40.41px;
+  border-radius: 100px;
+  border: none;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  display: block;
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.card-btn:hover { opacity: 0.9; }
+
+
+/* ========================
+   БАННЕР "О НАС"
+   Скругление 30, #1F4D2E 40%, стекломорфизм, градиентная обводка
+   ======================== */
+.about-section {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+/* Обёртка создаёт градиентную обводку толщиной 5px */
+.about-banner-wrapper {
+  border-radius: 30px;
+  padding: 5px;
+  background: linear-gradient(
+    to right,
+    rgba(31, 77, 46, 0.4) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+/* Сам баннер — стекломорфизм */
+.about-banner {
+  border-radius: 26px;
+  background-color: rgba(31, 77, 46, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+}
+
+/* Левая часть баннера — текст и кнопки */
+.about-content {
+  flex: 1;
+  padding: 52px 48px 52px 87px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок баннера — Montserrat Alternates SemiBold 32 */
+.about-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: left;
+  margin-bottom: 32px;
+  max-width: 545px;
+}
+
+/* Текст баннера — Montserrat Medium 18, line-height 20px */
+.about-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-white);
+  text-align: left;
+  line-height: 20px;
+  max-width: 100%;
+  flex: 1;
+}
+
+.about-text p { margin-bottom: 18px; }
+.about-text p:last-child { margin-bottom: 0; }
+
+/* Кнопки стран — скругление 100, #5B3E3E */
+.country-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+}
+
+.country-btn {
+  height: 44px;
+  width: 125px;
+  padding: 0 24px;
+  border-radius: 100px;
+  border: none;
+  background-color: #5B3E3E;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+}
+
+.country-btn:hover { opacity: 0.85; }
+
+/* Правая часть баннера — изображение 496px, скруглены правые углы.
+   Замените div на <img src="about.jpg" class="about-image" alt="О нас"
+   style="object-fit:cover;border-radius:0 25px 25px 0;" /> */
+.about-image {
+  width: 45%;
+  flex-shrink: 0;
+  border-radius: 0 25px 25px 0;
+  background-color: #2a4a35;
+}
+/* ========================
+   СЕКЦИЯ "ПОЧЕМУ ВЫБИРАЮТ НАС"
+   ======================== */
+.why-us-section {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Ряд из трёх преимуществ — горизонтально, по центру */
+.features-row {
+  display: flex;
+  gap: 60px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+/* Один элемент преимущества */
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 320px;
+  flex-shrink: 0;
+}
+
+/* Иконка — 80×80 */
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  
+  margin-bottom: 30px;
+  flex-shrink: 0;
+  /* Замените на img */
+}
+
+/* Заголовок преимущества — Montserrat Medium 32 */
+.feature-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 30px;
+  height: 80px; /* Фиксированная высота для всех заголовков */
+  display: flex;
+  align-items: center; /* Выравнивание текста по центру вертикали */
+  justify-content: center;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+/* Для заголовков в две строки */
+.feature-name.two-lines {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Для заголовка в одну строку */
+.feature-name.one-line {
+  white-space: nowrap;
+}
+
+/* Прямоугольник с текстом — #5B3E3E, скругление 20, градиентная обводка */
+.feature-box {
+  width: 100%;
+  border-radius: 20px;
+  padding: 5px; /* Толщина обводки */
+  background: linear-gradient(
+    to right,
+    #5B3E3E 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  height: 140px; /* Фиксированная высота для всех прямоугольников */
+  flex-shrink: 0;
+}
+
+/* Внутренняя часть прямоугольника */
+.feature-box .feature-text {
+  background-color: #5B3E3E;
+  border-radius: 16px;
+  padding: 20px 16px;
+  margin: 0;
+  height: 100%; /* Занимает всю высоту родителя */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  text-align: center;
+  line-height: 1.5;
+  display: flex;
+  align-items: center; /* Выравнивание текста по центру вертикали */
+  justify-content: center;
+}
+/* ========================
+   ФУТЕР
+   Высота 560px, градиентная заливка сверху #5B3E3E → снизу #0D2719
+   ======================== */
+.footer {
+  width: 100%;                      /* Футер на всю ширину экрана */
+  background: linear-gradient(      /* Градиентный фон */
+    to bottom,
+    #5B3E3E 0%,                     /* Тёмно-красный сверху */
+    #0D2719 100%                    /* Тёмно-зелёный снизу */
+  );
+  margin-top: 80px;                 /* Отступ от предыдущей секции */
+}
+
+/* Внутренний контейнер футера — ограничивает ширину и центрирует содержимое */
+.footer-container {
+  max-width: 1440px;                /* Максимальная ширина контента */
+  margin: 0 auto;                   /* Центрирование по горизонтали */
+  padding: 50px var(--page-margin) 40px var(--page-margin); /* Внутренние отступы */
+  height: 560px;                    /* Фиксированная высота футера */
+  display: flex;
+  flex-direction: column;           /* Элементы идут сверху вниз */
+}
+
+/* ========================
+   ВЕРХНЯЯ ЧАСТЬ — ПОДПИСКА
+   ======================== */
+.footer-subscribe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;              /* Центрирование по горизонтали */
+  margin-bottom: 30px;              /* Отступ до разделительной линии */
+}
+
+/* Заголовок блока подписки */
+.subscribe-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;                 /* SemiBold */
+  font-size: 24px;
+  color: var(--color-white);
+  text-align: center;
+  line-height: 1.4;                 /* Межстрочный интервал */
+  margin-bottom: 24px;              /* Отступ до поля ввода */
+}
+
+/* Обёртка поля ввода и кнопки */
+.subscribe-input-wrapper {
+  display: flex;
+  align-items: center;              /* Вертикальное центрирование */
+  width: 440px;                     /* Фиксированная ширина */
+  height: 55px;                     /* Фиксированная высота */
+  background-color: rgba(255, 255, 255, 0.25); /* Белый с прозрачностью 25% */
+  border-radius: 30px;              /* Сильное скругление */
+  padding: 0 8px 0 20px;            /* Отступы: сверху 0, справа 8px, снизу 0, слева 20px */
+}
+
+/* Поле ввода email */
+.subscribe-input {
+  flex: 1;                          /* Занимает всё доступное пространство */
+  height: 100%;                     /* На всю высоту обёртки */
+  background: transparent;          /* Прозрачный фон */
+  border: none;                     /* Убираем рамку */
+  outline: none;                    /* Убираем обводку при фокусе */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;                 /* SemiBold */
+  font-size: 18px;
+  color: var(--color-white);
+  opacity: 0.8;                     /* Лёгкая прозрачность текста */
+}
+
+/* Текст-подсказка в поле ввода */
+.subscribe-input::placeholder {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;                 /* SemiBold */
+  font-size: 18px;
+  color: var(--color-white);
+  opacity: 0.8;                     /* Прозрачность 80% */
+}
+
+/* Кнопка отправки */
+.subscribe-btn {
+  width: 35px;                      /* Размер кнопки 40×40 */
+  height: 35px;
+  background: transparent;          /* Прозрачный фон */
+  border: none;                     /* Убираем рамку */
+  cursor: pointer;                  /* Курсор-указатель */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;                   /* Запрет сжатия */
+  transition: opacity 0.3s;         /* Плавное изменение прозрачности */
+}
+
+.subscribe-btn:hover {
+  opacity: 0.7;                     /* Затемнение при наведении */
+}
+
+/* Иконка кнопки отправки */
+.send-icon {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;              /* Сохранение пропорций */
+}
+
+/* Сообщение об ошибке валидации email */
+.email-error {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;                 /* Medium */
+  font-size: 14px;
+  color: #ff6b6b;                   /* Красный цвет ошибки */
+  margin-top: 8px;                  /* Отступ от поля ввода */
+  min-height: 20px;                 /* Минимальная высота (чтобы не прыгал контент) */
+  text-align: center;
+}
+
+/* ========================
+   РАЗДЕЛИТЕЛЬНАЯ ЛИНИЯ
+   ======================== */
+.footer-divider {
+  width: 100%;                      /* На всю ширину */
+  height: 2px;                      /* Толщина линии */
+  background-color: rgba(255, 255, 255, 0.2); /* Белый с прозрачностью 20% */
+  margin: 20px 0 30px 0;            /* Отступы сверху и снизу */
+}
+
+/* ========================
+   НИЖНЯЯ ЧАСТЬ — КОЛОНКИ
+   ======================== */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;   /* Равномерное распределение колонок */
+  gap: 40px;                        /* Расстояние между колонками */
+  flex: 1;                          /* Занимает оставшееся пространство */
+}
+
+/* Одна колонка футера */
+.footer-column {
+  display: flex;
+  flex-direction: column;           /* Элементы внутри колонки сверху вниз */
+}
+
+/* Заголовок колонки */
+.footer-column-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;                 /* SemiBold */
+  font-size: 20px;
+  color: var(--color-white);
+  text-align: left;                 /* Выравнивание по левому краю */
+  margin-bottom: 20px;              /* Отступ до списка */
+}
+.footer-column:last-child .footer-column-title:first-of-type {
+  margin-bottom: 15px;              /* Меньший отступ только для "Наши соцсети" */
+}
+
+
+/* Список пунктов в колонке */
+.footer-list {
+  list-style: none;                 /* Убираем маркеры списка */
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;                        /* Расстояние между пунктами */
+}
+.footer-column:first-child .footer-list {
+  gap: 15px;                         /* Меньше отступ между номерами и почтой */
+}
+/* Пункт списка */
+.footer-list-item {
+  display: flex;
+  align-items: left;              /* Вертикальное центрирование */
+  gap: 10px;                        /* Расстояние между иконкой и текстом */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;                 /* Medium */
+  font-size: 18px;
+  color: var(--color-white);
+  text-align: left;
+}
+
+/* Иконка в пункте списка (телефон, почта) */
+.footer-icon {
+  width: 29px;                      /* Размер иконки 29×29 */
+  height: 29px;
+  object-fit: contain;              /* Сохранение пропорций */
+  flex-shrink: 0;                   /* Запрет сжатия */
+  margin-left: -5px;                /* Сдвигает иконку влево */
+
+}
+
+/* Ссылка в колонке (Каталог, О нас) */
+.footer-link {
+  cursor: pointer;                  /* Курсор-указатель */
+  transition: opacity 0.3s;         /* Плавное изменение прозрачности */
+}
+
+.footer-link:hover {
+  opacity: 0.7;                     /* Затемнение при наведении */
+}
+
+/* ========================
+   СОЦСЕТИ В ФУТЕРЕ
+   ======================== */
+.footer-socials {
+  display: flex;
+  gap: 30px;                        /* Расстояние между иконками */
+  margin-bottom: 10px;              /* Отступ до блока оплаты */
+}
+
+/* Ссылка на соцсеть */
+.footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+
+.footer-social-link:hover {
+  opacity: 0.7;
+}
+
+/* Иконка соцсети */
+.footer-social-icon {
+  width: 35px;                      /* Размер иконки 35×35 */
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Заголовок "Способы оплаты" */
+.payment-title {
+  margin-top: 0px;                  /* Небольшой отступ сверху */
+  margin-bottom: 20px;              /* Отступ до иконок */
+}
+
+/* Контейнер с иконками оплаты */
+.footer-payments {
+  display: flex;
+  gap: 15px;                        /* Расстояние между иконками */
+  flex-wrap: wrap;                  /* Перенос на новую строку при нехватке места */
+}
+
+/* Иконка способа оплаты */
+.payment-icon {
+  width: 80px;                      /* Ширина 89px */
+  height: 39px;                     /* Высота 48px */
+  object-fit: contain;              /* Сохранение пропорций */
+  background-color: var(--color-white); /* Белый фон */
+  border-radius: 5px;               /* Скругление углов */
+  padding: 5px;                     /* Внутренний отступ */
+}
+
+/* ========================
+   СТРАНИЦА КАТАЛОГА — ОСНОВНЫЕ СТИЛИ
+   ======================== */
+
+/* Основной контейнер страницы каталога */
+.catalog-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 100px;                      /* Отступ под фиксированный хедер */
+  margin-bottom: 80px;                    /* Отступ снизу перед футером */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок страницы */
+.catalog-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;                       /* Regular */
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+
+/* ========================
+   ПОИСКОВАЯ СТРОКА
+   ======================== */
+.catalog-search-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  height: 55px;
+  background-color: var(--color-white);
+  border-radius: 100px;
+  padding: 0 24px;
+  margin: 0 auto 30px auto;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-right: 12px;
+  opacity: 0.5;
+}
+
+.catalog-search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #333;
+}
+
+.catalog-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* ========================
+   ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ КАТЕГОРИЙ
+   ======================== */
+.categories-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-green) transparent;
+}
+
+.categories-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categories-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-accent-green);
+  border-radius: 4px;
+}
+
+.category-chip {
+  padding: 10px 20px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.category-chip:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.category-chip.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+}
+
+/* ========================
+   ДВУХКОЛОНОЧНЫЙ МАКЕТ: САЙДБАР + ТОВАРЫ
+   ======================== */
+.catalog-layout {
+  display: flex;
+  gap: 30px;
+}
+
+/* ========================
+   САЙДБАР С ФИЛЬТРАМИ (280px)
+   ======================== */
+.catalog-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: rgba(9, 21, 15, 0.6);
+  border-radius: 20px;
+  padding: 24px 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 120px;
+}
+
+/* Заголовок сайдбара */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sidebar-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-white);
+}
+
+.reset-filters-btn {
+  background: transparent;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.reset-filters-btn:hover {
+  color: var(--color-white);
+}
+
+/* ========================
+   ТУМБЛЕР "ТОЛЬКО В НАЛИЧИИ"
+   ======================== */
+.filter-availability {
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.switch-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+.availability-icon {
+  font-size: 14px;
+}
+
+.switch-toggle {
+  position: relative;
+  width: 48px;
+  height: 24px;
+}
+
+.switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  transition: background-color 0.3s;
+}
+
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--color-white);
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.switch-input:checked + .switch-slider {
+  background-color: var(--color-accent-green);
+}
+
+.switch-input:checked + .switch-slider::before {
+  transform: translateX(24px);
+}
+
+/* ========================
+   ГРУППА ФИЛЬТРОВ
+   ======================== */
+.filter-group {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-group:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-group-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  margin-bottom: 16px;
+}
+
+/* ========================
+   ФИЛЬТР ПО ЦЕНЕ (ПОЛЗУНОК)
+   ======================== */
+.price-slider-container {
+  padding: 0 2px;
+}
+
+.price-slider {
+  position: relative;
+  height: 4px;
+  margin: 20px 0 25px 0;
+}
+
+.slider-track {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.slider-fill {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-accent-green), #5B3E3E);
+  border-radius: 4px;
+}
+
+.slider-input {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: none;
+}
+
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-accent-green);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.slider-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-accent-green);
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Поля ввода цены */
+.price-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.price-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.price-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-right: 8px;
+}
+
+.price-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-white);
+  min-width: 0;
+}
+
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.price-input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ========================
+   ЧЕКБОКСЫ И СПИСКИ
+   ======================== */
+.filter-subheader {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-accent-green);
+  margin-bottom: 10px;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-white);
+  font-size: 12px;
+}
+
+.checkbox-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-white);
+}
+
+.country-flag {
+  font-size: 16px;
+  width: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+/* Раскрывающийся список "Другие страны" */
+.filter-details {
+  margin-top: 12px;
+}
+
+.filter-summary {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-summary::before {
+  content: '▶';
+  font-size: 10px;
+  transition: transform 0.3s;
+}
+
+.filter-details[open] .filter-summary::before {
+  transform: rotate(90deg);
+}
+
+.filter-details .checkbox-list {
+  margin-top: 12px;
+  margin-left: 10px;
+}
+
+/* ========================
+   ПРАВАЯ КОЛОНКА — ТОВАРЫ
+   ======================== */
+.catalog-products {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Панель управления товарами */
+.products-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.products-count {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.products-count span {
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.products-sort {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sort-select {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 32px 8px 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--color-white);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.sort-select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+}
+
+/* Переключатель вида (сетка/список) */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.view-btn.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: var(--color-white);
+}
+
+/* ========================
+   СЕТКА ТОВАРОВ
+   ======================== */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+/* Карточка товара в каталоге (адаптирована под сетку) */
+.catalog-product-card {
+  width: 100%;
+  height: auto;
+  min-height: 452px;
+}
+
+.catalog-product-card .card-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 270 / 264;
+}
+
+/* ========================
+   КНОПКА "ПОКАЗАТЬ ЕЩЁ"
+   ======================== */
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.load-more-btn {
+  padding: 14px 40px;
+  background-color: transparent;
+  border: 1px solid var(--color-accent-green);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.load-more-btn:hover {
+  background-color: var(--color-accent-green);
+}
+
+/* ========================
+   АДАПТИВНОСТЬ КАТАЛОГА
+   ======================== */
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .catalog-layout {
+    flex-direction: column;
+  }
+  
+  .catalog-sidebar {
+    width: 100%;
+    position: static;
+  }
+  
+  .products-controls {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .products-count {
+    order: 1;
+  }
+  
+  .view-toggle {
+    order: 2;
+  }
+  
+  .products-sort {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .sort-select {
+    flex: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .catalog-page-title {
+    font-size: 32px;
+  }
+  
+  .price-inputs {
+    flex-direction: column;
+  }
+}
+
+
+/* ========================
+   АДАПТИВНОСТЬ ФУТЕРА
+   ======================== */
+
+/* Планшеты (до 1200px) */
+@media (max-width: 1200px) {
+  .footer-bottom {
+    gap: 20px;                      /* Уменьшаем расстояние между колонками */
+  }
+  
+  .footer-list-item {
+    font-size: 16px;                /* Уменьшаем размер шрифта */
+  }
+}
+
+/* Средние экраны (до 1000px) */
+@media (max-width: 1000px) {
+  .footer-container {
+    height: auto;                   /* Убираем фиксированную высоту */
+    min-height: 560px;              /* Минимальная высота */
+  }
+  
+  .footer-bottom {
+    flex-wrap: wrap;                /* Разрешаем перенос колонок */
+  }
+  
+  .footer-column {
+    min-width: 200px;               /* Минимальная ширина колонки */
+  }
+}
+
+/* Мобильные устройства (до 700px) */
+@media (max-width: 700px) {
+  .subscribe-input-wrapper {
+    width: 100%;                    /* Поле ввода на всю ширину */
+    max-width: 440px;               /* Но не шире 440px */
+  }
+  
+  .footer-bottom {
+    flex-direction: column;         /* Колонки друг под другом */
+    gap: 30px;
+  }
+  
+  .footer-column {
+    width: 100%;                    /* Колонка на всю ширину */
+  }
+}
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .features-row {
+    gap: 30px;
+  }
+  
+  .feature-name {
+    font-size: 28px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .feature-item {
+    width: 280px;
+  }
+  
+  .feature-name {
+    font-size: 24px;
+    height: 60px;
+  }
+  
+  .feature-box {
+    height: 160px;
+  }
+}
+
+@media (max-width: 900px) {
+  .features-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+  
+  .feature-item {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .feature-box {
+    height: auto;
+    min-height: 120px;
+  }
+}
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+@media (max-width: 1300px) {
+  :root { --page-margin: 40px; }
+  .header-center { gap: 20px; }
+  .header-nav { gap: 24px; }
+  .header-nav a { font-size: 15px; }
+  .about-image { width: 360px; }
+}
+
+@media (max-width: 1000px) {
+  :root { --page-margin: 20px; }
+  .header-nav { gap: 16px; }
+  .header-nav a { font-size: 13px; }
+  .hero-title { font-size: 36px; }
+  .hero-subtitle { font-size: 22px; }
+  .hero-btn { width: 240px; height: 64px; font-size: 22px; }
+  .divider-line { width: 90%; }
+  .about-banner { flex-direction: column; }
+  .about-image { width: 100%; height: 280px; border-radius: 0 0 25px 25px; }
+  .about-content { padding: 40px 32px; }
+}
+
+@media (max-width: 700px) {
+  header { gap: 10px; }
+  .header-socials { display: none; }
+  .header-nav a { font-size: 12px; }
+  .hero-title { font-size: 26px; }
+  .hero-subtitle { font-size: 18px; }
+  .cards-row { gap: 20px; }
+}

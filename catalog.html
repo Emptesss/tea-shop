@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forest Tea — интернет-магазин чая</title>
+
+  <!-- Шрифты Montserrat и Montserrat Alternates -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Подключаем внешний CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========================
+       ХЕДЕР
+       Высота 100px, фон #09150F, фиксированный
+       [Лого] [Навигация + Соцсети по центру] [Действия справа]
+       ======================== -->
+  <header>
+
+    <!-- Логотип — круг 64×64. Замените на <img src="logo.png" width="64" height="64" /> -->
+    <div class="header-logo"></div>
+
+    <!-- Центральная зона: навигация + иконки соцсетей сразу после «Контакты» -->
+    <div class="header-center">
+
+      <!-- Навигация — Montserrat Medium 18, белый -->
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+
+      <!-- Соцсети 40×40 — вплотную правее пункта «Контакты»
+           Замените SVG на <img src="telegram.png" width="40" height="40" alt="Telegram" /> -->
+      <div class="header-socials">
+
+        <!-- Телеграм -->
+        <div class="header-icon" title="Telegram">
+          <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
+        </div>
+
+        <!-- YouTube -->
+        <div class="header-icon" title="YouTube">
+          <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
+        </div>
+
+        <!-- inst -->
+        <div class="header-icon" title="Instagram">
+          <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Правые иконки: сердце, корзина, аккаунт (40×40, белые)
+         Замените SVG на <img src="..." width="40" height="40" /> -->
+    <div class="header-actions">
+
+      <!-- Избранное (сердце) -->
+      <div class="header-icon" title="Избранное">
+        <img src="pictures/love.png" width="35" height="35" alt="Добавить в избранное" />
+      </div>
+
+      <!-- Корзина -->
+      <div class="header-icon" title="Корзина">
+        <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+      </div>
+
+      <!-- Аккаунт -->
+      <div class="header-icon" title="Аккаунт">
+        <img src="pictures/profile.png" width="35" height="35" alt="Telegram" />
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- ========================
+       ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ КАТАЛОГА
+       ======================== -->
+  <main class="catalog-main">
+    
+    <!-- Заголовок страницы -->
+    <h1 class="catalog-page-title">Каталог чая</h1>
+
+    <!-- Поисковая строка с подсказками -->
+    <div class="catalog-search-wrapper">
+      <img src="pictures/search.png" alt="Поиск" class="search-icon">
+      <input type="text" class="catalog-search-input" placeholder="Поиск по каталогу...">
+    </div>
+
+    <!-- Горизонтальный скролл категорий -->
+    <div class="categories-scroll">
+      <button class="category-chip active">Все</button>
+      <button class="category-chip">Зелёный чай</button>
+      <button class="category-chip">Чёрный чай</button>
+      <button class="category-chip">Травяной чай</button>
+      <button class="category-chip">Улун</button>
+      <button class="category-chip">Пуэр</button>
+      <button class="category-chip">Белый чай</button>
+      <button class="category-chip">Матча</button>
+      <button class="category-chip">Наборы</button>
+    </div>
+
+    <!-- Двухколоночный контейнер: сайдбар слева + товары справа -->
+    <div class="catalog-layout">
+      
+      <!-- ========================
+           САЙДБАР С ФИЛЬТРАМИ (280px)
+           ======================== -->
+      <aside class="catalog-sidebar">
+        
+        <!-- Заголовок сайдбара с кнопкой сброса -->
+        <div class="sidebar-header">
+          <h3 class="sidebar-title">Фильтры</h3>
+          <button class="reset-filters-btn">Сбросить</button>
+        </div>
+
+        <!-- Тумблер "Только в наличии" -->
+        <div class="filter-group filter-availability">
+          <label class="switch-label">
+            <span class="switch-text">
+              <span class="availability-icon">🟢</span>
+              Только в наличии
+            </span>
+            <div class="switch-toggle">
+              <input type="checkbox" class="switch-input" id="inStockToggle">
+              <span class="switch-slider"></span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Фильтр по цене с ползунком -->
+        <div class="filter-group">
+          <h4 class="filter-group-title">Цена, ₽</h4>
+          <div class="price-slider-container">
+            <!-- Ползунок (визуальная часть) -->
+            <div class="price-slider">
+              <div class="slider-track"></div>
+              <div class="slider-fill" style="left: 0%; right: 0%;"></div>
+              <input type="range" class="slider-input slider-min" min="300" max="15000" value="300" step="100">
+              <input type="range" class="slider-input slider-max" min="300" max="15000" value="15000" step="100">
+            </div>
+            <!-- Поля ввода "От" и "До" -->
+            <div class="price-inputs">
+              <div class="price-input-wrapper">
+                <span class="price-label">От</span>
+                <input type="number" class="price-input price-min-input" value="300" min="300" max="15000" step="100">
+              </div>
+              <div class="price-input-wrapper">
+                <span class="price-label">До</span>
+                <input type="number" class="price-input price-max-input" value="15000" min="300" max="15000" step="100">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Фильтр по стране с флагами -->
+        <div class="filter-group">
+          <h4 class="filter-group-title">Страна</h4>
+          <!-- Топ-производители -->
+          <div class="filter-subheader">Топ-производители</div>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="china">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text"><span class="country-flag">🇨🇳</span> Китай</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="japan">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text"><span class="country-flag">🇯🇵</span> Япония</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="india">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text"><span class="country-flag">🇮🇳</span> Индия</span>
+            </label>
+          </div>
+          <!-- Остальные страны (раскрывающийся список) -->
+          <details class="filter-details">
+            <summary class="filter-summary">Другие страны</summary>
+            <div class="checkbox-list">
+              <label class="checkbox-item">
+                <input type="checkbox" class="checkbox-input" value="taiwan">
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text"><span class="country-flag">🇹🇼</span> Тайвань</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="checkbox-input" value="kenya">
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text"><span class="country-flag">🇰🇪</span> Кения</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="checkbox-input" value="sri-lanka">
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text"><span class="country-flag">🇱🇰</span> Шри-Ланка</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" class="checkbox-input" value="vietnam">
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text"><span class="country-flag">🇻🇳</span> Вьетнам</span>
+              </label>
+            </div>
+          </details>
+        </div>
+
+        <!-- Фильтр по вкусу -->
+        <div class="filter-group">
+          <h4 class="filter-group-title">Вкус</h4>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="floral">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">🌸 Цветочный</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="fruity">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">🍑 Фруктовый</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="earthy">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">🌲 Землистый</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="nutty">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">🥜 Ореховый</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="creamy">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">🥛 Сливочный</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Фильтр по году сбора -->
+        <div class="filter-group">
+          <h4 class="filter-group-title">Год сбора</h4>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="2024">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">2026 (свежий)</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="2023">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">2025</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="2022">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">2024</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" class="checkbox-input" value="older">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">Выдержанный (старше)</span>
+            </label>
+          </div>
+        </div>
+
+      </aside><!-- /catalog-sidebar -->
+
+      <!-- ========================
+           ПРАВАЯ КОЛОНКА — ТОВАРЫ
+           ======================== -->
+      <div class="catalog-products">
+        
+        <!-- Панель управления: сортировка и переключение вида -->
+        <div class="products-controls">
+          <div class="products-count">
+            Найдено <span id="productsCount">24</span> товара
+          </div>
+          <div class="products-sort">
+            <label class="sort-label">Сортировка:</label>
+            <select class="sort-select">
+              <option value="popular">По популярности</option>
+              <option value="price-asc">По цене (возрастание)</option>
+              <option value="price-desc">По цене (убывание)</option>
+              <option value="new">Новинки</option>
+            </select>
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="grid" title="Сетка">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect x="2" y="2" width="7" height="7" rx="2"/>
+                <rect x="11" y="2" width="7" height="7" rx="2"/>
+                <rect x="2" y="11" width="7" height="7" rx="2"/>
+                <rect x="11" y="11" width="7" height="7" rx="2"/>
+              </svg>
+            </button>
+            <button class="view-btn" data-view="list" title="Список">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <rect x="2" y="3" width="16" height="3" rx="1.5"/>
+                <rect x="2" y="8" width="16" height="3" rx="1.5"/>
+                <rect x="2" y="13" width="16" height="3" rx="1.5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Сетка товаров (3 колонки) -->
+        <div class="products-grid" id="productsGrid">
+          
+          <!-- Карточка товара 1 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea1.jpg" alt="Горная матча" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">156</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Горная матча</div>
+              <div class="card-desc">Премиальный порошковый чай высшего качества из Японии</div>
+              <div class="card-price">1 250 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+          <!-- Карточка товара 2 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea2.jpg" alt="Молочный улун" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">89</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Молочный улун</div>
+              <div class="card-desc">Нежный чай с карамельным ароматом из Тайваня</div>
+              <div class="card-price">890 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+          <!-- Карточка товара 3 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea3.jpg" alt="Выдержанный пуэр" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">67</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Выдержанный пуэр</div>
+              <div class="card-desc">Глубокий землистый вкус с древесными нотами, Китай</div>
+              <div class="card-price">3 200 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+          <!-- Карточка товара 4 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea4.jpg" alt="Сенча" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">234</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Сенча</div>
+              <div class="card-desc">Классический японский зелёный чай с травянистым вкусом</div>
+              <div class="card-price">780 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+          <!-- Карточка товара 5 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea5.jpg" alt="Дарджилинг" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">112</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Дарджилинг</div>
+              <div class="card-desc">Чёрный чай с мускатным оттенком из Индии</div>
+              <div class="card-price">950 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+          <!-- Карточка товара 6 -->
+          <div class="product-card catalog-product-card">
+            <img src="pictures/products/tea6.jpg" alt="Белый пион" class="card-image">
+            <div class="card-badge">Купили <span class="purchase-count">45</span> раз</div>
+            <div class="card-body">
+              <div class="card-name">Белый пион</div>
+              <div class="card-desc">Нежный белый чай с цветочным ароматом из Китая</div>
+              <div class="card-price">1 490 Br</div>
+              <button class="card-btn add-to-cart-btn">В корзину</button>
+            </div>
+          </div>
+
+        </div><!-- /products-grid -->
+
+        <!-- Кнопка "Показать ещё" -->
+        <div class="load-more-wrapper">
+          <button class="load-more-btn">Показать ещё</button>
+        </div>
+
+      </div><!-- /catalog-products -->
+      
+    </div><!-- /catalog-layout -->
+
+  </main>
+  <!-- ========================
+     ФУТЕР
+     Высота 560px, градиентная заливка
+     ======================== -->
+<footer class="footer">
+  <div class="footer-container">
+
+    <!-- Верхняя часть с подпиской -->
+    <div class="footer-subscribe">
+      <div class="subscribe-title">
+        Подпишитесь на наши обновления<br>
+        и получайте советы и акции первыми
+      </div>
+      
+      <!-- Блок с полем ввода и кнопкой -->
+      <div class="subscribe-input-wrapper">
+        <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+        <button type="button" id="subscribe-btn" class="subscribe-btn">
+          <!-- Иконка кнопки отправить — вставьте свою -->
+          <img src="pictures/send.png" alt="Отправить" class="send-icon">
+        </button>
+      </div>
+      <div id="email-error" class="email-error"></div>
+    </div>
+
+    <!-- Разделительная линия -->
+    <div class="footer-divider"></div>
+
+    <!-- Нижняя часть с колонками -->
+    <div class="footer-bottom">
+      
+      <!-- Колонка 1 — Контакты -->
+      <div class="footer-column">
+        <h4 class="footer-column-title">Контакты</h4>
+        <ul class="footer-list">
+          <li class="footer-list-item">
+            <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+            <span>+375 (29) 123-45-67</span>
+          </li>
+          <li class="footer-list-item">
+            <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+            <span>+375 (33) 765-43-21</span>
+          </li>
+          <li class="footer-list-item">
+            <img src="pictures/email.png" alt="Почта" class="footer-icon">
+            <span>info@foresttea.by</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Колонка 2 — Каталог -->
+      <div class="footer-column">
+        <h4 class="footer-column-title">Каталог</h4>
+        <ul class="footer-list">
+          <li class="footer-list-item footer-link">Зелёный чай</li>
+          <li class="footer-list-item footer-link">Чёрный чай</li>
+          <li class="footer-list-item footer-link">Травяной чай</li>
+          <li class="footer-list-item footer-link">Акции</li>
+        </ul>
+      </div>
+
+      <!-- Колонка 3 — О нас -->
+      <div class="footer-column">
+        <h4 class="footer-column-title">О нас</h4>
+        <ul class="footer-list">
+          <li class="footer-list-item footer-link">Консультации</li>
+          <li class="footer-list-item footer-link">Оплата и доставка</li>
+          <li class="footer-list-item footer-link">FAQ</li>
+          <li class="footer-list-item footer-link">Чайный блог</li>
+        </ul>
+      </div>
+
+      <!-- Колонка 4 — Наши соцсети и способы оплаты -->
+      <div class="footer-column">
+        <h4 class="footer-column-title">Наши соцсети</h4>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link">
+            <img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon">
+          </a>
+          <a href="#" class="footer-social-link">
+            <img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon">
+          </a>
+          <a href="#" class="footer-social-link">
+            <img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon">
+          </a>
+        </div>
+        
+        <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+        <div class="footer-payments">
+          <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+          <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+          <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+        </div>
+      </div>
+
+    </div><!-- /footer-bottom -->
+
+  </div><!-- /footer-container -->
+</footer>
+
+
+  <!-- Подключаем внешний JavaScript -->
+  <script src="script.js"></script>
+
+</body>
+</html>
