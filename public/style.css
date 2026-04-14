@@ -812,25 +812,24 @@ header {
 .catalog-main {
   width: 100%;
   padding: 0 var(--page-margin);
-  margin-top: 100px;
-  margin-bottom: 100px;                        /* Убрали нижний отступ */
+  margin-top: 100px;           /* под хедер */
+  margin-bottom: 40px;         /* отступ перед футером */
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);             /* Фиксированная высота */
-  overflow: hidden;                        /* Запрещаем скролл */
 }
 
 /* Заголовок страницы */
 .catalog-page-title {
   font-family: 'Montserrat Alternates', sans-serif;
-  font-weight: 400;                       /* Regular */
+  font-weight: 400;
   font-size: 40px;
   color: var(--color-white);
   text-align: center;
   margin-top: 40px;
   margin-bottom: 30px;
-   flex-shrink: 0;  
+  flex-shrink: 0;  
 }
+
 
 /* ========================
    ПОИСКОВАЯ СТРОКА
@@ -845,11 +844,11 @@ header {
   border-radius: 100px;
   padding: 0 24px;
   margin: 0 auto 30px auto;
-   flex-shrink: 0;          
+  flex-shrink: 0;          
 }
 
 .search-icon {
-  width:30px;
+  width: 30px;
   height: 30px;
   object-fit: contain;
   flex-shrink: 0;
@@ -884,7 +883,19 @@ header {
   margin-bottom: 30px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent-green) transparent;
-   flex-shrink: 0;          
+  flex-shrink: 0;
+
+  /* Липкие категории под хедером */
+  position: sticky;
+  top: 100px;
+  z-index: 100;
+  background-color: var(--color-bg);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin-left: calc(-1 * var(--page-margin));
+  margin-right: calc(-1 * var(--page-margin));
+  padding-left: var(--page-margin);
+  padding-right: var(--page-margin);
 }
 
 .categories-scroll::-webkit-scrollbar {
@@ -925,10 +936,9 @@ header {
    ======================== */
 .catalog-layout {
   display: flex;
-  gap: 30px;
-  flex: 1;                                /* Занимает всё оставшееся пространство */
-  min-height: 0;                          /* Важно для flex-скролла */
-  overflow: hidden;                       /* Запрещаем скролл */
+  gap: 40px;
+  align-items: flex-start;
+  /* НЕ overflow:hidden — иначе sticky не работает */
 }
 
 /* ========================
@@ -943,11 +953,28 @@ header {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  height: fit-content;
+
+  /* Sticky: прилипает к верху при скролле */
   position: sticky;
-  top: 120px;
-  overflow-y: visible;  /* ← ДОБАВИТЬ эту строку */
-  max-height: none;     /* ← ДОБАВИТЬ эту строку */
+  top: 170px;                  /* 100px хедер + ~58px категории + 12px отступ */
+  max-height: calc(100vh - 186px);
+  overflow-y: auto;
+  /* ВАЖНО: родители НЕ должны иметь overflow: hidden */
+}
+
+/* Стилизация скроллбара сайдбара */
+.catalog-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.catalog-sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.catalog-sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-accent-green);
+  border-radius: 4px;
 }
 
 /* Заголовок сайдбара */
@@ -1293,32 +1320,32 @@ header {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;                       /* ← ВОТ ГДЕ ПРОКРУТКА! */
-  overflow-x: hidden;
-  padding-right: 5px;
-  
-  /* Стилизация скроллбара */
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-accent-green) rgba(255, 255, 255, 0.1);
+  /* убираем overflow, height, padding */
 }
 
-/* Стилизация скроллбара для Webkit */
+/* Стилизация скроллбара для Webkit (Chrome, Edge, Safari) */
+/* Стилизация скроллбара для Webkit (Chrome, Edge, Safari) */
 .catalog-products::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;                    /* Делаем пошире */
 }
 
 .catalog-products::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  margin: 10px 0;                 /* Отступ сверху и снизу */
 }
 
 .catalog-products::-webkit-scrollbar-thumb {
   background: var(--color-accent-green);
-  border-radius: 6px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;    /* Чтобы бордер не сжимал скроллбар */
 }
 
 .catalog-products::-webkit-scrollbar-thumb:hover {
   background: #5B3E3E;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 /* Панель управления товарами */
@@ -1327,15 +1354,10 @@ header {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
-  padding-bottom: 16px;
+  padding: 8px 0 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;                         /* Не сжимается */
-  position: sticky;
-  top: 0;
-  background-color: var(--color-bg);      /* Фон чтобы не просвечивало */
-  z-index: 5;
+  /* убираем position: sticky и top */
 }
-
 .products-count {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
@@ -1420,22 +1442,11 @@ header {
 .products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 30px 24px;               /* Отступы между карточками */
   margin-bottom: 40px;
-  flex-shrink: 0;                         /* ← Добавить */
-}
-
-/* Карточка товара в каталоге (адаптирована под сетку) */
-.catalog-product-card {
+  padding: 4px;                 /* Чтобы тени и бейджи не обрезались */
   width: 100%;
-  height: auto;
-  min-height: 452px;
-}
-
-.catalog-product-card .card-image {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 270 / 264;
+  justify-items: center;        /* Центрируем карточки в ячейках */
 }
 
 /* ========================
@@ -1445,7 +1456,8 @@ header {
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  flex-shrink: 0;                         /* ← Добавить */
+  margin-bottom: 20px;             /* Добавляем отступ снизу */
+  flex-shrink: 0;
 }
 
 .load-more-btn {
@@ -1646,4 +1658,223 @@ header {
   .hero-title { font-size: 26px; }
   .hero-subtitle { font-size: 18px; }
   .cards-row { gap: 20px; }
+}
+.header-search {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  border-radius: 40px;
+  padding: 0 16px;
+  height: 44px;
+  width: 320px;
+  flex-shrink: 0;
+}
+.header-search-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  margin-right: 8px;
+}
+.header-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 15px;
+  width: 100%;
+}
+.header-search-input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+/* ========================
+   ИСПРАВЛЕНИЯ ДЛЯ КАТАЛОГА (версия 2)
+   ======================== */
+
+/* ========================
+   ИСПРАВЛЕНИЯ ДЛЯ КАТАЛОГА (версия 3 – фиксированный сайдбар)
+   ======================== */
+
+/* 1. Категории внутри правой колонки — убираем sticky */
+.catalog-products .categories-scroll {
+  position: static;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 24px;
+  background-color: transparent;
+  z-index: auto;
+  width: 100%;
+}
+
+/* 2. Контейнер для сайдбара — relative, чтобы absolute работал */
+.catalog-layout {
+  position: relative;
+}
+
+/* 3. Сайдбар — управляется JS, по умолчанию absolute */
+.catalog-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  flex-shrink: 0;
+  background-color: rgba(9, 21, 15, 0.6);
+  border-radius: 20px;
+  padding: 24px 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+  transition: none;
+  will-change: top, left;
+  overflow-y: auto;
+}
+
+/* Состояния, добавляемые через JS */
+.catalog-sidebar.sidebar-fixed {
+  position: fixed;
+  top: 120px; /* будет переопределено JS */
+  left: auto;
+  right: auto;
+}
+
+.catalog-sidebar.sidebar-top {
+  position: absolute;
+  top: 0;
+  bottom: auto;
+}
+
+.catalog-sidebar.sidebar-bottom {
+  position: absolute;
+  bottom: 0;
+  top: auto;
+}
+
+
+/* 4. Освобождаем место под сайдбар в правой колонке */
+.catalog-products {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-right: 0;
+  margin-left: 320px; /* 280px + 40px gap */
+}
+
+/* 5. Карточки товаров — адаптивная ширина */
+.products-grid {
+  gap: 20px;
+  justify-items: stretch;
+}
+
+.product-card.catalog-product-card {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.product-card.catalog-product-card .card-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 270 / 264;
+  object-fit: cover;
+}
+
+.product-card.catalog-product-card .card-body {
+  height: auto;
+  min-height: 160px;
+  padding-bottom: 70px;
+  position: relative;
+}
+
+.product-card.catalog-product-card .card-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+}
+
+.product-card.catalog-product-card .card-price {
+  position: absolute;
+  bottom: 70px;
+  left: 14px;
+}
+
+/* 6. Режим списка */
+.products-grid.list-view {
+  grid-template-columns: 1fr !important;
+}
+
+.products-grid.list-view .product-card.catalog-product-card {
+  display: flex;
+  flex-direction: row;
+  height: auto;
+}
+
+.products-grid.list-view .catalog-product-card .card-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 25px 0 0 25px;
+}
+
+.products-grid.list-view .catalog-product-card .card-body {
+  flex: 1;
+  padding: 20px;
+  min-height: auto;
+}
+/* ========================
+   УВЕЛИЧЕНИЕ ТЕКСТА И УМЕНЬШЕНИЕ КАРТИНОК В КАТАЛОГЕ
+   ======================== */
+
+/* Уменьшаем высоту картинки, сохраняя пропорции */
+.product-card.catalog-product-card .card-image {
+  aspect-ratio: 270 / 200 !important; /* было 270/264 */
+}
+
+/* Увеличиваем название товара */
+.product-card.catalog-product-card .card-name {
+  font-size: 18px !important;      /* было 16px */
+  margin-bottom: 8px !important;
+}
+
+/* Увеличиваем описание */
+.product-card.catalog-product-card .card-desc {
+  font-size: 13px !important;      /* было 11px */
+  line-height: 1.5 !important;
+}
+
+/* Цену тоже можно сделать чуть заметнее */
+.product-card.catalog-product-card .card-price {
+  font-size: 18px !important;      /* было 16px */
+}
+
+/* Подгоняем внутренние отступы, чтобы всё помещалось */
+.product-card.catalog-product-card .card-body {
+  min-height: 150px !important;
+  padding: 14px 14px 70px 14px !important;
+}
+
+/* Кнопку оставляем без изменений, но можно подвинуть */
+.product-card.catalog-product-card .card-btn {
+  bottom: 20px !important;
+}
+.products-grid.list-view .catalog-product-card .card-btn {
+  position: static;
+  margin-top: 20px;
+  transform: none;
+}
+
+/* 7. Адаптивность */
+@media (max-width: 900px) {
+  .catalog-sidebar {
+    position: static !important;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+  .catalog-products {
+    margin-left: 0;
+  }
 }

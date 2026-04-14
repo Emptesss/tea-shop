@@ -59,6 +59,12 @@
       </div>
     </div>
 
+    <!-- Поиск в хедере -->
+    <div class="header-search">
+      <img src="pictures/search.png" alt="Поиск" class="header-search-icon">
+      <input type="text" class="header-search-input" placeholder="Поиск по каталогу...">
+    </div>
+
     <!-- Правые иконки: сердце, корзина, аккаунт (40×40, белые)
          Замените SVG на <img src="..." width="40" height="40" /> -->
     <div class="header-actions">
@@ -90,24 +96,6 @@
     <!-- Заголовок страницы -->
     <h1 class="catalog-page-title">Каталог чая</h1>
 
-    <!-- Поисковая строка с подсказками -->
-    <div class="catalog-search-wrapper">
-      <img src="pictures/search.png" alt="Поиск" class="search-icon">
-      <input type="text" class="catalog-search-input" placeholder="Поиск по каталогу...">
-    </div>
-
-    <!-- Горизонтальный скролл категорий -->
-    <div class="categories-scroll">
-      <button class="category-chip active">Все</button>
-      <button class="category-chip">Зелёный чай</button>
-      <button class="category-chip">Чёрный чай</button>
-      <button class="category-chip">Травяной чай</button>
-      <button class="category-chip">Улун</button>
-      <button class="category-chip">Пуэр</button>
-      <button class="category-chip">Белый чай</button>
-      <button class="category-chip">Матча</button>
-      <button class="category-chip">Наборы</button>
-    </div>
 
     <!-- Двухколоночный контейнер: сайдбар слева + товары справа -->
     <div class="catalog-layout">
@@ -305,7 +293,17 @@
             </button>
           </div>
         </div>
-
+        <div class="categories-scroll">
+          <button class="category-chip active">Все</button>
+          <button class="category-chip">Зелёный чай</button>
+          <button class="category-chip">Чёрный чай</button>
+          <button class="category-chip">Травяной чай</button>
+          <button class="category-chip">Улун</button>
+          <button class="category-chip">Пуэр</button>
+          <button class="category-chip">Белый чай</button>
+          <button class="category-chip">Матча</button>
+          <button class="category-chip">Наборы</button>
+        </div>
         <!-- Сетка товаров (3 колонки) -->
         <div class="products-grid" id="productsGrid">
           
@@ -316,8 +314,7 @@
             <div class="card-body">
               <div class="card-name">Горная матча</div>
               <div class="card-desc">Премиальный порошковый чай высшего качества</div>
-              <div class="card-price">32 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">32 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -328,8 +325,7 @@
             <div class="card-body">
               <div class="card-name">Молочный улун</div>
               <div class="card-desc">Нежный чай с карамельным ароматом</div>
-              <div class="card-price">42 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">42 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -340,8 +336,7 @@
             <div class="card-body">
               <div class="card-name">Выдержанный пуэр</div>
               <div class="card-desc">Глубокий землистый вкус с древесными нотами</div>
-              <div class="card-price">56 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">56 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -352,8 +347,7 @@
             <div class="card-body">
               <div class="card-name">Сенча</div>
               <div class="card-desc">Классический японский зелёный чай с травянистым вкусом</div>
-              <div class="card-price">20 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">20 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -364,8 +358,7 @@
             <div class="card-body">
               <div class="card-name">Дарджилинг</div>
               <div class="card-desc">Чёрный чай с мускатным оттенком</div>
-              <div class="card-price">28 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">28 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -376,8 +369,7 @@
             <div class="card-body">
               <div class="card-name">Белый пион</div>
               <div class="card-desc">Нежный белый чай с цветочным ароматом</div>
-              <div class="card-price">1 490 Br</div>
-              <button class="card-btn add-to-cart-btn">В корзину</button>
+              <div class="card-footer"><div class="card-price">1 490 Br</div><button class="card-btn add-to-cart-btn">В корзину</button></div>
             </div>
           </div>
 
@@ -438,7 +430,7 @@
           </li>
           <li class="footer-list-item">
             <img src="pictures/email.png" alt="Почта" class="footer-icon">
-            <span>info.foresttea@gmail.com</span>
+            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e474048410048415c4b5d5a5a4b4f6e49434f4742004d4143">[email&#160;protected]</a></span>
           </li>
         </ul>
       </div>
@@ -491,11 +483,4 @@
     </div><!-- /footer-bottom -->
 
   </div><!-- /footer-container -->
-</footer>
-
-
-  <!-- Подключаем внешний JavaScript -->
-  <script src="script.js"></script>
-
-</body>
-</html>
+</
