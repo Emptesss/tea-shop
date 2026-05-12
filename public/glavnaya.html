@@ -64,19 +64,19 @@
     <div class="header-actions">
 
       <!-- Избранное (сердце) -->
-      <div class="header-icon" title="Избранное">
-        <img src="pictures/love.png" width="35" height="35" alt="Добавить в избранное" />
-      </div>
+<a href="favorites.html" class="header-icon" title="Избранное">
+  <img src="pictures/love.png" width="35" height="35" alt="Избранное" />
+</a>
 
       <!-- Корзина -->
-      <div class="header-icon" title="Корзина">
-        <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
-      </div>
+<a href="cart.html" class="header-icon" title="Корзина">
+  <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+</a>
 
-      <!-- Аккаунт -->
-      <div class="header-icon" title="Аккаунт">
-        <img src="pictures/profile.png" width="35" height="35" alt="Telegram" />
-      </div>
+   <!-- Аккаунт -->
+<div class="header-icon" title="Аккаунт" id="accountIcon">
+  <img src="pictures/profile.png" width="35" height="35" alt="Аккаунт">
+</div>
 
     </div>
 
@@ -117,45 +117,109 @@
     <div class="section-subtitle">
       Позиции, которые чаще всего покупали в <span class="highlight-green">марте</span>
     </div>
-
-    <!-- Три карточки в ряд -->
+    
+<!-- Три карточки в ряд -->
 <div class="cards-row">
-
-  <!-- Карточка #1 -->
+  <!-- Карточка #1 — Горная матча -->
   <div class="product-card">
-    <!-- Фото товара -->
-    <img src="pictures/tea1.jpg" alt="Горная матча" class="card-image">
-    <!-- Бейдж -->
+    
+    <!-- Бейдж наличия -->
+    <div class="stock-badge in-stock">В наличии</div>
+    
+    <!-- Фото с лупой -->
+    <div class="card-image-wrapper">
+      <img src="pictures/tea1.jpg" alt="Горная матча" class="card-image">
+    </div>
+    
+    <!-- Бейдж покупок -->
     <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
+    
+    <!-- Тело карточки -->
     <div class="card-body">
       <div class="card-name">Горная матча</div>
       <div class="card-desc">Премиальный порошковый чай высшего качества</div>
-      <div class="card-price">35 br</div>
-      <button class="card-btn add-to-cart-btn">В корзину</button>
+      
+      <div class="card-price">35 br <span class="card-price-unit">/ 50 г</span></div>
+      
+      <div class="qty-label">Выберите количество:</div>
+      <div class="qty-selector">
+        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-btn plus" aria-label="Увеличить">+</button>
+      </div>
+      
+      <div class="card-bottom-row">
+        <button class="card-btn add-to-cart-btn">В корзину</button>
+        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
+          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Карточка #2 -->
+  <!-- Карточка #2 — Молочный улун -->
   <div class="product-card">
-    <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
+    
+    <div class="stock-badge in-stock">В наличии</div>
+    
+    <div class="card-image-wrapper">
+      <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
+    </div>
+    
     <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
+    
     <div class="card-body">
       <div class="card-name">Молочный улун</div>
       <div class="card-desc">Нежный чай с карамельным ароматом</div>
-      <div class="card-price">42 br</div>
-      <button class="card-btn add-to-cart-btn">В корзину</button>
+      
+      <div class="card-price">42 br <span class="card-price-unit">/ 50 г</span></div>
+      
+      <div class="qty-label">Выберите количество:</div>
+      <div class="qty-selector">
+        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-btn plus" aria-label="Увеличить">+</button>
+      </div>
+      
+      <div class="card-bottom-row">
+        <button class="card-btn add-to-cart-btn">В корзину</button>
+        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
+          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Карточка #3 -->
+  <!-- Карточка #3 — Выдержанный пуэр -->
   <div class="product-card">
-    <img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="card-image">
+    
+    <div class="stock-badge out-of-stock">Нет в наличии</div>
+    
+    <div class="card-image-wrapper">
+      <img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="card-image">
+    </div>
+    
     <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
+    
     <div class="card-body">
       <div class="card-name">Выдержанный пуэр</div>
       <div class="card-desc">Глубокий землистый вкус с древесными нотами</div>
-      <div class="card-price">58 br</div>
-      <button class="card-btn add-to-cart-btn">В корзину</button>
+      
+      <div class="card-price">58 br <span class="card-price-unit">/ 50 г</span></div>
+      
+      <div class="qty-label">Выберите количество:</div>
+      <div class="qty-selector">
+        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-btn plus" aria-label="Увеличить">+</button>
+      </div>
+      
+      <div class="card-bottom-row">
+        <button class="card-btn add-to-cart-btn">В корзину</button>
+        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
+          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
+        </button>
+      </div>
     </div>
   </div>
 
@@ -164,55 +228,52 @@
   </section>
 
   <!-- ========================
-       БАННЕР "О НАС"
-       Скругление 30, #1F4D2E 40%, стекломорфизм, градиентная обводка
-       ======================== -->
-  <section class="about-section">
-
-    <!-- Обёртка создаёт градиентную обводку 5px: слева #1F4D2E(40%) → справа белый -->
-    <div class="about-banner-wrapper">
-      <div class="about-banner">
-
-        <!-- Левая часть: текст и кнопки стран -->
-        <div class="about-content">
-
-          <!-- Заголовок — Montserrat Alternates SemiBold 32 -->
-          <div class="about-title">Forest Tea — вкус тишины и природы.</div>
-
-          <!-- Основной текст — Montserrat Medium 18, line-height 20 -->
-          <div class="about-text">
-            <p>
-              Интернет-магазин Forest Tea — это ваш проводник в мир азиатского чая. Мы собрали для вас коллекцию лучших сортов из Китая, Индии, Тайваня и Японии, тщательно отобранных и доставленных в Беларусь.
-            </p>
-            <p>
-              Хотите раскрыть глубину выдержанного пуэра? Или насладиться нежным молочным улуном? А может, найти ту самую матчу для утренней церемонии? В нашем каталоге вы найдете именно то, что ищет настоящий ценитель.
-            </p>
-            <p>
-              Мы заботимся о качестве и гарантируем свежесть и правильное хранение, чтобы каждая чашка чая радовала вас день за днём.
-            </p>
-            <p>
-              Выберите страну, чтобы познакомиться с её чайными традициями поближе:
-            </p>
-          </div>
-
-          <!-- Кнопки стран — скругление 100, #5B3E3E, Montserrat Medium 16 -->
-          <div class="country-buttons">
-            <button class="country-btn">Китай</button>
-            <button class="country-btn">Тайвань</button>
-            <button class="country-btn">Индия</button>
-            <button class="country-btn">Япония</button>
-          </div>
-
+     БАННЕР "О НАС" (В СТИЛЕ КНИГИ)
+     ======================== -->
+<section class="about-section">
+  
+  <div class="about-book">
+    
+    <!-- Левая страница — текст и кнопки -->
+    <div class="about-book-page about-book-left">
+      <div class="about-book-content">
+        <h2 class="about-book-title">Forest Tea — вкус тишины и природы.</h2>
+        
+        <div class="about-book-text">
+          <p>
+            Интернет-магазин Forest Tea — это ваш проводник в мир азиатского чая. Мы собрали для вас коллекцию лучших сортов из Китая, Индии, Японии и других стран Азии тщательно отобранных и доставленных в Беларусь.
+          </p>
+          <p>
+            Глубина выдержанного пуэра, нежность молочного улуна, яркость утренней матчи — в нашем магазине вы найдёте <br>то, что ищет настоящий ценитель.
+          </p>
+          <p>
+            Выберите страну, чтобы познакомиться с её чайными традициями поближе:
+          </p>
         </div>
 
-       <img src="pictures/about.jpg" class="about-image" alt="О нас"
-             style="width:496px;object-fit:cover;border-radius:0 25px 25px 0;flex-shrink:0;" /> 
-        
+        <div class="about-book-buttons">
+          <button class="about-book-btn">Китай</button>
+          <button class="about-book-btn">Тайвань</button>
+          <button class="about-book-btn">Индия</button>
+          <button class="about-book-btn">Япония</button>
+        </div>
       </div>
     </div>
 
-  </section>
-  <!-- ========================
+    <!-- Правая страница — изображение -->
+    <div class="about-book-page about-book-right">
+      <div class="about-book-image">
+        <img src="pictures/about.jpg" alt="О нас" class="about-book-img">
+      </div>
+    </div>
+
+    <!-- Складка -->
+    <div class="about-book-fold"></div>
+
+  </div>
+
+</section>
+ <!-- ========================
      СЕКЦИЯ "ПОЧЕМУ ВЫБИРАЮТ НАС"
      ======================== -->
 <section class="why-us-section">
@@ -223,154 +284,177 @@
   <!-- Заголовок -->
   <div class="section-title">Почему выбирают нас</div>
 
-  <!-- Три преимущества в ряд -->
-  <div class="features-row">
+  <!-- Три преимущества -->
+  <div class="why-us-grid">
 
     <!-- Преимущество #1 — Проверенное качество -->
-    <div class="feature-item">
-      <!-- Иконка 80×80 — вставьте свою -->
-      <img src="pictures/q1.png" alt="Проверенное качество" width="80" height="80" class="feature-icon"> 
-      <!-- Заголовок преимущества -->
-      <div class="feature-name">Проверенное качество</div>
-      <!-- Прямоугольник с текстом -->
-      <div class="feature-box">
-        <p class="feature-text">
+    <div class="why-us-card">
+      <div class="why-us-icon">
+        <img src="pictures/q1.png" alt="Проверенное качество" class="why-us-img">
+      </div>
+      <h3 class="why-us-title">Проверенное качество</h3>
+      <div class="why-us-box">
+        <p class="why-us-text">
           Только сертифицированные поставщики из Китая, Индии, Тайваня и Японии
         </p>
       </div>
     </div>
 
     <!-- Преимущество #2 — Быстрая доставка -->
-    <div class="feature-item">
-      <!-- Иконка 80×80 — вставьте свою -->
-     <img src="pictures/q2.png" alt="Быстрая доставка" width="80" height="80" class="feature-icon"> 
-      <!-- Заголовок преимущества -->
-      <div class="feature-name">Быстрая доставка</div>
-      <!-- Прямоугольник с текстом -->
-      <div class="feature-box">
-        <p class="feature-text">
+    <div class="why-us-card">
+      <div class="why-us-icon">
+        <img src="pictures/q2.png" alt="Быстрая доставка" class="why-us-img">
+      </div>
+      <h3 class="why-us-title">Быстрая доставка</h3>
+      <div class="why-us-box">
+        <p class="why-us-text">
           Доставляем заказы по всей Беларуси в течение 1-3 дней. Бережная упаковка сохраняет свежесть и аромат чая.
         </p>
       </div>
     </div>
 
-    <!-- Преимущество #3 — Широкий ассортимент -->
-    <div class="feature-item">
-      <!-- Иконка 80×80 — вставьте свою -->
-      
-        <img src="pictures/q3.png" alt="Забота о покупателях" width="80" height="80" class="feature-icon"> 
-      
-      <!-- Заголовок преимущества -->
-      <div class="feature-name">Забота о покупателях</div>
-      <!-- Прямоугольник с текстом -->
-      <div class="feature-box">
-        <p class="feature-text">
+    <!-- Преимущество #3 — Забота о покупателях -->
+    <div class="why-us-card">
+      <div class="why-us-icon">
+        <img src="pictures/q3.png" alt="Забота о покупателях" class="why-us-img">
+      </div>
+      <h3 class="why-us-title">Забота о покупателях</h3>
+      <div class="why-us-box">
+        <p class="why-us-text">
           Помогаем выбрать чай под любой вкус и повод. Отвечаем на ваши вопросы и даём рекомендации по заварке
         </p>
       </div>
     </div>
 
-  </div><!-- /features-row -->
+  </div><!-- /why-us-grid -->
 
 </section>
-<!-- ========================
-     ФУТЕР
-     Высота 560px, градиентная заливка
-     ======================== -->
-<footer class="footer">
-  <div class="footer-container">
-
-    <!-- Верхняя часть с подпиской -->
-    <div class="footer-subscribe">
-      <div class="subscribe-title">
-        Подпишитесь на наши обновления<br>
-        и получайте советы и акции первыми
+  <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn">
+            <img src="pictures/send.png" alt="Отправить" class="send-icon">
+          </button>
+        </div>
+        <div id="email-error" class="email-error"></div>
       </div>
-      
-    <!-- Блок с полем ввода и кнопкой -->
-<div class="subscribe-input-wrapper">
-    <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
-    <button type="button" id="subscribe-btn" class="subscribe-btn">
-        <img src="pictures/send.png" alt="Отправить" class="send-icon" id="send-icon">
-    </button>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+       <div class="footer-column">
+  <h4 class="footer-column-title">Контакты</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/email.png" alt="Почта" class="footer-icon">
+      <a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a>
+    </li>
+  </ul>
 </div>
-<div id="email-error" class="email-error"></div>
-
-    <!-- Разделительная линия -->
-    <div class="footer-divider"></div>
-
-    <!-- Нижняя часть с колонками -->
-    <div class="footer-bottom">
-      
-      <!-- Колонка 1 — Контакты -->
-      <div class="footer-column">
-        <h4 class="footer-column-title">Контакты</h4>
-        <ul class="footer-list">
-          <li class="footer-list-item">
-            <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
-            <span>+375 (29) 123-45-67</span>
-          </li>
-          <li class="footer-list-item">
-            <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
-            <span>+375 (33) 765-43-21</span>
-          </li>
-          <li class="footer-list-item">
-            <img src="pictures/email.png" alt="Почта" class="footer-icon">
-            <span>info.foresttea@gmail.com</span>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Колонка 2 — Каталог -->
-      <div class="footer-column">
-        <h4 class="footer-column-title">Каталог</h4>
-        <ul class="footer-list">
-          <li class="footer-list-item footer-link">Зелёный чай</li>
-          <li class="footer-list-item footer-link">Чёрный чай</li>
-          <li class="footer-list-item footer-link">Травяной чай</li>
-          <li class="footer-list-item footer-link">Акции</li>
-        </ul>
-      </div>
-
-      <!-- Колонка 3 — О нас -->
-      <div class="footer-column">
-        <h4 class="footer-column-title">О нас</h4>
-        <ul class="footer-list">
-          <li class="footer-list-item footer-link">Консультации</li>
-          <li class="footer-list-item footer-link">Оплата и доставка</li>
-          <li class="footer-list-item footer-link">FAQ</li>
-          <li class="footer-list-item footer-link">Чайный блог</li>
-        </ul>
-      </div>
-
-      <!-- Колонка 4 — Наши соцсети и способы оплаты -->
-      <div class="footer-column">
-        <h4 class="footer-column-title">Наши соцсети</h4>
-        <div class="footer-socials">
-          <a href="#" class="footer-social-link">
-            <img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon">
-          </a>
-          <a href="#" class="footer-social-link">
-            <img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon">
-          </a>
-          <a href="#" class="footer-social-link">
-            <img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon">
-          </a>
+        <div class="footer-column">
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
         </div>
-        
-        <h4 class="footer-column-title payment-title">Способы оплаты</h4>
-        <div class="footer-payments">
-          <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
-          <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
-          <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
         </div>
       </div>
+    </div>
+  </footer>
+<!-- Модальное окно Вход / Регистрация -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-window">
+    
+    <!-- Кнопка закрытия -->
+    <button class="modal-close-btn" id="closeModal">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
 
-    </div><!-- /footer-bottom -->
+    <!-- Табы: Вход / Регистрация -->
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Вход</button>
+      <button class="modal-tab" data-tab="register">Регистрация</button>
+    </div>
 
-  </div><!-- /footer-container -->
-</footer>
+    <!-- Форма Входа -->
+    <form class="modal-form active" id="loginForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Войти</button>
+    </form>
 
+    <!-- Форма Регистрации -->
+    <form class="modal-form" id="registerForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Имя</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/profile.png" alt="Имя" class="modal-input-icon">
+          <input type="text" class="modal-input" placeholder="Ваше имя" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+    </form>
+  </div>
+</div>
 
   <!-- Подключаем внешний JavaScript -->
   <script src="script.js"></script>

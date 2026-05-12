@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Корзина — Forest Tea</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ХЕДЕР -->
+  <header>
+    <div class="header-logo"></div>
+    <div class="header-center">
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+      <div class="header-socials">
+        <div class="header-icon" title="Telegram"><img src="pictures/telegram.png" width="35" height="35" alt="Telegram" /></div>
+        <div class="header-icon" title="YouTube"><img src="pictures/youtube.png" width="35" height="35" alt="YouTube" /></div>
+        <div class="header-icon" title="Instagram"><img src="pictures/instagram.png" width="35" height="35" alt="Instagram" /></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="favorites.html" class="header-icon" title="Избранное"><img src="pictures/love.png" width="35" height="35" alt="Избранное" /></a>
+        <!-- Корзина -->
+<a href="cart.html" class="header-icon" title="Корзина">
+  <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+</a>
+
+      <div class="header-icon" title="Аккаунт" id="accountIcon"><img src="pictures/profile.png" width="35" height="35" alt="Аккаунт" /></div>
+    </div>
+  </header>
+
+  <!-- Хлебные крошки -->
+  <nav class="breadcrumbs">
+    <ol class="breadcrumbs-list">
+      <li class="breadcrumbs-item"><a href="/" class="breadcrumbs-link breadcrumbs-home">Главная</a></li>
+      <li class="breadcrumbs-item"><span class="breadcrumbs-separator">/</span><a href="cart.html" class="breadcrumbs-link">Корзина</a></li>
+  </nav>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="cart-main">
+    
+    <h1 class="cart-page-title">Корзина</h1>
+
+    <!-- Товары в корзине -->
+    <div class="cart-layout" id="cartLayout">
+      
+      <!-- Список товаров -->
+      <div class="cart-items" id="cartItems">
+        
+<!-- Карточка 1 — Горная матча -->
+<div class="cart-item">
+  <button class="cart-item-remove" onclick="removeCartItem(this)">
+    <img src="pictures/close.png" alt="Удалить" class="cart-remove-icon">
+  </button>
+
+  <label class="cart-item-checkbox-wrapper">
+    <input type="checkbox" class="cart-item-checkbox" checked onchange="updateCartTotal()">
+    <span class="cart-item-checkbox-custom"></span>
+  </label>
+
+  <div class="cart-item-image">
+    <img src="pictures/tea1.jpg" alt="Горная матча" class="cart-item-img">
+  </div>
+
+  <div class="cart-item-info">
+    <h3 class="cart-item-name">Горная матча</h3>
+    <p class="cart-item-desc">Премиальный порошковый чай высшего качества</p>
+  </div>
+
+  <div class="cart-item-qty">
+    <button class="cart-qty-btn" onclick="changeCartQty(this, -1)">−</button>
+    <span class="cart-qty-value">2</span>
+    <button class="cart-qty-btn" onclick="changeCartQty(this, +1)">+</button>
+  </div>
+
+  <div class="cart-item-price">
+    <span class="cart-item-price-value">35 Br</span>
+    <span class="cart-item-price-unit">/ 50 г</span>
+  </div>
+</div>
+
+<!-- Карточка 2 — Молочный улун -->
+<div class="cart-item">
+  <button class="cart-item-remove" onclick="removeCartItem(this)">
+    <img src="pictures/close.png" alt="Удалить" class="cart-remove-icon">
+  </button>
+
+  <label class="cart-item-checkbox-wrapper">
+    <input type="checkbox" class="cart-item-checkbox" checked onchange="updateCartTotal()">
+    <span class="cart-item-checkbox-custom"></span>
+  </label>
+
+  <div class="cart-item-image">
+    <img src="pictures/tea2.jpg" alt="Молочный улун" class="cart-item-img">
+  </div>
+
+  <div class="cart-item-info">
+    <h3 class="cart-item-name">Молочный улун</h3>
+    <p class="cart-item-desc">Нежный чай с карамельным ароматом</p>
+  </div>
+
+  <div class="cart-item-qty">
+    <button class="cart-qty-btn" onclick="changeCartQty(this, -1)">−</button>
+    <span class="cart-qty-value">1</span>
+    <button class="cart-qty-btn" onclick="changeCartQty(this, +1)">+</button>
+  </div>
+
+  <div class="cart-item-price">
+    <span class="cart-item-price-value">42 Br</span>
+    <span class="cart-item-price-unit">/ 50 г</span>
+  </div>
+</div>
+
+<!-- Карточка 3 — Выдержанный пуэр -->
+<div class="cart-item">
+  <button class="cart-item-remove" onclick="removeCartItem(this)">
+    <img src="pictures/close.png" alt="Удалить" class="cart-remove-icon">
+  </button>
+
+  <label class="cart-item-checkbox-wrapper">
+    <input type="checkbox" class="cart-item-checkbox" checked onchange="updateCartTotal()">
+    <span class="cart-item-checkbox-custom"></span>
+  </label>
+
+  <div class="cart-item-image">
+    <img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="cart-item-img">
+  </div>
+
+  <div class="cart-item-info">
+    <h3 class="cart-item-name">Выдержанный пуэр</h3>
+    <p class="cart-item-desc">Глубокий землистый вкус с древесными нотами</p>
+  </div>
+
+  <div class="cart-item-qty">
+    <button class="cart-qty-btn" onclick="changeCartQty(this, -1)">−</button>
+    <span class="cart-qty-value">3</span>
+    <button class="cart-qty-btn" onclick="changeCartQty(this, +1)">+</button>
+  </div>
+
+  <div class="cart-item-price">
+    <span class="cart-item-price-value">58 Br</span>
+    <span class="cart-item-price-unit">/ 50 г</span>
+  </div>
+</div>
+
+<!-- Карточка 4 — Сенча -->
+<div class="cart-item">
+  <button class="cart-item-remove" onclick="removeCartItem(this)">
+    <img src="pictures/close.png" alt="Удалить" class="cart-remove-icon">
+  </button>
+
+  <label class="cart-item-checkbox-wrapper">
+    <input type="checkbox" class="cart-item-checkbox" checked onchange="updateCartTotal()">
+    <span class="cart-item-checkbox-custom"></span>
+  </label>
+
+  <div class="cart-item-image">
+    <img src="pictures/tea/sencha2.jpeg" alt="Сенча" class="cart-item-img">
+  </div>
+
+  <div class="cart-item-info">
+    <h3 class="cart-item-name">Сенча</h3>
+    <p class="cart-item-desc">Классический японский зелёный чай с травянистым вкусом</p>
+  </div>
+
+  <div class="cart-item-qty">
+    <button class="cart-qty-btn" onclick="changeCartQty(this, -1)">−</button>
+    <span class="cart-qty-value">1</span>
+    <button class="cart-qty-btn" onclick="changeCartQty(this, +1)">+</button>
+  </div>
+
+  <div class="cart-item-price">
+    <span class="cart-item-price-value">20 Br</span>
+    <span class="cart-item-price-unit">/ 50 г</span>
+  </div>
+</div>
+
+<!-- Карточка 5 — Дарджилинг -->
+<div class="cart-item">
+  <button class="cart-item-remove" onclick="removeCartItem(this)">
+    <img src="pictures/close.png" alt="Удалить" class="cart-remove-icon">
+  </button>
+
+  <label class="cart-item-checkbox-wrapper">
+    <input type="checkbox" class="cart-item-checkbox" checked onchange="updateCartTotal()">
+    <span class="cart-item-checkbox-custom"></span>
+  </label>
+
+  <div class="cart-item-image">
+    <img src="pictures/tea/jarjiling1.png" alt="Дарджилинг" class="cart-item-img">
+  </div>
+
+  <div class="cart-item-info">
+    <h3 class="cart-item-name">Дарджилинг</h3>
+    <p class="cart-item-desc">Чёрный чай с мускатным оттенком</p>
+  </div>
+
+  <div class="cart-item-qty">
+    <button class="cart-qty-btn" onclick="changeCartQty(this, -1)">−</button>
+    <span class="cart-qty-value">2</span>
+    <button class="cart-qty-btn" onclick="changeCartQty(this, +1)">+</button>
+  </div>
+
+  <div class="cart-item-price">
+    <span class="cart-item-price-value">28 Br</span>
+    <span class="cart-item-price-unit">/ 50 г</span>
+  </div>
+</div>
+
+      </div><!-- /cart-items -->
+
+      <!-- Сводка -->
+      <div class="cart-summary">
+        <div class="cart-summary-card">
+          <h3 class="cart-summary-title">Ваш заказ</h3>
+          
+          <div class="cart-summary-row">
+            <span>Товары</span>
+            <span id="cartTotalItems">8 товаров</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Доставка</span>
+            <span class="cart-summary-free">Бесплатно</span>
+          </div>
+          <div class="cart-summary-divider"></div>
+          <div class="cart-summary-row cart-summary-total">
+            <span>Итого</span>
+            <span id="cartTotalPrice">305 Br</span>
+          </div>
+
+          <a href="checkout.html" class="cart-checkout-btn">Оформить заказ</a>
+          
+          
+        </div>
+      </div><!-- /cart-summary -->
+
+    </div><!-- /cart-layout -->
+
+    <!-- Пустая корзина -->
+    <div class="cart-empty" id="cartEmpty" style="display: none;">
+      <img src="pictures/cart.png" alt="Пустая корзина" class="cart-empty-icon">
+      <h2 class="cart-empty-title">В корзине пока пусто</h2>
+      <p class="cart-empty-text">Добавляйте товары из каталога</p>
+      <a href="catalog.html" class="cart-empty-btn">Перейти в каталог</a>
+    </div>
+
+  </main>
+
+  <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn"><img src="pictures/send.png" alt="Отправить" class="send-icon"></button>
+        </div>
+        <div id="email-error" class="email-error"></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <div class="footer-column">
+          <h4 class="footer-column-title">Контакты</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><img src="pictures/phone.png" alt="Телефон" class="footer-icon"><a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a></li>
+            <li class="footer-list-item"><img src="pictures/phone.png" alt="Телефон" class="footer-icon"><a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a></li>
+            <li class="footer-list-item"><img src="pictures/email.png" alt="Почта" class="footer-icon"><a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Каталог</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+            <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+            <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Модальное окно -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-window">
+      <button class="modal-close-btn" id="closeModal"><img src="pictures/close.png" alt="Закрыть" class="modal-close-icon"></button>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login">Вход</button>
+        <button class="modal-tab" data-tab="register">Регистрация</button>
+      </div>
+      <form class="modal-form active" id="loginForm">
+        <div class="modal-input-group"><label class="modal-label">Email</label><div class="modal-input-wrapper"><img src="pictures/email.png" alt="Email" class="modal-input-icon"><input type="email" class="modal-input" placeholder="example@mail.ru" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Пароль</label><div class="modal-input-wrapper"><img src="pictures/lock.png" alt="Пароль" class="modal-input-icon"><input type="password" class="modal-input" placeholder="••••••••" required></div></div>
+        <button type="submit" class="modal-submit-btn">Войти</button>
+      </form>
+      <form class="modal-form" id="registerForm">
+        <div class="modal-input-group"><label class="modal-label">Имя</label><div class="modal-input-wrapper"><img src="pictures/profile.png" alt="Имя" class="modal-input-icon"><input type="text" class="modal-input" placeholder="Ваше имя" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Email</label><div class="modal-input-wrapper"><img src="pictures/email.png" alt="Email" class="modal-input-icon"><input type="email" class="modal-input" placeholder="example@mail.ru" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Пароль</label><div class="modal-input-wrapper"><img src="pictures/lock.png" alt="Пароль" class="modal-input-icon"><input type="password" class="modal-input" placeholder="••••••••" required></div></div>
+        <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+      </form>
+      <p class="modal-footer-text">Входя, вы соглашаетесь с условиями обработки данных</p>
+    </div>
+  </div>
+
+  <script src="cart.js"></script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Оформление заказа — Forest Tea</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ХЕДЕР -->
+  <header>
+    <div class="header-logo"></div>
+    <div class="header-center">
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+      <div class="header-socials">
+        <div class="header-icon" title="Telegram"><img src="pictures/telegram.png" width="35" height="35" alt="Telegram" /></div>
+        <div class="header-icon" title="YouTube"><img src="pictures/youtube.png" width="35" height="35" alt="YouTube" /></div>
+        <div class="header-icon" title="Instagram"><img src="pictures/instagram.png" width="35" height="35" alt="Instagram" /></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="favorites.html" class="header-icon" title="Избранное"><img src="pictures/love.png" width="35" height="35" alt="Избранное" /></a>
+      <a href="cart.html" class="header-icon" title="Корзина"><img src="pictures/cart.png" width="35" height="35" alt="Корзина" /></a>
+      <div class="header-icon" title="Аккаунт" id="accountIcon"><img src="pictures/profile.png" width="35" height="35" alt="Аккаунт" /></div>
+    </div>
+  </header>
+
+  <!-- Хлебные крошки -->
+  <nav class="breadcrumbs">
+    <ol class="breadcrumbs-list">
+      <li class="breadcrumbs-item"><a href="/" class="breadcrumbs-link breadcrumbs-home">Главная</a></li>
+      <li class="breadcrumbs-item"><span class="breadcrumbs-separator">/</span><a href="cart.html" class="breadcrumbs-link">Корзина</a></li>
+      <li class="breadcrumbs-item"><span class="breadcrumbs-separator">/</span><span class="breadcrumbs-link">Оформление заказа</span></li>
+    </ol>
+  </nav>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<main class="checkout-main">
+  
+
+
+  <h1 class="checkout-page-title">Оформление заказа</h1>
+
+  <!-- ФОРМА (по умолчанию) -->
+  <div class="checkout-layout" id="checkoutFormLayout">
+    
+ <div class="checkout-form-col">
+
+  <!-- Шаг 1: Контакты -->
+  <div class="checkout-card active" id="cardContact">
+  <div class="checkout-card-header" onclick="this.parentElement.classList.toggle('active')">
+    <span class="step-check">✓</span>
+    <h3 class="checkout-card-title">Контактные данные</h3>
+    <span class="step-arrow">
+      <img src="pictures/arrow.png" alt="▾" class="step-arrow-icon">
+    </span>
+  </div>
+    <div class="checkout-card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Имя*</label>
+          <input type="text" class="form-input" id="checkoutName" placeholder="Ваше имя" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Фамилия*</label>
+          <input type="text" class="form-input" id="checkoutSurname" placeholder="Ваша фамилия" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Телефон*</label>
+          <input type="tel" class="form-input" id="checkoutPhone" placeholder="+375 (__) ___-__-__" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="checkoutEmail" placeholder="example@mail.ru">
+        </div>
+      </div>
+      <button class="step-next-btn" onclick="nextStep('cardContact', 'cardDelivery')">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- Шаг 2: Доставка -->
+  <div class="checkout-card locked" id="cardDelivery">
+   <div class="checkout-card-header" onclick="this.parentElement.classList.toggle('active')">
+  <span class="step-check">✓</span>
+  <h3 class="checkout-card-title">Способ доставки</h3>
+   <span class="step-arrow">
+      <img src="pictures/arrow.png" alt="▾" class="step-arrow-icon">
+    </span>
+</div>
+    <div class="checkout-card-body">
+      <div class="delivery-options">
+        <label class="delivery-option">
+          <input type="radio" name="delivery" value="pickup" checked>
+          <span class="delivery-radio"></span>
+          <span class="delivery-info"><span class="delivery-name">Самовывоз</span><span class="delivery-desc">ул. Чайная, 15, агрогородок Лесной</span></span>
+          <span class="delivery-price">Бесплатно</span>
+        </label>
+        <label class="delivery-option">
+          <input type="radio" name="delivery" value="courier">
+          <span class="delivery-radio"></span>
+          <span class="delivery-info"><span class="delivery-name">Курьером</span><span class="delivery-desc">Доставка по Минску и области</span></span>
+          <span class="delivery-price">10 Br</span>
+        </label>
+        <label class="delivery-option">
+          <input type="radio" name="delivery" value="post">
+          <span class="delivery-radio"></span>
+          <span class="delivery-info"><span class="delivery-name">Почтой</span><span class="delivery-desc">По всей Беларуси, 3–7 дней</span></span>
+          <span class="delivery-price">5 Br</span>
+        </label>
+      </div>
+      <div class="delivery-address" id="deliveryAddress" style="display: none;">
+        <div class="form-group full-width" style="margin-top: 14px;">
+          <label class="form-label">Адрес доставки*</label>
+          <input type="text" class="form-input" id="deliveryAddressInput" placeholder="Город, улица, дом, квартира">
+        </div>
+      </div>
+      <button class="step-next-btn" onclick="nextStep('cardDelivery', 'cardPayment')">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- Шаг 3: Оплата -->
+  <div class="checkout-card locked" id="cardPayment">
+   <div class="checkout-card-header" onclick="this.parentElement.classList.toggle('active')">
+  <span class="step-check">✓</span>
+  <h3 class="checkout-card-title">Способ оплаты</h3>
+   <span class="step-arrow">
+      <img src="pictures/arrow.png" alt="▾" class="step-arrow-icon">
+    </span>
+</div>
+    <div class="checkout-card-body">
+      <div class="payment-options">
+        <label class="payment-option">
+          <input type="radio" name="payment" value="card" checked>
+          <span class="payment-radio"></span>
+          <span class="payment-name">Банковской картой онлайн</span>
+        </label>
+        <label class="payment-option">
+          <input type="radio" name="payment" value="cash">
+          <span class="payment-radio"></span>
+          <span class="payment-name">Наличными при получении</span>
+        </label>
+        <label class="payment-option">
+          <input type="radio" name="payment" value="erip">
+          <span class="payment-radio"></span>
+          <span class="payment-name">Через ЕРИП</span>
+        </label>
+      </div>
+    <button class="step-next-btn" onclick="nextStep('cardPayment', 'cardComment')">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- Комментарий -->
+  <div class="checkout-card" id="cardComment">
+    <div class="checkout-card-header" onclick="this.parentElement.classList.toggle('active')">
+  <span class="step-check">✓</span>
+  <h3 class="checkout-card-title">Комментарий к заказу</h3>
+   <span class="step-arrow">
+      <img src="pictures/arrow.png" alt="▾" class="step-arrow-icon">
+    </span>
+</div>
+    <div class="checkout-card-body">
+      <div class="form-group full-width">
+        <textarea class="form-textarea" placeholder="Пожелания к заказу (необязательно)" rows="2"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка подтверждения -->
+  <div class="checkout-confirm-wrapper">
+    <button class="checkout-submit-btn" id="confirmOrderBtn" onclick="placeOrder()" disabled>Подтвердить заказ</button>
+  </div>
+
+</div><!-- /checkout-form-col -->
+
+    <!-- Сводка -->
+    <div class="checkout-summary-col">
+      <div class="checkout-summary-card">
+        <h3 class="checkout-summary-title">Ваш заказ</h3>
+        <div class="checkout-items">
+          <div class="checkout-item"><img src="pictures/tea1.jpg" alt="Горная матча" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Горная матча</span><span class="checkout-item-qty">× 2</span></div><span class="checkout-item-price">70 Br</span></div>
+          <div class="checkout-item"><img src="pictures/tea2.jpg" alt="Молочный улун" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Молочный улун</span><span class="checkout-item-qty">× 1</span></div><span class="checkout-item-price">42 Br</span></div>
+          <div class="checkout-item"><img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Выдержанный пуэр</span><span class="checkout-item-qty">× 3</span></div><span class="checkout-item-price">174 Br</span></div>
+        </div>
+        <div class="checkout-summary-divider"></div>
+        <div class="checkout-summary-row"><span>Товары (6)</span><span id="checkoutSubtotal">286 Br</span></div>
+        <div class="checkout-summary-row"><span>Доставка</span><span id="checkoutDelivery">Бесплатно</span></div>
+        <div class="checkout-summary-divider"></div>
+        <div class="checkout-summary-row checkout-summary-total"><span>Итого</span><span id="checkoutTotal">286 Br</span></div>
+    </div>
+
+  </div><!-- /checkout-layout -->
+
+  
+
+</main>
+
+   <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn">
+            <img src="pictures/send.png" alt="Отправить" class="send-icon">
+          </button>
+        </div>
+        <div id="email-error" class="email-error"></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+       <div class="footer-column">
+  <h4 class="footer-column-title">Контакты</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/email.png" alt="Почта" class="footer-icon">
+      <a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a>
+    </li>
+  </ul>
+</div>
+        <div class="footer-column">
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Модальное окно -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-window">
+      <button class="modal-close-btn" id="closeModal"><img src="pictures/close.png" alt="Закрыть" class="modal-close-icon"></button>
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login">Вход</button>
+        <button class="modal-tab" data-tab="register">Регистрация</button>
+      </div>
+      <form class="modal-form active" id="loginForm">
+        <div class="modal-input-group"><label class="modal-label">Email</label><div class="modal-input-wrapper"><img src="pictures/email.png" alt="Email" class="modal-input-icon"><input type="email" class="modal-input" placeholder="example@mail.ru" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Пароль</label><div class="modal-input-wrapper"><img src="pictures/lock.png" alt="Пароль" class="modal-input-icon"><input type="password" class="modal-input" placeholder="••••••••" required></div></div>
+        <button type="submit" class="modal-submit-btn">Войти</button>
+      </form>
+      <form class="modal-form" id="registerForm">
+        <div class="modal-input-group"><label class="modal-label">Имя</label><div class="modal-input-wrapper"><img src="pictures/profile.png" alt="Имя" class="modal-input-icon"><input type="text" class="modal-input" placeholder="Ваше имя" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Email</label><div class="modal-input-wrapper"><img src="pictures/email.png" alt="Email" class="modal-input-icon"><input type="email" class="modal-input" placeholder="example@mail.ru" required></div></div>
+        <div class="modal-input-group"><label class="modal-label">Пароль</label><div class="modal-input-wrapper"><img src="pictures/lock.png" alt="Пароль" class="modal-input-icon"><input type="password" class="modal-input" placeholder="••••••••" required></div></div>
+        <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+      </form>
+      <p class="modal-footer-text">Входя, вы соглашаетесь с условиями обработки данных</p>
+    </div>
+  </div>
+
+  <script src="checkout.js"></script>
+</body>
+</html>

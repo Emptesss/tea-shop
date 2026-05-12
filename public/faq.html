@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ — Часто задаваемые вопросы — Forest Tea</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Подключаем CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+ <!-- ========================
+       ХЕДЕР
+       Высота 100px, фон #09150F, фиксированный
+       [Лого] [Навигация + Соцсети по центру] [Действия справа]
+       ======================== -->
+  <header>
+
+    <!-- Логотип — круг 64×64. Замените на <img src="logo.png" width="64" height="64" /> -->
+    <div class="header-logo"></div>
+
+    <!-- Центральная зона: навигация + иконки соцсетей сразу после «Контакты» -->
+    <div class="header-center">
+
+      <!-- Навигация — Montserrat Medium 18, белый -->
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+
+      <!-- Соцсети 40×40 — вплотную правее пункта «Контакты»
+           Замените SVG на <img src="telegram.png" width="40" height="40" alt="Telegram" /> -->
+      <div class="header-socials">
+
+        <!-- Телеграм -->
+        <div class="header-icon" title="Telegram">
+          <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
+        </div>
+
+        <!-- YouTube -->
+        <div class="header-icon" title="YouTube">
+          <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
+        </div>
+
+        <!-- inst -->
+        <div class="header-icon" title="Instagram">
+          <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="header-actions">
+
+            <!-- Избранное (сердце) -->
+<a href="favorites.html" class="header-icon" title="Избранное">
+  <img src="pictures/love.png" width="35" height="35" alt="Избранное" />
+</a>
+
+        <!-- Корзина -->
+<a href="cart.html" class="header-icon" title="Корзина">
+  <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+</a>
+
+      <!-- Аккаунт -->
+      <div class="header-icon" title="Аккаунт" id="accountIcon">
+        <img src="pictures/profile.png" width="35" height="35" alt="Telegram" />
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- Хлебные крошки -->
+<nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <ol class="breadcrumbs-list">
+    <li class="breadcrumbs-item">
+      <a href="/" class="breadcrumbs-link breadcrumbs-home">
+        Главная
+      </a>
+    </li>
+    <li class="breadcrumbs-item">
+      <span class="breadcrumbs-separator">/</span>
+      <a href="/faq" class="breadcrumbs-link">FAQ</a>
+    </li>
+  </ol>
+</nav>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="faq-main">
+    
+    <!-- Заголовок -->
+    <h1 class="faq-page-title">Частые вопросы</h1>
+    <p class="faq-subtitle">
+      Здесь собраны ответы на самые популярные вопросы о нашем чае, доставке и оплате
+    </p>
+
+    <!-- Поиск по вопросам -->
+    <div class="faq-search-wrapper">
+      <img src="pictures/search.png" alt="Поиск" class="faq-search-icon">
+      <input type="text" class="faq-search-input" id="faqSearch" placeholder="Найти ответ на вопрос...">
+    </div>
+
+    <!-- Категории вопросов -->
+    <div class="faq-categories">
+      <button class="faq-category-btn active" data-category="all">Все</button>
+      <button class="faq-category-btn" data-category="order">Заказы</button>
+      <button class="faq-category-btn" data-category="delivery">Доставка</button>
+      <button class="faq-category-btn" data-category="payment">Оплата</button>
+      <button class="faq-category-btn" data-category="tea">О чае</button>
+      <button class="faq-category-btn" data-category="return">Возврат</button>
+    </div>
+
+    <!-- Список вопросов (аккордеон) -->
+    <div class="faq-list" id="faqList">
+      
+      <!-- Категория: Заказы -->
+      <div class="faq-item" data-category="order">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Как оформить заказ на сайте?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Оформить заказ очень просто:</p>
+            <ol>
+              <li>Выберите понравившийся чай в каталоге</li>
+              <li>Добавьте товары в корзину, указав нужное количество</li>
+              <li>Нажмите «Оформить заказ»</li>
+              <li>Заполните контактные данные и адрес доставки</li>
+              <li>Выберите способ оплаты и подтвердите заказ</li>
+            </ol>
+            <p>После оформления на вашу почту придёт письмо с номером заказа. Вы всегда можете отследить статус в личном кабинете.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="order">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Можно ли изменить или отменить заказ?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Да, вы можете изменить состав заказа или отменить его <strong>до момента передачи в доставку</strong>.</p>
+            <p>Для этого свяжитесь с нами любым удобным способом:</p>
+            <ul>
+              <li>По телефону: +375 (25) 523-96-28</li>
+              <li>По почте: info.foresttea@gmail.com</li>
+              <li>В мессенджерах (Instagram)</li>
+            </ul>
+            <p>Если заказ уже передан курьеру — отмена невозможна, но вы можете оформить возврат после получения.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="order">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Как узнать статус моего заказа?</span>
+         <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Статус заказа отображается в вашем личном кабинете. Также мы отправляем уведомления на email:</p>
+            <ul>
+              <li><strong>«Принят»</strong> — заказ оформлен и поступил в обработку</li>
+              <li><strong>«Собирается»</strong> — мы формируем вашу посылку</li>
+              <li><strong>«В пути»</strong> — заказ передан в службу доставки</li>
+              <li><strong>«Доставлен»</strong> — заказ у вас!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Категория: Доставка -->
+      <div class="faq-item" data-category="delivery">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Сколько стоит доставка и как долго ждать?</span>
+         <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Мы доставляем заказы по всей Беларуси:</p>
+            <ul>
+              <li><strong>Минск и Минский район</strong> — <span style="color: #337B57;">бесплатно</span> от 80 BYN, 1–2 дня</li>
+              <li><strong>Областные города</strong> — от 10 BYN, 2–3 дня</li>
+              <li><strong>Районные центры</strong> — от 15 BYN, 3–5 дней</li>
+            </ul>
+            <p>Точную стоимость доставки вы увидите при оформлении заказа.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="delivery">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Можно ли забрать заказ самовывозом?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Да! Вы можете забрать заказ из нашего магазина по адресу:</p>
+            <p><strong>агрогородок Лесной, ул. Чайная, 15 (Минский район)</strong></p>
+            <p>Режим работы пункта самовывоза:</p>
+            <ul>
+              <li>Пн–Пт: 9:00 – 21:00</li>
+              <li>Сб–Вс: 11:00 – 23:00</li>
+            </ul>
+            <p>При оформлении заказа выберите способ доставки «Самовывоз». Мы соберём заказ и сообщим, когда его можно забрать.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Категория: Оплата -->
+      <div class="faq-item" data-category="payment">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Какие способы оплаты вы принимаете?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Мы принимаем следующие способы оплаты:</p>
+            <ul>
+              <li>Банковские карты (Visa, Mastercard, МИР) — онлайн</li>
+              <li>ЕРИП (через интернет-банкинг)</li>
+              <li>Наличными — при самовывозе или курьеру</li>
+              <li>Банковский перевод (для юрлиц)</li>
+            </ul>
+            <p>Все онлайн-платежи защищены и проходят через безопасное соединение.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="payment">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Можно ли оплатить заказ при получении?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Да, оплата наличными доступна:</p>
+            <ul>
+              <li>При самовывозе из магазина</li>
+              <li>Курьеру при доставке по Минску</li>
+            </ul>
+            <p>Для доставки в другие города оплата наличными недоступна — только онлайн-оплата.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Категория: О чае -->
+      <div class="faq-item" data-category="tea">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Как правильно хранить чай после покупки?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Чай — деликатный продукт. Чтобы сохранить его вкус и аромат:</p>
+            <ul>
+              <li>Храните в прохладном месте (18–22°C)</li>
+              <li>Избегайте прямых солнечных лучей</li>
+              <li>Держите в герметичной упаковке (стекло, керамика, фольга)</li>
+              <li>Не храните рядом со специями и кофе — чай впитывает запахи</li>
+              <li>Не храните в холодильнике (кроме матчи)</li>
+            </ul>
+            <p>При правильном хранении зелёный чай сохраняет свежесть до 1 года, пуэр — десятилетиями.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="tea">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Как заваривать разные виды чая?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Для каждого вида чая — своя температура и время:</p>
+            <table class="faq-table">
+              <thead>
+                <tr><th>Вид чая</th><th>Температура</th><th>Время</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Зелёный</td><td>70–80°C</td><td>1–3 мин</td></tr>
+                <tr><td>Белый</td><td>75–85°C</td><td>3–5 мин</td></tr>
+                <tr><td>Улун</td><td>85–95°C</td><td>3–5 мин</td></tr>
+                <tr><td>Чёрный</td><td>90–100°C</td><td>3–5 мин</td></tr>
+                <tr><td>Пуэр</td><td>95–100°C</td><td>5–7 мин</td></tr>
+                <tr><td>Матча</td><td>70–80°C</td><td>Взбивать</td></tr>
+              </tbody>
+            </table>
+            <p>Совет: не заливайте чай крутым кипятком — он «сгорит» и будет горчить.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="tea">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Сколько раз можно заваривать чай?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Хороший чай можно заваривать несколько раз (проливом). При каждом заваривании вкус раскрывается по-новому:</p>
+            <ul>
+              <li>Зелёный чай — 2–3 раза</li>
+              <li>Белый чай — 3–4 раза</li>
+              <li>Улун — 4–7 раз</li>
+              <li>Пуэр — 5–10+ раз</li>
+            </ul>
+            <p>Время каждого последующего заваривания увеличивайте на 30–60 секунд.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Категория: Возврат -->
+      <div class="faq-item" data-category="return">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Можно ли вернуть чай, если он не понравился?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Согласно законодательству РБ, чай является <strong>продовольственным товаром</strong> и не подлежит возврату, если он надлежащего качества.</p>
+            <p>Однако мы идём навстречу нашим клиентам:</p>
+            <ul>
+              <li>Возврат возможен в течение <strong>7 дней</strong>, если упаковка не вскрыта</li>
+              <li>Если упаковка вскрыта — возврат невозможен по санитарным нормам</li>
+              <li>Если товар повреждён при доставке — замена или возврат в полном объёме</li>
+            </ul>
+            <p>Для возврата свяжитесь с нами по почте info.foresttea@gmail.com.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-category="return">
+        <button class="faq-question" aria-expanded="false">
+          <span class="faq-question-text">Что делать, если заказ повреждён при доставке?</span>
+          <span class="faq-icon">
+  <img src="pictures/arrow.png" alt="▾" class="faq-arrow-icon">
+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            <p>Нам жаль, если такое произошло! Пожалуйста:</p>
+            <ol>
+              <li>Сфотографируйте повреждённую упаковку и содержимое</li>
+              <li>Отправьте фото нам на почту info.foresttea@gmail.com с номером заказа</li>
+              <li>Или позвоните по телефону +375 (33) 765-43-21</li>
+            </ol>
+            <p>Мы бесплатно заменим повреждённый товар или вернём деньги — на ваш выбор.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /faq-list -->
+
+    <!-- Блок "Не нашли ответ?" -->
+    <div class="faq-contact-cta">
+      <div class="faq-contact-cta-inner">
+        <h3 class="faq-cta-title">Не нашли ответ на свой вопрос?</h3>
+        <p class="faq-cta-text">Напишите нам — мы ответим лично и, возможно, добавим ваш вопрос на эту страницу</p>
+        <div class="faq-cta-buttons">
+          <a href="contacts.html#feedbackForm" class="faq-cta-btn faq-cta-email">
+            <img src="pictures/email.png" alt="" class="faq-cta-icon">
+            Написать нам
+          </a>
+          <a href="contacts.html" class="faq-cta-btn faq-cta-contacts">
+            <img src="pictures/phone.png" alt="" class="faq-cta-icon">
+            Все контакты
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn">
+            <img src="pictures/send.png" alt="Отправить" class="send-icon">
+          </button>
+        </div>
+        <div id="email-error" class="email-error"></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+       <div class="footer-column">
+  <h4 class="footer-column-title">Контакты</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/email.png" alt="Почта" class="footer-icon">
+      <a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a>
+    </li>
+  </ul>
+</div>
+        <div class="footer-column">
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+<!-- Модальное окно Вход / Регистрация -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-window">
+    
+    <!-- Кнопка закрытия -->
+    <button class="modal-close-btn" id="closeModal">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+
+    <!-- Табы: Вход / Регистрация -->
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Вход</button>
+      <button class="modal-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <!-- Форма Входа -->
+    <form class="modal-form active" id="loginForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Войти</button>
+    </form>
+
+    <!-- Форма Регистрации -->
+    <form class="modal-form" id="registerForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Имя</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/profile.png" alt="Имя" class="modal-input-icon">
+          <input type="text" class="modal-input" placeholder="Ваше имя" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+    </form>
+  </div>
+</div>
+  <script src="faq.js"></script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Горная матча — Forest Tea</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ========================
+       ХЕДЕР
+       Высота 100px, фон #09150F, фиксированный
+       [Лого] [Навигация + Соцсети по центру] [Действия справа]
+       ======================== -->
+  <header>
+
+    <!-- Логотип — круг 64×64. Замените на <img src="logo.png" width="64" height="64" /> -->
+    <div class="header-logo"></div>
+
+    <!-- Центральная зона: навигация + иконки соцсетей сразу после «Контакты» -->
+    <div class="header-center">
+
+      <!-- Навигация — Montserrat Medium 18, белый -->
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+
+      <!-- Соцсети 40×40 — вплотную правее пункта «Контакты»
+           Замените SVG на <img src="telegram.png" width="40" height="40" alt="Telegram" /> -->
+      <div class="header-socials">
+
+        <!-- Телеграм -->
+        <div class="header-icon" title="Telegram">
+          <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
+        </div>
+
+        <!-- YouTube -->
+        <div class="header-icon" title="YouTube">
+          <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
+        </div>
+
+        <!-- inst -->
+        <div class="header-icon" title="Instagram">
+          <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="header-actions">
+
+         <!-- Избранное (сердце) -->
+<a href="favorites.html" class="header-icon" title="Избранное">
+  <img src="pictures/love.png" width="35" height="35" alt="Избранное" />
+</a>
+
+        <!-- Корзина -->
+<a href="cart.html" class="header-icon" title="Корзина">
+  <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+</a>
+
+      <!-- Аккаунт -->
+      <div class="header-icon" title="Аккаунт" id="accountIcon">
+        <img src="pictures/profile.png" width="35" height="35" alt="Telegram" />
+      </div>
+
+    </div>
+
+  </header>
+
+   <!-- Хлебные крошки -->
+<nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <ol class="breadcrumbs-list">
+    <li class="breadcrumbs-item">
+      <a href="/" class="breadcrumbs-link breadcrumbs-home">
+        Главная
+      </a>
+    </li>
+    <li class="breadcrumbs-item">
+      <span class="breadcrumbs-separator">/</span>
+      <a href="/catalog" class="breadcrumbs-link">Каталог</a>
+    </li>
+       <li class="breadcrumbs-item">
+        <span class="breadcrumbs-separator">/</span>
+        <span class="breadcrumbs-current">Горная матча</span>
+      </li>
+  </ol>
+</nav>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="product-main">
+    
+    <!-- Верхняя часть: галерея + информация -->
+    <div class="product-top">
+      
+      <!-- Галерея изображений (слева) -->
+      <div class="product-gallery">
+        
+        <!-- Миниатюры -->
+        <div class="gallery-thumbnails">
+          <button class="gallery-thumb active" data-index="0">
+            <img src="pictures/tea/gornayamatcha2.jpg" alt="Горная матча" class="gallery-thumb-img">
+          </button>
+          <button class="gallery-thumb" data-index="1">
+            <img src="pictures/tea/gornayamatcha2.png" alt="Горная матча" class="gallery-thumb-img">
+          </button>
+    
+        </div>
+
+        <!-- Основное изображение -->
+        <div class="gallery-main">
+          <img src="pictures/tea/gornayamatcha2.jpg" alt="Горная матча" class="gallery-main-img" id="mainProductImage">
+          
+                <!-- Бейджи -->
+          <div class="gallery-badges">
+            <span class="gallery-badge bestseller">Хит продаж</span>
+            <span class="gallery-badge in-stock">В наличии</span>
+          </div>
+
+          <!-- Кнопки навигации -->
+          <button class="gallery-nav gallery-prev" aria-label="Предыдущее фото">
+            <img src="pictures/arrow-left.png" alt="←" class="gallery-nav-icon">
+          </button>
+          <button class="gallery-nav gallery-next" aria-label="Следующее фото">
+            <img src="pictures/arrow-right.png" alt="→" class="gallery-nav-icon">
+          </button>
+        </div><!-- /gallery-main -->
+
+      </div><!-- /product-gallery -->
+
+      <!-- Информация о товаре (справа) -->
+      <div class="product-info">
+        
+        <!-- Название и рейтинг -->
+        <h1 class="product-title">Горная матча</h1>
+        
+        <div class="product-rating-row">
+  <div class="product-stars">
+    <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+    <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+    <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+    <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+    <img src="pictures/star-empty.png" alt="☆" class="star-icon-static">
+  </div>
+  <span class="product-rating-text">4.2 (128 отзывов)</span>
+</div>
+
+        <!-- Страна и год -->
+        <div class="product-meta">
+          <span class="product-meta-tag">Япония</span>
+          <span class="product-meta-tag">2024</span>
+          <span class="product-meta-tag">травянистый</span>
+          <span class="product-meta-tag">сливочный</span>
+        </div>
+
+        <!-- Краткое описание -->
+        <p class="product-short-desc">
+          Премиальная церемониальная матча высшего сорта из префектуры Удзи. 
+          Яркий изумрудный цвет, нежный вкус с травянистыми и сливочными нотами. 
+          Идеально подходит для традиционной чайной церемонии и приготовления матча-латте.
+        </p>
+
+        <!-- Цена и покупка -->
+        <div class="product-buy-section">
+          <div class="product-price-block">
+            <span class="product-price">32 Br</span>
+            <span class="product-price-unit">/ 50 г</span>
+          </div>
+
+          <div class="product-buy-row">
+            <!-- Количество -->
+<div class="product-qty-selector">
+  <button class="product-qty-btn">−</button>
+  <span class="product-qty-value">1</span>
+  <button class="product-qty-btn">+</button>
+</div>
+
+            <!-- Кнопка "В корзину" -->
+            <button class="product-add-to-cart-btn">
+              В корзину
+            </button>
+
+            <!-- Избранное -->
+            <button class="product-favorite-btn" onclick="toggleFavorite(this)">
+              <img src="pictures/heart-empty.png" alt="В избранное" class="favorite-btn-img">
+            </button>
+          </div>
+        </div>
+
+    
+      </div>
+    </div>
+
+    <!-- Нижняя часть: описание + характеристики + отзывы -->
+    <div class="product-bottom">
+      
+      <!-- Табы -->
+      <div class="product-tabs">
+        <button class="product-tab active" data-tab="description">Описание</button>
+        <button class="product-tab" data-tab="characteristics">Характеристики</button>
+        <button class="product-tab" data-tab="reviews">Отзывы (128)</button>
+      </div>
+
+      <!-- Контент табов -->
+      <div class="product-tab-content">
+        
+        <!-- Таб: Описание -->
+        <div class="tab-panel active" id="tab-description">
+          <div class="product-description">
+            <h3>О товаре</h3>
+            <p>
+              Горная матча — это церемониальный сорт, выращенный в префектуре Удзи, 
+              знаменитой своими чайными традициями. Чайные кусты затеняются за 3-4 недели 
+              до сбора, что повышает содержание хлорофилла и придаёт листьям насыщенный 
+              изумрудный цвет.
+            </p>
+            <p>
+              После сбора листья обрабатываются паром, высушиваются и перемалываются 
+              на медленных каменных жерновах в тончайший порошок. Такой метод сохраняет 
+              все полезные вещества и даёт неповторимый вкус.
+            </p>
+            <p>
+              <strong>Вкус:</strong> травянистый, сливочный, с лёгкой сладостью и бархатистым послевкусием.<br>
+              <strong>Аромат:</strong> свежий, с нотами морских водорослей и зелени.
+            </p>
+          </div>
+        </div>
+
+        <!-- Таб: Характеристики -->
+        <div class="tab-panel" id="tab-characteristics">
+          <div class="product-characteristics">
+            <div class="char-row">
+              <span class="char-label">Страна</span>
+              <span class="char-value">Япония, префектура Удзи</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Год сбора</span>
+              <span class="char-value">2024 (май, первый сбор)</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Вид чая</span>
+              <span class="char-value">Матча</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Температура воды</span>
+              <span class="char-value">70–80°C</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Время заваривания</span>
+              <span class="char-value">взбивать 30–60 секунд</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Кофеин</span>
+              <span class="char-value">Высокий</span>
+            </div>
+            <div class="char-row">
+              <span class="char-label">Срок хранения</span>
+              <span class="char-value">12 месяцев</span>
+            </div>
+          </div>
+        </div>
+
+<!-- Таб: Отзывы -->
+<div class="tab-panel" id="tab-reviews">
+  
+  <!-- Форма добавления отзыва -->
+  <div class="review-form-wrapper">
+    <h3 class="review-form-title">Оставте отзыв</h3>
+    
+    <form class="review-form feedback-form" id="reviewForm">
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="review-name" class="form-label">Ваше имя*</label>
+          <input type="text" id="review-name" class="form-input" placeholder="Иван" required>
+        </div>
+        <div class="form-group">
+          <label for="review-email" class="form-label">Email*</label>
+          <input type="email" id="review-email" class="form-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+
+      <!-- Оценка звёздами (PNG-иконки) -->
+    <div class="form-group full-width">
+  
+  <div class="rating-row">
+    <label class="form-label">Ваша оценка*</label>
+
+    <div class="stars-input" id="starsInput">
+          <button type="button" class="star-btn" data-value="1" title="Ужасно">
+            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+          </button>
+          <button type="button" class="star-btn" data-value="2" title="Плохо">
+            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+          </button>
+          <button type="button" class="star-btn" data-value="3" title="Нормально">
+            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+          </button>
+          <button type="button" class="star-btn" data-value="4" title="Хорошо">
+            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+          </button>
+          <button type="button" class="star-btn" data-value="5" title="Отлично">
+            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+          </button>
+        </div>
+        </div>
+        <input type="hidden" id="review-rating" name="rating" value="0" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="review-title" class="form-label">Заголовок отзыва</label>
+          <input type="text" id="review-title" class="form-input" placeholder="Кратко опишите ваше впечатление">
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="review-text" class="form-label">Ваш отзыв*</label>
+        <textarea id="review-text" class="form-textarea" placeholder="Расскажите о вкусе, аромате и ваших впечатлениях..." rows="4" required></textarea>
+      </div>
+
+      <button type="submit" class="review-submit-btn">Отправить</button>
+      
+      <div id="review-message-box" class="feedback-message"></div>
+    </form>
+  </div>
+
+          <!-- Список отзывов -->
+          <div class="reviews-list">
+            
+         <div class="review-card">
+  <div class="review-header">
+    <div class="review-author-avatar">А</div>
+    <div class="review-author-info">
+      <span class="review-author-name">Анна</span>
+      <span class="review-date">12 марта 2026</span>
+    </div>
+    <div class="review-stars">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+    </div>
+  </div>
+  <div class="review-body">
+    <h4 class="review-title">Лучшая матча, которую я пробовала!</h4>
+    <p class="review-text">
+      Заказывала для чайной церемонии. Цвет потрясающий — ярко-изумрудный. 
+      Вкус нежный, без горечи, с приятной сладостью. Пена получается 
+      густая и бархатистая. Рекомендую всем ценителям!
+    </p>
+  </div>
+  <div class="review-footer">
+    <button class="review-helpful-btn">Полезно (12)</button>
+  </div>
+</div>
+
+            <div class="review-card">
+  <div class="review-header">
+    <div class="review-author-avatar">М</div>
+    <div class="review-author-info">
+      <span class="review-author-name">Михаил</span>
+      <span class="review-date">5 марта 2026</span>
+    </div>
+    <div class="review-stars">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-empty.png" alt="☆" class="star-icon-static">
+    </div>
+  </div>
+  <div class="review-body">
+    <h4 class="review-title">Отличное качество, но цена высоковата</h4>
+    <p class="review-text">
+      Качество на высоте — цвет, вкус, аромат. Делаю матча-латте по утрам, 
+      заряжает энергией на весь день. Единственное — хотелось бы упаковку 
+      побольше за эти деньги.
+    </p>
+  </div>
+  <div class="review-footer">
+    <button class="review-helpful-btn">Полезно (8)</button>
+  </div>
+</div>
+
+         <div class="review-card">
+  <div class="review-header">
+    <div class="review-author-avatar">Е</div>
+    <div class="review-author-info">
+      <span class="review-author-name">Екатерина</span>
+      <span class="review-date">28 февраля 2026</span>
+    </div>
+    <div class="review-stars">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
+      <img src="pictures/star-empty.png" alt="☆" class="star-icon-static">
+    </div>
+  </div>
+  <div class="review-body">
+    <h4 class="review-title">Хорошая матча для latte</h4>
+    <p class="review-text">
+      Для церемониальной, наверное, есть варианты и получше, но для 
+      повседневного использования и матча-латте — отличный выбор. 
+      Быстрая доставка, красивая упаковка.
+    </p>
+  </div>
+  <div class="review-footer">
+    <button class="review-helpful-btn">Полезно (5)</button>
+  </div>
+</div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Похожие товары -->
+    <div class="divider-line"></div>
+    <h2 class="product-same-title">Похожие товары</h2>
+    <div class="cards-row">
+      <!-- Карточки похожих товаров -->
+   <div class="product-card">
+    
+    <div class="stock-badge in-stock">В наличии</div>
+    
+    <div class="card-image-wrapper">
+      <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
+    </div>
+    
+    <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
+    
+    <div class="card-body">
+      <div class="card-name">Молочный улун</div>
+      <div class="card-desc">Нежный чай с карамельным ароматом</div>
+      
+      <div class="card-price">42 br <span class="card-price-unit">/ 50 г</span></div>
+      
+      <div class="qty-label">Выберите количество:</div>
+      <div class="qty-selector">
+        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
+        <span class="qty-value">1</span>
+        <button class="qty-btn plus" aria-label="Увеличить">+</button>
+      </div>
+      
+      <div class="card-bottom-row">
+        <button class="card-btn add-to-cart-btn">В корзину</button>
+        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
+          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
+        </button>
+      </div>
+    </div>
+  </div>
+
+      <!-- Можно добавить ещё 2 карточки -->
+    </div>
+
+  </main>
+
+  <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn">
+            <img src="pictures/send.png" alt="Отправить" class="send-icon">
+          </button>
+        </div>
+        <div id="email-error" class="email-error"></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+       <div class="footer-column">
+  <h4 class="footer-column-title">Контакты</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/email.png" alt="Почта" class="footer-icon">
+      <a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a>
+    </li>
+  </ul>
+</div>
+        <div class="footer-column">
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+<!-- Модальное окно Вход / Регистрация -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-window">
+    
+    <!-- Кнопка закрытия -->
+    <button class="modal-close-btn" id="closeModal">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+
+    <!-- Табы: Вход / Регистрация -->
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Вход</button>
+      <button class="modal-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <!-- Форма Входа -->
+    <form class="modal-form active" id="loginForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Войти</button>
+    </form>
+
+    <!-- Форма Регистрации -->
+    <form class="modal-form" id="registerForm">
+      <div class="modal-input-group">
+        <label class="modal-label">Имя</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/profile.png" alt="Имя" class="modal-input-icon">
+          <input type="text" class="modal-input" placeholder="Ваше имя" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Email</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+          <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+        </div>
+      </div>
+      <div class="modal-input-group">
+        <label class="modal-label">Пароль</label>
+        <div class="modal-input-wrapper">
+          <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+          <input type="password" class="modal-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+    </form>
+  </div>
+</div>
+  <script src="product.js"></script>
+</body>
+</html>

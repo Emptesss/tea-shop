@@ -309,3 +309,243 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
 });
+// ========================
+// ЭФФЕКТ ЛУПЫ — ПРИБЛИЖЕНИЕ И ДВИЖЕНИЕ МЫШКОЙ
+// ========================
+const wrappers = document.querySelectorAll('.card-image-wrapper');
+
+wrappers.forEach(wrapper => {
+  const img = wrapper.querySelector('.card-image');
+  if (!img) return;
+
+  wrapper.addEventListener('mouseenter', () => {
+    wrapper.classList.add('panning');
+  });
+
+  wrapper.addEventListener('mousemove', (e) => {
+    const rect = wrapper.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    img.style.transformOrigin = `${x}% ${y}%`;
+    img.style.transform = 'scale(1.4)';
+  });
+
+  wrapper.addEventListener('mouseleave', () => {
+    wrapper.classList.remove('panning');
+    img.style.transform = 'scale(1)';
+    img.style.transformOrigin = 'center center';
+  });
+
+  // Тач-версия
+  wrapper.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    wrapper.classList.add('panning');
+  }, { passive: false });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = wrapper.getBoundingClientRect();
+    const x = ((touch.clientX - rect.left) / rect.width) * 100;
+    const y = ((touch.clientY - rect.top) / rect.height) * 100;
+
+    img.style.transformOrigin = `${x}% ${y}%`;
+    img.style.transform = 'scale(1.4)';
+  }, { passive: false });
+
+  wrapper.addEventListener('touchend', () => {
+    wrapper.classList.remove('panning');
+    img.style.transform = 'scale(1)';
+    img.style.transformOrigin = 'center center';
+  });
+});
+
+// ========================
+// ИЗБРАННОЕ В КАРТОЧКАХ (главная + каталог)
+// ========================
+window.toggleFavoriteBottom = function(btn) {
+  btn.classList.toggle('active');
+  const img = btn.querySelector('img');
+  if (!img) return;
+  
+  if (btn.classList.contains('active')) {
+    img.src = 'pictures/love.png';
+  } else {
+    img.src = 'pictures/heart-empty.png';
+  }
+};
+
+// ========================
+// МОДАЛЬНОЕ ОКНО ВХОД/РЕГИСТРАЦИЯ
+// ========================
+const modal = document.getElementById('loginModal');
+const accountIcon = document.getElementById('accountIcon');
+const closeModal = document.getElementById('closeModal');
+const modalTabs = document.querySelectorAll('.modal-tab');
+const modalForms = document.querySelectorAll('.modal-form');
+
+// Проверяем, сохранён ли вход
+let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+// При загрузке — ставим аватар или плейсхолдер
+if (isLoggedIn && accountIcon) {
+  const iconImg = accountIcon.querySelector('img');
+  const savedAvatar = localStorage.getItem('userAvatar');
+  iconImg.src = savedAvatar || 'pictures/cat.png';
+  iconImg.style.width = '35px';
+  iconImg.style.height = '35px';
+  iconImg.style.borderRadius = '50%';
+  iconImg.style.objectFit = 'cover';
+}
+
+if (accountIcon) {
+  accountIcon.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (isLoggedIn) {
+      window.location.href = 'account.html';
+    } else {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+}
+
+if (closeModal) {
+  closeModal.addEventListener('click', function() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+}
+
+modal.addEventListener('click', function(e) {
+  if (e.target === modal) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && modal.classList.contains('open')) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+modalTabs.forEach(tab => {
+  tab.addEventListener('click', function() {
+    modalTabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    
+    const target = this.dataset.tab;
+    modalForms.forEach(form => {
+      form.classList.remove('active');
+      if (form.id === target + 'Form') form.classList.add('active');
+    });
+  });
+});
+
+// Вход
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  isLoggedIn = true;
+  localStorage.setItem('isLoggedIn', 'true');
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  const iconImg = accountIcon.querySelector('img');
+  const savedAvatar = localStorage.getItem('userAvatar');
+  iconImg.src = savedAvatar || 'pictures/cat.png';
+  iconImg.style.width = '35px';
+  iconImg.style.height = '35px';
+  iconImg.style.borderRadius = '50%';
+  iconImg.style.objectFit = 'cover';
+});
+
+// Регистрация
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  isLoggedIn = true;
+  localStorage.setItem('isLoggedIn', 'true');
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  const iconImg = accountIcon.querySelector('img');
+  iconImg.src = 'pictures/cat.png';
+  iconImg.style.width = '35px';
+  iconImg.style.height = '35px';
+  iconImg.style.borderRadius = '50%';
+  iconImg.style.objectFit = 'cover';
+});
+
+// ========================
+// МОДАЛЬНОЕ ОКНО «СПАСИБО ЗА ЗАКАЗ»
+// ========================
+if (localStorage.getItem('orderPlaced') === 'true') {
+  // Удаляем флаг, чтобы окно не показывалось при следующем обновлении
+  localStorage.removeItem('orderPlaced');
+
+  // Создаём оверлей
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.display = 'flex';
+  overlay.style.zIndex = '10000';
+
+  // Само окно (копия стиля входа/регистрации)
+  const modal = document.createElement('div');
+  modal.className = 'modal-window';
+  modal.style.textAlign = 'center';
+  modal.style.maxWidth = '480px';
+
+  modal.innerHTML = `
+    <button class="modal-close-btn" id="closeThanksModal">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+    <div style="padding: 24px 16px 12px;">
+      <div style="width: 60px; height: 60px; margin: 0 auto 16px; border-radius: 50%; 
+                  display: flex; align-items: center; justify-content: center;">
+        <img src="pictures/love.png" alt="Спасибо" style="width: 50px; height: 50px; object-fit: contain;">
+      </div>
+      <h2 style="font-family: 'Montserrat Alternates', sans-serif; font-weight: 500; 
+                 font-size: 28px; color: #fff; margin: 0 0 12px;">
+        Спасибо за заказ!
+      </h2>
+      <p style="font-family: 'Montserrat', sans-serif; font-size: 16px; 
+                color: rgba(255,255,255,0.8); margin: 0 0 12px;">
+        Ваш заказ принят. Отслеживайте статус заказа в личном кабинете.
+      </p>
+      <p style="font-family: 'Montserrat', sans-serif; font-size: 18px; 
+                color: #fff; margin: 0 0 24px;">
+        Номер заказа: <strong style="color: #337B57;">#0042</strong>
+      </p>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Блокируем прокрутку страницы пока окно открыто
+  document.body.style.overflow = 'hidden';
+
+  // Закрытие по крестику
+  const closeBtn = modal.querySelector('#closeThanksModal');
+  closeBtn.addEventListener('click', function() {
+    overlay.remove();
+    document.body.style.overflow = '';
+  });
+
+  // Закрытие по клику на оверлей
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      overlay.remove();
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Закрытие по ESC
+  document.addEventListener('keydown', function handler(e) {
+    if (e.key === 'Escape') {
+      document.removeEventListener('keydown', handler);
+      overlay.remove();
+      document.body.style.overflow = '';
+    }
+  });
+}

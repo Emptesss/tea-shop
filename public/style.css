@@ -38,9 +38,12 @@ header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;                    /* Растягивается на весь экран */
+  width: 100%;
   height: 100px;
-  background-color: var(--color-header);
+  background:
+    rgba(9, 21, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
   padding: 0 var(--page-margin);
@@ -51,10 +54,12 @@ header {
 /* Логотип — круг 64×64 в левом углу.
    Замените на <img src="logo.png" width="64" height="64" /> */
 .header-logo {
-  width: 64px;
-  height: 64px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
-  background-color: var(--color-accent-green);
+  background-image: url('../pictures/logo.png');
+  background-size: cover;
+  background-position: center;
   flex-shrink: 0;
 }
 
@@ -259,65 +264,166 @@ header {
 .product-card {
   width: 270px;
   height: 452px;
-  background-color: var(--color-card);
+  background: linear-gradient(
+    180deg,
+
+    #3a2727 60%,
+    #5B3E3E 100%
+  );
   border-radius: 25px;
-  overflow: visible;
+  overflow: hidden;
   flex-shrink: 0;
   position: relative;
+  
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 /* Фото товара */
 .card-image {
   width: 270px;
-  height: 264px;
+  height: 240px;
   border-radius: 25px 25px 0 0;
   object-fit: cover;
   display: block;
   background-color: #3a2a2a;
 }
+/* ========================
+   ФОТО ТОВАРА С ЛУПОЙ
+   ======================== */
 
-/* Бейдж */
+/* Контейнер — обрезает изображение по скруглениям */
+.card-image-wrapper {
+  width: 340px;
+  height: 240px;
+  border-radius: 25px 25px 0 0;
+  overflow: hidden;
+  position: relative;
+  cursor: zoom-in;
+  background-color: #3a2a2a;
+}
+
+/* Само изображение */
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* При наведении — приближение */
+.card-image-wrapper:hover .card-image {
+  transform: scale(1.4);
+}
+
+/* При движении мышкой — убираем задержку */
+.card-image-wrapper.panning .card-image {
+  transition: none;
+}
+/* ========================
+   БЕЙДЖ НАЛИЧИЯ НА ФОТО
+   ======================== */
+.stock-badge {
+  position: absolute;
+  bottom: 220px;
+  left: 10px;
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  z-index: 3;
+  backdrop-filter: blur(4px);
+}
+
+.stock-badge.in-stock {
+  background: #337B57;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.stock-badge.out-of-stock {
+  background: #0D2719;
+  color: #fff;
+  opacity: 0.9;
+ 
+}
+
+/* Бейдж покупок (слева сверху) */
 .card-badge {
   position: absolute;
   top: 12px;
   left: 12px;
   background-color: rgba(9, 21, 15, 0.80);
   border-radius: 43px;
-  padding: 8px 18px;
+  padding: 7px 14px;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 600;
-  font-size: 11px;
-  color: var(--color-white);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--color-white, #fff);
   white-space: nowrap;
   z-index: 2;
 }
 
 /* Нижняя часть карточки */
 .card-body {
-  padding: 12px 14px 14px 14px;
-  height: 188px; /* 452 - 264 = 188 */
+  padding: 10px 14px 14px 14px;
+  height: 212px;                           /* 452 - 240 = 212 */
   position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* Название */
 .card-name {
   font-family: 'Montserrat Alternates', sans-serif;
   font-weight: 600;
-  font-size: 16px;
-  color: var(--color-white);
+  font-size: 17px;
+  color: var(--color-white, #fff);
   text-align: left;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  line-height: 1.2;
+  flex-shrink: 0;
 }
 
 /* Описание */
 .card-desc {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
-  font-size: 11px;
-  color: var(--color-white);
+  font-size: 13px;
+  color: #fff;
   text-align: left;
-  line-height: 1.4;
-  margin-bottom: 5px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+/* Ссылка на страницу товара */
+.card-name-link,
+.card-desc-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card-name-link .card-name,
+.card-desc-link .card-desc {
+  transition: color 0.2s ease;
+}
+
+.card-name-link:hover .card-name,
+.card-desc-link:hover .card-desc {
+  color: #337B57;  /* акцентный зелёный */
+}
+
+/* Теги (оставлены на случай, если понадобятся, но в вёрстке их нет) */
+.card-tags {
+  display: none;                            /* скрываем, т.к. удалили */
+}
+
+.card-tag {
+  display: none;
 }
 
 /* Цена */
@@ -325,38 +431,150 @@ header {
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   font-size: 16px;
-  color: var(--color-white);
+  color: var(--color-white, #fff);
   text-align: left;
-  position: absolute;
-  bottom: 90px; /* Над кнопкой */
-  left: 14px;
+  margin-top: 0;
+  margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
-/* Кнопка — прижата к низу */
+.card-price-unit {
+  font-weight: 400;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* ========================
+   ВЫБОР КОЛИЧЕСТВА В КАРТОЧКЕ
+   ======================== */
+.qty-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.qty-selector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 25px;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 0 2px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.qty-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.qty-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.qty-value {
+  min-width: 24px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  user-select: none;
+}
+/* ========================
+   КНОПКА + ИЗБРАННОЕ
+   ======================== */
+.card-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;                         /* прижимает к низу */
+  flex-shrink: 0;
+}
+
+/* Кнопка "В корзину" */
 .card-btn {
-  width: 140.31px;
-  height: 40.41px;
+  flex: 1;
+  height: 38px;
   border-radius: 100px;
   border: none;
   background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
   font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  color: var(--color-white);
+  font-weight:400;
+  font-size: 14px;
+  color: var(--color-white, #fff);
   cursor: pointer;
-  display: block;
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
+  transition: opacity 0.3s;
+  padding: 0 16px;
 }
 
-.card-btn:hover { opacity: 0.9; }
-
+.card-btn:hover {
+  opacity: 0.9;
+}
 
 /* ========================
-   БАННЕР "О НАС"
-   Скругление 30, #1F4D2E 40%, стекломорфизм, градиентная обводка
+   ИЗБРАННОЕ В КАРТОЧКЕ (как на странице продукта)
+   ======================== */
+.card-favorite-bottom {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background-color: transparent;           /* убрали фон */
+  border: none;                            /* убрали рамку */
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  padding: 0;
+}
+
+.card-favorite-bottom:hover {
+  transform: scale(1.15);                  /* увеличение как у звёзд */
+  background-color: transparent;
+}
+
+.card-favorite-bottom:active {
+  transform: scale(0.9);                   /* сжатие при клике */
+}
+
+.card-favorite-bottom.active {
+  background-color: transparent;
+}
+
+.card-favorite-bottom-img {
+  width: 34px;                             /* крупнее, как на странице продукта */
+  height: 34px;
+  object-fit: contain;
+  pointer-events: none;                    /* клик идёт на кнопку */
+}
+
+/* ========================
+   БАННЕР "О НАС" (В СТИЛЕ КНИГИ)
    ======================== */
 .about-section {
   width: 100%;
@@ -365,95 +583,265 @@ header {
   margin-bottom: 80px;
 }
 
-/* Обёртка создаёт градиентную обводку толщиной 5px */
-.about-banner-wrapper {
-  border-radius: 30px;
-  padding: 5px;
+/* Книга */
+.about-book {
+  display: flex;
+  max-width: 1050px;
+  margin: 0 auto;
+  position: relative;
+  filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.5));
+  height: 460px;
+}
+
+/* Страницы */
+.about-book-page {
+  flex: 1;
+  position: relative;
+  min-height: 200px;
+  min-width: 0; /* <-- ВАЖНО: предотвращает переполнение flex-элемента */
+}
+
+/* Левая страница — текст + кнопки */
+.about-book-left {
   background: linear-gradient(
     to right,
-    rgba(31, 77, 46, 0.4) 0%,
-    rgba(255, 255, 255, 1) 100%
+    rgba(31, 77, 46, 0.2) 0%,
+    rgba(31, 77, 46, 0.35) 100%
   );
-}
-
-/* Сам баннер — стекломорфизм */
-.about-banner {
-  border-radius: 26px;
-  background-color: rgba(31, 77, 46, 0.4);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  display: flex;
-  position: relative;
+  border-radius: 20px 0 0 20px;
   overflow: hidden;
-  min-height: 400px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: none;
+  display: flex; /* <-- Добавлено */
 }
 
-/* Левая часть баннера — текст и кнопки */
-.about-content {
-  flex: 1;
-  padding: 52px 48px 52px 87px;
+.about-book-content {
+  padding: 40px 35px 30px 40px;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  width: 100%; /* <-- Добавлено */
+  overflow-y: auto; /* <-- Добавлено: прокрутка если текст не помещается */
+  box-sizing: border-box;
 }
 
-/* Заголовок баннера — Montserrat Alternates SemiBold 32 */
-.about-title {
+/* Заголовок */
+.about-book-title {
   font-family: 'Montserrat Alternates', sans-serif;
   font-weight: 600;
-  font-size: 32px;
+  font-size: 26px;
   color: var(--color-white);
-  text-align: left;
-  margin-bottom: 32px;
-  max-width: 545px;
+  margin-bottom: 20px;
+  line-height: 1.3;
+  flex-shrink: 0; /* <-- Добавлено: заголовок не сжимается */
 }
 
-/* Текст баннера — Montserrat Medium 18, line-height 20px */
-.about-text {
+/* Текст */
+.about-book-text {
   font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  color: var(--color-white);
-  text-align: left;
-  line-height: 20px;
-  max-width: 100%;
-  flex: 1;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  flex-shrink: 0; /* <-- Добавлено */
 }
 
-.about-text p { margin-bottom: 18px; }
-.about-text p:last-child { margin-bottom: 0; }
+.about-book-text p {
+  margin-bottom: 12px;
+}
 
-/* Кнопки стран — скругление 100, #5B3E3E */
-.country-buttons {
+.about-book-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Кнопки стран */
+.about-book-buttons {
   display: flex;
-  gap: 16px;
+  gap: 15px;
   flex-wrap: wrap;
-  margin-top: 36px;
+  margin-top: auto; /* <-- Изменено: кнопки прижимаются к низу */
+  padding-top: 20px;
+  flex-shrink: 0; /* <-- Добавлено: кнопки не сжимаются */
 }
 
-.country-btn {
-  height: 44px;
-  width: 125px;
-  padding: 0 24px;
+.about-book-btn {
+  height: 35px;
+  padding: 0 20px;
   border-radius: 100px;
   border: none;
   background-color: #5B3E3E;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 14px;
   color: var(--color-white);
   cursor: pointer;
+  transition: opacity 0.3s;
+  white-space: nowrap; /* <-- Добавлено: текст кнопки не переносится */
 }
 
-.country-btn:hover { opacity: 0.85; }
+.about-book-btn:hover {
+  opacity: 0.8;
+}
 
-/* Правая часть баннера — изображение 496px, скруглены правые углы.
-   Замените div на <img src="about.jpg" class="about-image" alt="О нас"
-   style="object-fit:cover;border-radius:0 25px 25px 0;" /> */
-.about-image {
-  width: 45%;
-  flex-shrink: 0;
-  border-radius: 0 25px 25px 0;
-  background-color: #2a4a35;
+/* Правая страница — изображение */
+.about-book-right {
+  background: linear-gradient(
+    to right,
+    rgba(31, 77, 46, 0.15) 0%,
+    rgba(31, 77, 46, 0.3) 100%
+  );
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: none;
+  min-width: 0; /* <-- Добавлено */
+}
+
+.about-book-image {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.about-book-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+
+/* Планшеты */
+@media (max-width: 850px) {
+  .about-section {
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+
+  .about-book {
+    flex-direction: column;
+    max-width: 600px;
+    height: auto; /* <-- Убираем фиксированную высоту */
+  }
+
+  .about-book-page {
+    min-height: auto;
+  }
+
+  .about-book-left {
+    border-radius: 20px 20px 0 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: none;
+  }
+
+  .about-book-content {
+    padding: 30px 25px 25px 25px;
+  }
+
+  .about-book-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .about-book-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .about-book-buttons {
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .about-book-right {
+    border-radius: 0 0 20px 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    height: 280px;
+  }
+
+}
+
+/* Мобильные */
+@media (max-width: 480px) {
+  .about-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+
+  .about-book {
+    max-width: 100%;
+  }
+
+  .about-book-left {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .about-book-right {
+    border-radius: 0 0 16px 16px;
+    height: 200px;
+  }
+
+  .about-book-content {
+    padding: 24px 18px 20px 18px;
+  }
+
+  .about-book-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .about-book-text {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .about-book-text p {
+    margin-bottom: 10px;
+  }
+
+  .about-book-buttons {
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .about-book-btn {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+  .about-book-right {
+    height: 160px;
+  }
+
+  .about-book-content {
+    padding: 20px 14px 16px 14px;
+  }
+
+  .about-book-title {
+    font-size: 18px;
+  }
+
+  .about-book-buttons {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .about-book-btn {
+    width: 100%;
+    text-align: center;
+  }
 }
 /* ========================
    СЕКЦИЯ "ПОЧЕМУ ВЫБИРАЮТ НАС"
@@ -467,92 +855,163 @@ header {
   align-items: center;
 }
 
-/* Ряд из трёх преимуществ — горизонтально, по центру */
-.features-row {
-  display: flex;
-  gap: 60px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 40px;
+/* Заголовок секции (использует .section-title) */
+.section-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-/* Один элемент преимущества */
-.feature-item {
+/* Сетка преимуществ */
+.why-us-grid {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Карточка преимущества */
+.why-us-card {
+  width: 320px;
+  text-align: center;
+  transition: transform 0.3s;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 320px;
-  flex-shrink: 0;
 }
 
-/* Иконка — 80×80 */
-.feature-icon {
+.why-us-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Иконка */
+.why-us-icon {
+  width: 64px;
+  height: 64px;
+  background: transparent;
+  border-radius: 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border: 0px solid rgba(51, 123, 87, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.why-us-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Заголовок */
+.why-us-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-white);
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Блок с описанием (прямоугольник) */
+.why-us-box {
+  width: 100%;
+  flex: 1;
+  border-radius: 20px;
+  padding: 3px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green) 0%,
+    #5B3E3E 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  transition: box-shadow 0.3s;
+  height: 140px;     
+}
+
+.why-us-card:hover .why-us-box {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(51, 123, 87, 0.1);
+}
+
+.why-us-text {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.8) 0%,
+    rgba(9, 21, 15, 0.9) 100%
+  );
+  border-radius: 17px;
+  padding: 24px 20px;
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgb(255, 255, 255);
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Декоративные круги на фоне */
+.why-us-text::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
   width: 80px;
   height: 80px;
-  border-radius: 50%;
-  
-  margin-bottom: 30px;
-  flex-shrink: 0;
-  /* Замените на img */
-}
-
-/* Заголовок преимущества — Montserrat Medium 32 */
-.feature-name {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-size: 32px;
-  color: var(--color-white);
-  text-align: center;
-  margin-bottom: 30px;
-  height: 80px; /* Фиксированная высота для всех заголовков */
-  display: flex;
-  align-items: center; /* Выравнивание текста по центру вертикали */
-  justify-content: center;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-
-/* Для заголовков в две строки */
-.feature-name.two-lines {
-  white-space: normal;
-  word-break: break-word;
-}
-
-/* Для заголовка в одну строку */
-.feature-name.one-line {
-  white-space: nowrap;
-}
-
-/* Прямоугольник с текстом — #5B3E3E, скругление 20, градиентная обводка */
-.feature-box {
-  width: 100%;
-  border-radius: 20px;
-  padding: 5px; /* Толщина обводки */
-  background: linear-gradient(
-    to right,
-    #5B3E3E 0%,
-    rgba(255, 255, 255, 1) 100%
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.12) 0%,
+    transparent 70%
   );
-  height: 140px; /* Фиксированная высота для всех прямоугольников */
-  flex-shrink: 0;
+  border-radius: 50%;
 }
 
-/* Внутренняя часть прямоугольника */
-.feature-box .feature-text {
-  background-color: #5B3E3E;
-  border-radius: 16px;
-  padding: 20px 16px;
-  margin: 0;
-  height: 100%; /* Занимает всю высоту родителя */
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  color: var(--color-white);
-  text-align: center;
-  line-height: 1.5;
-  display: flex;
-  align-items: center; /* Выравнивание текста по центру вертикали */
-  justify-content: center;
+.why-us-text::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+@media (max-width: 800px) {
+  .why-us-grid {
+    gap: 24px;
+  }
+
+  .why-us-card {
+    width: 100%;
+    max-width: 360px;
+  }
 }
 /* ========================
    ФУТЕР
@@ -716,7 +1175,7 @@ header {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;                        /* Расстояние между пунктами */
+  gap: 15px;                        /* Расстояние между пунктами */
 }
 .footer-column:first-child .footer-list {
   gap: 15px;                         /* Меньше отступ между номерами и почтой */
@@ -731,26 +1190,39 @@ header {
   font-size: 18px;
   color: var(--color-white);
   text-align: left;
+  line-height: 1.2;                        
+}
+
+/* Текст рядом с иконкой */
+.footer-list-item span,
+.footer-list-item a {
+  line-height: 29px;                       /* ← ровно по высоте иконки */
 }
 
 /* Иконка в пункте списка (телефон, почта) */
 .footer-icon {
-  width: 29px;                      /* Размер иконки 29×29 */
-  height: 29px;
+  width: 28px;                      /* Размер иконки 29×29 */
+  height: 28px;
   object-fit: contain;              /* Сохранение пропорций */
   flex-shrink: 0;                   /* Запрет сжатия */
-  margin-left: -5px;                /* Сдвигает иконку влево */
-
+  margin-left: -5px;                /* Сдвигает иконку влево */ 
 }
 
-/* Ссылка в колонке (Каталог, О нас) */
+/* Ссылка в колонке */
 .footer-link {
-  cursor: pointer;                  /* Курсор-указатель */
-  transition: opacity 0.3s;         /* Плавное изменение прозрачности */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-white);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  line-height: 1.2;
+  display: block;     
 }
 
 .footer-link:hover {
-  opacity: 0.7;                     /* Затемнение при наведении */
+  opacity: 0.7;
 }
 
 /* ========================
@@ -805,31 +1277,28 @@ header {
 }
 
 /* ========================
-   СТРАНИЦА КАТАЛОГА — ОСНОВНЫЕ СТИЛИ
+   СТРАНИЦА КАТАЛОГА — ПОЛНЫЙ ИСПРАВЛЕННЫЙ CSS
    ======================== */
 
-/* Основной контейнер страницы каталога */
+/* Основной контейнер */
 .catalog-main {
   width: 100%;
   padding: 0 var(--page-margin);
-  margin-top: 100px;
-  margin-bottom: 100px;                        /* Убрали нижний отступ */
+  margin-top: 10px;
+  margin-bottom: 80px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);             /* Фиксированная высота */
-  overflow: hidden;                        /* Запрещаем скролл */
 }
 
-/* Заголовок страницы */
+/* Заголовок */
 .catalog-page-title {
   font-family: 'Montserrat Alternates', sans-serif;
-  font-weight: 400;                       /* Regular */
+  font-weight: 400;
   font-size: 40px;
   color: var(--color-white);
   text-align: center;
-  margin-top: 40px;
+  margin-top: 0;
   margin-bottom: 30px;
-   flex-shrink: 0;  
 }
 
 /* ========================
@@ -845,16 +1314,14 @@ header {
   border-radius: 100px;
   padding: 0 24px;
   margin: 0 auto 30px auto;
-   flex-shrink: 0;          
 }
 
 .search-icon {
-  width:30px;
+  width: 30px;
   height: 30px;
   object-fit: contain;
   flex-shrink: 0;
   margin-right: 12px;
-  opacity: 0.5;
 }
 
 .catalog-search-input {
@@ -884,7 +1351,8 @@ header {
   margin-bottom: 30px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent-green) transparent;
-   flex-shrink: 0;          
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .categories-scroll::-webkit-scrollbar {
@@ -921,18 +1389,16 @@ header {
 }
 
 /* ========================
-   ДВУХКОЛОНОЧНЫЙ МАКЕТ: САЙДБАР + ТОВАРЫ
+   ДВУХКОЛОНОЧНЫЙ МАКЕТ
    ======================== */
 .catalog-layout {
   display: flex;
   gap: 30px;
-  flex: 1;                                /* Занимает всё оставшееся пространство */
-  min-height: 0;                          /* Важно для flex-скролла */
-  overflow: hidden;                       /* Запрещаем скролл */
+  align-items: flex-start;
 }
 
 /* ========================
-   САЙДБАР С ФИЛЬТРАМИ (280px)
+   САЙДБАР С ФИЛЬТРАМИ
    ======================== */
 .catalog-sidebar {
   width: 280px;
@@ -943,11 +1409,8 @@ header {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  height: fit-content;
   position: sticky;
   top: 120px;
-  overflow-y: visible;  /* ← ДОБАВИТЬ эту строку */
-  max-height: none;     /* ← ДОБАВИТЬ эту строку */
 }
 
 /* Заголовок сайдбара */
@@ -1004,10 +1467,6 @@ header {
   font-weight: 500;
   font-size: 16px;
   color: var(--color-white);
-}
-
-.availability-icon {
-  font-size: 14px;
 }
 
 .switch-toggle {
@@ -1246,13 +1705,6 @@ header {
   color: var(--color-white);
 }
 
-.country-flag {
-  font-size: 16px;
-  width: 20px;
-  display: inline-block;
-  text-align: center;
-}
-
 /* Раскрывающийся список "Другие страны" */
 .filter-details {
   margin-top: 12px;
@@ -1291,37 +1743,9 @@ header {
 .catalog-products {
   flex: 1;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;                       /* ← ВОТ ГДЕ ПРОКРУТКА! */
-  overflow-x: hidden;
-  padding-right: 5px;
-  
-  /* Стилизация скроллбара */
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-accent-green) rgba(255, 255, 255, 0.1);
 }
 
-/* Стилизация скроллбара для Webkit */
-.catalog-products::-webkit-scrollbar {
-  width: 6px;
-}
-
-.catalog-products::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-}
-
-.catalog-products::-webkit-scrollbar-thumb {
-  background: var(--color-accent-green);
-  border-radius: 6px;
-}
-
-.catalog-products::-webkit-scrollbar-thumb:hover {
-  background: #5B3E3E;
-}
-
-/* Панель управления товарами */
+/* Панель управления */
 .products-controls {
   display: flex;
   align-items: center;
@@ -1329,11 +1753,6 @@ header {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;                         /* Не сжимается */
-  position: sticky;
-  top: 0;
-  background-color: var(--color-bg);      /* Фон чтобы не просвечивало */
-  z-index: 5;
 }
 
 .products-count {
@@ -1383,37 +1802,6 @@ header {
   color: var(--color-white);
 }
 
-/* Переключатель вида (сетка/список) */
-.view-toggle {
-  display: flex;
-  gap: 8px;
-}
-
-.view-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.view-btn:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.view-btn.active {
-  background-color: var(--color-accent-green);
-  border-color: var(--color-accent-green);
-  color: var(--color-white);
-}
-
 /* ========================
    СЕТКА ТОВАРОВ
    ======================== */
@@ -1422,10 +1810,9 @@ header {
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-bottom: 40px;
-  flex-shrink: 0;                         /* ← Добавить */
 }
 
-/* Карточка товара в каталоге (адаптирована под сетку) */
+/* Карточка в каталоге */
 .catalog-product-card {
   width: 100%;
   height: auto;
@@ -1435,7 +1822,7 @@ header {
 .catalog-product-card .card-image {
   width: 100%;
   height: auto;
-  aspect-ratio: 270 / 264;
+  aspect-ratio: 300 / 264;
 }
 
 /* ========================
@@ -1445,7 +1832,6 @@ header {
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  flex-shrink: 0;                         /* ← Добавить */
 }
 
 .load-more-btn {
@@ -1465,7 +1851,6 @@ header {
   background-color: var(--color-accent-green);
 }
 
-
 /* ========================
    АДАПТИВНОСТЬ КАТАЛОГА
    ======================== */
@@ -1479,31 +1864,22 @@ header {
   .catalog-layout {
     flex-direction: column;
   }
-  
+
   .catalog-sidebar {
     width: 100%;
     position: static;
   }
-  
+
   .products-controls {
     flex-wrap: wrap;
     gap: 15px;
   }
-  
-  .products-count {
-    order: 1;
-  }
-  
-  .view-toggle {
-    order: 2;
-  }
-  
+
   .products-sort {
-    order: 3;
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .sort-select {
     flex: 1;
   }
@@ -1513,16 +1889,15 @@ header {
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .catalog-page-title {
     font-size: 32px;
   }
-  
+
   .price-inputs {
     flex-direction: column;
   }
 }
-
 
 /* ========================
    АДАПТИВНОСТЬ ФУТЕРА
@@ -1646,4 +2021,5109 @@ header {
   .hero-title { font-size: 26px; }
   .hero-subtitle { font-size: 18px; }
   .cards-row { gap: 20px; }
+}
+
+/* ========================
+   ХЛЕБНЫЕ КРОШКИ
+   ======================== */
+.breadcrumbs {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 100px;          /* Отступ под фиксированный хедер */
+  margin-bottom: 0;
+}
+
+.breadcrumbs-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;            /* Перенос на мобильных */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumbs-item {
+  display: flex;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+}
+
+.breadcrumbs-link {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumbs-link:hover {
+  color: var(--color-accent-green); /* Зелёный при наведении */
+}
+
+.breadcrumbs-separator {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 10px;
+  font-size: 12px;
+}
+
+.breadcrumbs-current {
+  color: var(--color-white);
+  font-weight: 500;
+}
+
+/* ========================
+   СТРАНИЦА КОНТАКТЫ
+   ======================== */
+
+/* Основной контейнер */
+.contacts-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 10px;             /* Небольшой отступ от хлебных крошек */
+  margin-bottom: 80px;          /* Отступ перед футером */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок страницы */
+.contacts-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;             /* Regular */
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;                /* Без отступа сверху */
+  margin-bottom: 16px;          /* Отступ до приветственного текста */
+}
+
+/* Приветственный текст */
+.contacts-intro {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 50px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* ========================
+   ТРИ КАРТОЧКИ КОНТАКТОВ
+   ======================== */
+.contact-cards {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+}
+
+/* Одна карточка */
+.contact-card {
+  width: 320px;
+  border-radius: 24px;
+  padding: 3px;                        /* Тонкая обводка */
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green) 0%,
+    #5B3E3E 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.contact-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 25px;
+  padding: 3px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green) 0%,
+    #5B3E3E 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.contact-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(51, 123, 87, 0.1);
+}
+
+/* Внутренняя часть карточки */
+.contact-card-inner {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.8) 0%,
+    rgba(9, 21, 15, 0.9) 100%
+  );
+  border-radius: 22px;
+  padding: 35px 24px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Декоративный круг на фоне */
+.contact-card-inner::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+/* Второй декоративный круг */
+.contact-card-inner::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+/* Иконка в карточке */
+.contact-card-icon {
+  width: 70px;
+  height: 70px;
+  background-color: #5B3E3E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.card-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Описание в карточке */
+.contact-card-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  min-height: 36px;  
+  color: rgba(255, 255, 255, 0.879);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* Значения в карточке */
+.contact-card-values {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.contact-card-link {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s;
+   line-height: 1.4;
+}
+
+.contact-card-link:hover {
+  color: var(--color-accent-green);
+}
+
+.contact-card-email {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s;
+   line-height: 1.4;
+ 
+}
+
+.contact-card-address {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  line-height: 1.4;
+}
+.contact-card-address-secondary {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;               /* Чуть меньше основного */
+  color: rgb(255, 255, 255);
+  line-height: 0.5;
+}
+
+/* ========================
+   СОЦСЕТИ (ПО ЦЕНТРУ)
+   ======================== */
+.contact-socials-centered {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.contact-socials-centered .socials-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  margin-bottom: 60px;
+}
+
+/* Ряд соцсетей */
+.socials-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 170px;
+  flex-wrap: wrap;
+}
+
+/* Одна соцсеть: иконка + название */
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Иконка */
+.social-item .social-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Название-ссылка */
+.social-name-link {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.social-name-link:hover {
+  color: var(--color-accent-green);
+}
+
+/* ========================
+   РАЗДЕЛИТЕЛЬНАЯ ЛИНИЯ
+   ======================== */
+.divider-line {
+  width: 727px;
+  max-width: 100%;
+  height: 5px;
+  background-color: #5B3E3E;
+  border-radius: 100px;
+  margin: 10px auto 40px auto;
+}
+
+/* ========================
+   СЕКЦИЯ "ЛИЧНЫЕ КОНСУЛЬТАЦИИ"
+   ======================== */
+.consultation-section {
+  margin-bottom: 20px;
+
+}
+
+.consultation-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* Двухколоночный макет */
+.consultation-layout {
+  display: flex;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+/* Левая колонка — карта */
+.consultation-map-col {
+  width: 500px;                      /* Меньше чем раньше */
+  flex-shrink: 0;
+}
+
+.consultation-map-col .contacts-map {
+  width: 100%;
+  height: 320px;                     /* Меньше высота */
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background-color: #2a3a30;
+}
+
+.consultation-map-col .map-caption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.map-pin {
+  font-size: 16px;
+}
+
+/* Правая колонка — информация */
+.consultation-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Блок с часами */
+.consultation-schedule {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background-color: #5b3e3e30;
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 500px;  
+}
+
+
+
+.schedule-icon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Текст расписания */
+.schedule-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.schedule-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.schedule-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.schedule-label {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.schedule-hours {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-white);
+}
+
+.schedule-days {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--color-white);
+  white-space: nowrap;   
+}
+
+
+/* Текст */
+.consultation-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgb(255, 255, 255);
+  line-height: 1.6;
+  text-align: left;
+}
+
+
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+@media (max-width: 900px) {
+  .consultation-layout {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .consultation-map-col {
+    width: 100%;
+  }
+  
+  .consultation-map-col .contacts-map {
+    height: 280px;
+  }
+  
+  .consultation-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+}
+
+@media (max-width: 500px) {
+  .consultation-schedule {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .schedule-text {
+    align-items: center;
+  }
+  
+  .consultation-text {
+    text-align: center;
+    font-size: 15px;
+  }
+  
+  .consultation-hint {
+    text-align: center;
+  }
+}
+
+/* ========================
+   ФОРМА ОБРАТНОЙ СВЯЗИ
+   ======================== */
+.feedback-section {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.feedback-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.feedback-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.feedback-form {
+  background-color: #5b3e3e30;
+  border-radius: 20px;
+  padding:  40px 40px 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  scroll-margin-top: 130px;   /* Отступ при скролле к якорю */
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-white);
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--color-accent-green);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='white' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.form-select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+
+.feedback-submit-btn {
+  width: 30%;
+  padding: 16px;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: block;
+ margin: 40px auto 0;
+}
+
+.feedback-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.feedback-message {
+  margin-top: 15px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+.feedback-message.success {
+  color: #337B57;
+}
+
+.feedback-message.error {
+  color: #ff6b6b;
+}
+
+/* ========================
+   АДАПТИВНОСТЬ КОНТАКТОВ
+   ======================== */
+@media (max-width: 1000px) {
+  .contact-cards {
+    gap: 20px;
+  }
+  
+  .contact-card {
+    width: 280px;
+  }
+  
+  .feedback-submit-btn {
+    width: 50%;
+  }
+}
+
+@media (max-width: 700px) {
+  .contact-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contact-card {
+    width: 100%;
+    max-width: 380px;
+  }
+  
+  .contacts-page-title {
+    font-size: 32px;
+  }
+  
+  .consultation-title {
+    font-size: 28px;
+  }
+  
+  .consultation-text {
+    font-size: 16px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .feedback-form {
+    padding: 25px;
+  }
+  
+  .feedback-title {
+    font-size: 28px;
+  }
+  
+  .feedback-submit-btn {
+    width: 100%;
+  }
+}
+
+/* ========================
+   СТРАНИЦА FAQ
+   ======================== */
+.faq-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 10px;
+  margin-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+}
+
+/* Заголовок */
+.faq-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.faq-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgb(255, 255, 255);
+  white-space: nowrap;
+  text-align: center;
+  margin: 0 auto 40px auto;
+  margin-left: -70px;
+  max-width: 100%;             /* ← ИЗМЕНИТЕ НА 100% */
+  line-height: 1.5;
+  width: 100%;                 /* ← ДОБАВЬТЕ */
+}
+
+/* ========================
+   ПОИСК ПО ВОПРОСАМ
+   ======================== */
+.faq-search-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  height: 52px;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  padding: 0 20px;
+  margin: 0 auto 35px auto;
+  transition: border-color 0.3s;
+}
+
+.faq-search-wrapper:focus-within {
+  border-color: var(--color-accent-green);
+}
+
+.faq-search-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.faq-search-input {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgb(9, 21, 15);
+}
+
+.faq-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.4); 
+}
+
+/* ========================
+   КАТЕГОРИИ ВОПРОСОВ
+   ======================== */
+.faq-categories {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin-bottom: 40px;
+  
+}
+
+.faq-category-btn {
+  padding: 10px 22px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.faq-category-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--color-white);
+}
+
+.faq-category-btn.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: var(--color-white);
+}
+
+/* ========================
+   СПИСОК ВОПРОСОВ (АККОРДЕОН)
+   ======================== */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 60px;
+}
+
+/* Один вопрос */
+.faq-item {
+  background-color: rgba(9, 21, 15, 0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.faq-item:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.faq-item.active {
+  border-color: var(--color-accent-green);
+}
+
+/* Кнопка вопроса */
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--color-white);
+  text-align: left;
+  gap: 20px;
+  transition: color 0.3s;
+}
+
+.faq-question:hover {
+  color: var(--color-accent-green);
+}
+
+.faq-question-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+/* Иконка стрелки */
+.faq-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faq-arrow-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  transition: transform 0.3s;
+  
+}
+
+.faq-item.active .faq-arrow-icon {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* Ответ */
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 1000px;
+}
+
+.faq-answer-inner {
+  padding: 0 28px 24px 28px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+}
+
+.faq-answer-inner p {
+  margin-bottom: 12px;
+}
+
+.faq-answer-inner p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-answer-inner ul,
+.faq-answer-inner ol {
+  margin: 8px 0 16px 0;
+  padding-left: 20px;
+}
+
+.faq-answer-inner li {
+  margin-bottom: 6px;
+}
+
+.faq-answer-inner strong {
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+/* Таблица заваривания */
+.faq-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.faq-table th,
+.faq-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.faq-table th {
+  font-weight: 600;
+  color: var(--color-accent-green);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.faq-table td {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========================
+   БЛОК "НЕ НАШЛИ ОТВЕТ?"
+   ======================== */
+.faq-contact-cta {
+  text-align: center;
+}
+
+.faq-contact-cta-inner {
+  background-color: rgba(9, 21, 15, 0.5);
+  border-radius: 24px;
+  padding: 45px 40px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.faq-cta-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--color-white);
+  margin-bottom: 12px;
+}
+
+.faq-cta-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 30px;
+}
+
+.faq-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.faq-cta-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.faq-cta-email {
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+}
+
+.faq-cta-email:hover {
+  opacity: 0.9;
+}
+
+.faq-cta-contacts {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.faq-cta-contacts:hover {
+  border-color: var(--color-accent-green);
+  color: var(--color-accent-green);
+}
+
+.faq-cta-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Скрытые вопросы (при фильтрации) */
+.faq-item.hidden {
+  display: none;
+}
+
+/* Подсветка найденного текста */
+.faq-highlight {
+  background-color: rgba(51, 123, 87, 0.3);
+  padding: 1px 2px;
+  border-radius: 3px;
+}
+
+/* ========================
+   АДАПТИВНОСТЬ FAQ
+   ======================== */
+@media (max-width: 700px) {
+  .faq-page-title {
+    font-size: 32px;
+  }
+  
+  .faq-question {
+    padding: 18px 20px;
+    font-size: 15px;
+  }
+  
+  .faq-answer-inner {
+    padding: 0 20px 18px 20px;
+    font-size: 14px;
+  }
+  
+  .faq-category-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .faq-contact-cta-inner {
+    padding: 30px 24px;
+  }
+  
+  .faq-cta-title {
+    font-size: 20px;
+  }
+}
+/* Подсветка формы при переходе по якорю */
+.feedback-form:target {
+  animation: highlight-form 1.5s ease;
+}
+
+@keyframes highlight-form {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(51, 123, 87, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 40px 15px rgba(51, 123, 87, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(51, 123, 87, 0);
+  }
+}
+
+/* ========================
+   СТРАНИЦА "О НАС"
+   ======================== */
+.about-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 10px;
+  margin-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Заголовок */
+.about-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.about-page-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin: 0 auto 50px auto;
+  max-width: 800px;
+  line-height: 1.6;
+}
+
+/* ========================
+   БЛОК 1: ИСТОРИЯ (КНИГА)
+   ======================== */
+.about-history-book {
+  display: flex;
+  max-width: 1050px;
+  margin: 0 auto 40px auto;
+  position: relative;
+  filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.5));
+  height: 470px; 
+}
+
+/* ========================
+   СТРАНИЦЫ КНИГИ
+   ======================== */
+.history-page {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+}
+
+/* Левая страница — изображение */
+.history-page-left {
+  background: linear-gradient(
+    to right,
+    rgba(31, 77, 46, 0.15) 0%,
+    rgba(31, 77, 46, 0.3) 100%
+  );
+  border-radius: 20px 0 0 20px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: none;
+}
+
+.history-page-image {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.history-page-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* Правая страница — текст */
+.history-page-right {
+  background: linear-gradient(
+    to right,
+    rgba(31, 77, 46, 0.2) 0%,
+    rgba(31, 77, 46, 0.35) 100%
+  );
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: none;
+}
+
+.history-page-content {
+  padding: 45px 40px 35px 45px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Заголовок */
+.history-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--color-white);
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+
+/* Текст */
+.history-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.8;
+  
+}
+
+.history-text p {
+  margin-bottom: 14px;
+}
+
+.history-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Буквица */
+.history-dropcap {
+  float: left;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--color-accent-green);
+  line-height: 0.8;
+  margin-right: 1px;
+  margin-top: 0px;
+}
+
+/* ========================
+   МИНИ-СТАТИСТИКА В КНИГЕ
+   ======================== */
+.history-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-stat {
+  text-align: center;
+  flex: 1;
+}
+
+.history-stat-year {
+  display: block;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--color-accent-green);
+}
+
+.history-stat-desc {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: rgb(255, 255, 255);
+  margin-top: 2px;
+}
+
+.history-stat-divider {
+  width: 1px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* ========================
+   БЛОК 2: ЦЕННОСТИ (3 КАРТОЧКИ)
+   ======================== */
+.about-section-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-values-grid {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Карточка ценности */
+.about-value-card {
+  width: 320px;
+  text-align: center;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-value-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Иконка */
+.about-value-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(
+    135deg,
+    rgba(51, 123, 87, 0.3) 0%,
+    rgba(#5B3E3E, 0.1) 0%
+  );
+  border-radius: 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border: 0px solid rgba(51, 123, 87, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.about-value-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Заголовок */
+.about-value-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Блок с описанием (прямоугольник) */
+.about-value-box {
+  width: 100%;
+  flex: 1;
+  border-radius: 20px;
+  padding: 3px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green) 0%,
+    #5B3E3E 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  transition: box-shadow 0.3s;
+}
+
+.about-value-card:hover .about-value-box {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(51, 123, 87, 0.1);
+}
+
+.about-value-text {
+  width: 100%;
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.8) 0%,
+    rgba(9, 21, 15, 0.9) 100%
+  );
+  border-radius: 17px;
+  padding: 24px 20px;
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: rgb(255, 255, 255);
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Декоративные круги на фоне описания */
+.about-value-text::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.about-value-text::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+/* ========================
+   БЛОК "ПУТЬ ЧАЯ" — КРЕАТИВНАЯ ВРЕМЕННАЯ ЛИНИЯ
+   ======================== */
+.about-section-title-desc {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Описание под заголовком */
+.about-section-desc {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  max-width: 100%;
+  margin: 0 auto 40px auto;
+  line-height: 1.6;
+}
+
+.tea-journey {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto 50px auto;
+  padding: 20px 0;
+}
+
+/* Центральная вертикальная линия */
+.tea-journey::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-accent-green),
+    #5B3E3E,
+    var(--color-accent-green)
+  );
+  opacity: 0.4;
+}
+
+/* Один шаг */
+.journey-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.journey-step:last-child {
+  margin-bottom: 0;
+}
+
+/* Маркер (номер + точка) */
+.journey-marker {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+/* Номер шага */
+.journey-number {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--color-accent-green);
+  background-color: var(--color-bg);
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+/* Точка на линии */
+.journey-dot {
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-accent-green);
+  border-radius: 50%;
+  border: 3px solid var(--color-bg);
+  box-shadow: 0 0 0 2px var(--color-accent-green);
+}
+
+.journey-dot-last {
+  background-color: #5B3E3E;
+  box-shadow: 0 0 0 2px #5B3E3E;
+}
+
+/* Карточка шага */
+.journey-card {
+  width: 42%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(51, 123, 87, 0.3) 0%,
+    rgba(91, 62, 62, 0.3) 100%
+  );
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s;
+}
+
+.journey-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Карточка слева */
+.journey-card-left {
+  margin-right: auto;
+}
+
+/* Карточка справа */
+.journey-card-right {
+  margin-left: auto;
+}
+
+/* Изображение в карточке */
+.journey-card-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.journey-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.journey-card:hover .journey-card-img {
+  transform: scale(1.05);
+}
+
+/* Контент карточки */
+.journey-card-content {
+  padding: 20px 24px 24px 24px;
+}
+
+.journey-card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  margin-bottom: 10px;
+}
+
+.journey-card-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+/* ========================
+   БЛОК 5: ПРИЗЫВ К ДЕЙСТВИЮ
+   ======================== */
+.about-cta {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.about-cta-inner {
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.5) 0%,
+    rgba(9, 21, 15, 0.7) 100%
+  );
+  border-radius: 30px;
+  padding: 55px 50px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+ 
+}
+
+/* Декоративные элементы */
+.about-cta-inner::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.about-cta-inner::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+/* Иконка чашки (декор) */
+.about-cta-icon {
+  font-size: 40px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.about-cta-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--color-white);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.about-cta-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgb(255, 255, 255);
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.about-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.about-cta-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Кнопка "Каталог" */
+.about-cta-catalog {
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  
+}
+
+.about-cta-catalog:hover {
+  transform: translateY(-2px);
+  
+}
+
+/* Кнопка "Контакты" */
+.about-cta-contacts {
+  background: #5B3E3E
+}
+
+.about-cta-contacts:hover {
+  transform: translateY(-2px);
+}
+
+/* ========================
+   АДАПТИВНОСТЬ CTA
+   ======================== */
+@media (max-width: 600px) {
+  .about-cta-inner {
+    padding: 40px 25px;
+  }
+
+  .about-cta-title {
+    font-size: 24px;
+  }
+
+  .about-cta-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ========================
+   АДАПТИВНОСТЬ ДЛЯ ВСЕГО
+   ======================== */
+
+/* Планшеты и малые ноутбуки (до 900px) */
+@media (max-width: 900px) {
+  /* Отступы */
+  .about-main {
+    margin-bottom: 60px;
+  }
+  
+  /* Заголовки */
+  .about-page-title {
+    font-size: 36px;
+  }
+  
+  .about-page-subtitle {
+    font-size: 16px;
+    margin-bottom: 40px;
+  }
+  
+  /* Книга */
+  .about-history-book {
+    margin-bottom: 30px;
+  }
+  
+  .history-page-content {
+    padding: 35px 30px 30px 35px;
+  }
+  
+  .history-title {
+    font-size: 24px;
+  }
+  
+  /* Ценности */
+  .about-values-grid {
+    gap: 30px;
+  }
+  
+  .about-value-card {
+    width: calc(50% - 30px);
+    max-width: 320px;
+  }
+  
+  .about-section-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+  }
+  
+  /* Путь чая */
+  .tea-journey {
+    padding: 10px 0;
+  }
+  
+  .journey-card {
+    width: 44%;
+  }
+  
+  .journey-card-content {
+    padding: 16px 20px 20px 20px;
+  }
+  
+  .journey-card-title {
+    font-size: 16px;
+  }
+  
+  .journey-card-text {
+    font-size: 13px;
+  }
+  
+  /* Призыв к действию */
+  .about-cta-inner {
+    padding: 40px 30px;
+  }
+  
+  .about-cta-title {
+    font-size: 24px;
+  }
+  
+  .about-cta-text {
+    font-size: 15px;
+  }
+}
+
+/* Планшеты (до 768px) */
+@media (max-width: 768px) {
+  /* Заголовки */
+  .about-page-title {
+    font-size: 32px;
+  }
+  
+  .about-page-subtitle {
+    font-size: 15px;
+    padding: 0 20px;
+  }
+  
+  /* Книга — вертикально */
+  .about-history-book {
+    flex-direction: column;
+    max-width: 600px;
+  }
+  
+  .history-page {
+    min-height: auto;
+  }
+  
+  .history-page-left {
+    border-radius: 20px 20px 0 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: none;
+    height: 250px;
+  }
+  
+  .history-page-right {
+    border-radius: 0 0 20px 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  
+  .history-page-content {
+    padding: 25px 20px 25px 20px;
+  }
+  
+  
+  .history-stats {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .history-stat {
+    min-width: 80px;
+  }
+  
+  /* Ценности — 2 в ряд */
+  .about-values-grid {
+    gap: 20px;
+  }
+  
+  .about-value-card {
+    width: calc(50% - 10px);
+    max-width: none;
+  }
+  
+  .about-section-title {
+    font-size: 26px;
+  }
+  
+  .about-section-desc {
+    font-size: 14px;
+    margin-bottom: 30px;
+  }
+  
+  /* Путь чая — все слева */
+  .tea-journey::before {
+    left: 24px;
+  }
+  
+  .journey-marker {
+    left: 24px;
+  }
+  
+  .journey-card {
+    width: calc(100% - 60px);
+    margin-left: 60px !important;
+    margin-right: 0 !important;
+  }
+  
+  .journey-card-image {
+    height: 140px;
+  }
+  
+  .journey-number {
+    font-size: 22px;
+    padding: 3px 8px;
+  }
+  
+  /* Призыв к действию */
+  .about-cta-inner {
+    padding: 30px 20px;
+  }
+  
+  .about-cta-title {
+    font-size: 22px;
+  }
+  
+  .about-cta-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+/* Телефоны (до 480px) */
+@media (max-width: 480px) {
+  /* Заголовки */
+  .about-page-title {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  
+  .about-page-subtitle {
+    font-size: 14px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  
+  /* Книга */
+  .history-page-left {
+    height: 200px;
+  }
+  
+  .history-page-content {
+    padding: 20px 16px 20px 16px;
+  }
+  
+  .history-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .history-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  
+  .history-dropcap {
+    font-size: 20px;
+  }
+  
+  .history-stats {
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 15px;
+    margin-top: 20px;
+  }
+  
+  .history-stat-divider {
+    width: 30px;
+    height: 1px;
+  }
+  
+  .history-stat-year {
+    font-size: 20px;
+  }
+  
+  /* Ценности — в 1 колонку */
+  .about-values-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .about-value-card {
+    width: 100%;
+    max-width: 320px;
+  }
+  
+  .about-section-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .about-section-desc {
+    font-size: 13px;
+    margin-bottom: 25px;
+  }
+  
+  .about-value-text {
+    min-height: 100px;
+    padding: 20px 16px;
+    font-size: 12px;
+  }
+  
+  .about-value-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  /* Путь чая */
+  .tea-journey {
+    padding: 0;
+  }
+  
+  .tea-journey::before {
+    left: 20px;
+  }
+  
+  .journey-marker {
+    left: 20px;
+  }
+  
+  .journey-number {
+    font-size: 20px;
+    padding: 2px 6px;
+  }
+  
+  .journey-dot {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .journey-card {
+    width: calc(100% - 50px);
+    margin-left: 50px !important;
+    border-radius: 15px;
+  }
+  
+  .journey-card-image {
+    height: 120px;
+  }
+  
+  .journey-card-content {
+    padding: 12px 16px 16px 16px;
+  }
+  
+  .journey-card-title {
+    font-size: 15px;
+  }
+  
+  .journey-card-text {
+    font-size: 12px;
+  }
+  
+  .journey-step {
+    margin-bottom: 30px;
+  }
+  
+  /* Призыв к действию */
+  .about-cta-inner {
+    padding: 25px 15px;
+    border-radius: 20px;
+  }
+  
+  .about-cta-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .about-cta-text {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .about-cta-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .about-cta-btn {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+  }
+}
+
+/* Очень маленькие телефоны (до 360px) */
+@media (max-width: 360px) {
+  .about-page-title {
+    font-size: 24px;
+  }
+  
+  .about-page-subtitle {
+    font-size: 13px;
+  }
+  
+  .history-page-left {
+    height: 180px;
+  }
+  
+  .history-title {
+    font-size: 18px;
+  }
+  
+  .about-section-title {
+    font-size: 22px;
+  }
+  
+  .about-value-card {
+    max-width: 280px;
+  }
+  
+  .journey-card-image {
+    height: 100px;
+  }
+  
+  .about-cta-title {
+    font-size: 18px;
+  }
+}
+
+
+/* ========================
+   СТРАНИЦА ТОВАРА
+   ======================== */
+.product-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+/* ========================
+   ВЕРХНЯЯ ЧАСТЬ: ГАЛЕРЕЯ + ИНФО
+   ======================== */
+.product-top {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 30px;
+}
+
+/* ========================
+   ГАЛЕРЕЯ
+   ======================== */
+.product-gallery {
+  display: flex;
+  gap: 16px;
+  width: 55%;
+  flex-shrink: 0;
+}
+
+/* Миниатюры */
+.gallery-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.gallery-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  transition: border-color 0.3s;
+}
+
+.gallery-thumb.active {
+  border-color: var(--color-accent-green);
+}
+
+.gallery-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Основное изображение */
+.gallery-main {
+  flex: 1;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: rgba(9, 21, 15, 0.3);
+  aspect-ratio: 1 / 1;
+  max-height: 500px;
+}
+
+.gallery-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Бейджи на изображении */
+.gallery-badges {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.gallery-badge {
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--color-white);
+}
+
+.gallery-badge.bestseller {
+  background-color: rgba(51, 123, 87, 0.9);
+}
+
+.gallery-badge.in-stock {
+  background-color: rgba(9, 21, 15, 0.8);
+}
+
+/* Кнопки навигации */
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(9, 21, 15, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: var(--color-white);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  z-index: 2;
+}
+
+.gallery-nav:hover {
+  background-color: rgba(9, 21, 15, 0.9);
+}
+
+.gallery-prev {
+  left: 12px;
+}
+
+.gallery-next {
+  right: 12px;
+} 
+
+.gallery-nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* ========================
+   ИНФОРМАЦИЯ О ТОВАРЕ
+   ======================== */
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--color-white);
+  margin: 0;
+}
+
+/* ========================
+   РЕЙТИНГ
+   ======================== */
+.product-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-stars {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Статичные звёзды (рейтинг и отзывы) */
+.star-icon-static {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.product-rating-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Мета-теги */
+.product-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-meta-tag {
+  padding: 6px 14px;
+  background-color: rgba(51, 123, 87, 0.15);
+  border: 1px solid rgba(51, 123, 87, 0.25);
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Описание */
+.product-short-desc {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Опции выбора */
+.product-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.option-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  padding: 10px 20px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.option-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.option-btn.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: var(--color-white);
+}
+
+/* Блок покупки */
+.product-buy-section {
+  background-color: #5b3e3e30;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.product-price-block {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.product-price {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: var(--color-white);
+}
+
+.product-price-unit {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.product-buy-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* ========================
+   КОЛИЧЕСТВО НА СТРАНИЦЕ ТОВАРА
+   ======================== */
+
+.product-qty-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  margin-bottom: 10px;
+}
+
+.product-qty-selector {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+  height: 44px;
+
+  background-color: rgba(255, 255, 255, 0.06);
+
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  padding: 0 6px;
+}
+
+.product-qty-btn {
+  width: 32px;
+  height: 32px;
+
+  background: none;
+  border: none;
+
+  color: var(--color-white);
+
+  font-size: 18px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  border-radius: 100px;
+
+  transition: background-color 0.3s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-qty-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.product-qty-value {
+  width: 50px;
+
+  text-align: center;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+
+  color: var(--color-white);
+
+  user-select: none;
+}
+
+/* Кнопка В корзину */
+.product-add-to-cart-btn {
+  flex: 1;
+  height: 44px;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.3s;
+}
+
+.product-add-to-cart-btn:hover {
+  opacity: 0.9;
+}
+
+.cart-btn-icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+/* Избранное */
+/* ========================
+   ИЗБРАННОЕ (как у звёзд)
+   ======================== */
+.product-favorite-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background-color 0.3s;
+  padding: 0;
+}
+
+.product-favorite-btn:hover {
+  transform: scale(1.15);                  /* увеличение как у звёзд */
+}
+
+.product-favorite-btn:active {
+  transform: scale(0.9);                   /* сжатие при клике */
+}
+
+.favorite-btn-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  pointer-events: none;                    /* клик идёт на кнопку */
+  transition: transform 0.2s;
+}
+
+/* ========================
+   НИЖНЯЯ ЧАСТЬ: ТАБЫ
+   ======================== */
+.product-bottom {
+  max-width: 900px;
+  margin: 0 auto 40px; /* нижний отступ */
+}
+
+/* Табы */
+.product-tabs {
+  display: flex;
+  justify-content: center; /* табы по центру */
+  gap: 10px;
+  margin-bottom: 30px; /* линия ниже */
+  border-bottom: none; /* убираем линию */
+}
+
+.product-tab {
+  padding: 14px 28px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+   border-radius: 5px 5px 0 0;      
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.product-tab:hover {
+  color: var(--color-white);
+}
+
+.product-tab.active {
+  color: var(--color-white);
+  border-bottom: 2px solid transparent;
+  /* Градиентная линия снизу */
+  border-image: linear-gradient(to right, #337B57, #5B3E3E) 1;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Панели */
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Описание */
+.product-description h3 {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 500;
+  font-size: 32px; 
+  color: var(--color-white);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.product-description p {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+/* Характеристики */
+.product-characteristics {
+  background-color: rgba(9, 21, 15, 0.3);
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.char-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 30px;
+}
+
+.char-row:last-child {
+  border-bottom: none;
+}
+
+.char-label {
+  width: 200px;
+  flex-shrink: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.char-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+/* ========================
+   ОТЗЫВЫ
+   ======================== */
+
+.review-form-wrapper {
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  width: 100%;
+}
+
+.review-form-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.review-form {
+  background-color: #5b3e3e30;
+  border-radius: 20px;
+  padding: 40px 40px 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* В строку: текст + звёзды */
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* расстояние между текстом и звёздами */
+}
+
+/* Убираем лишний нижний отступ */
+.review-form .form-row {
+  margin-bottom: 12px;
+}
+
+/* Меньше расстояние перед textarea */
+.review-form .form-group.full-width {
+  margin-bottom: 12px;
+}
+
+/* Звёзды на PNG */
+.stars-input {
+  display: flex;
+  gap: 6px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s;
+  line-height: 0;
+}
+
+.star-btn:hover {
+  transform: scale(1.15);
+}
+
+.star-btn:active {
+  transform: scale(0.95);
+}
+
+.star-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  transition: opacity 0.2s;
+  pointer-events: none;                    /* клик идёт на кнопку, не на картинку */
+}
+
+/* Кнопка отправки */
+.review-submit-btn {
+  width: 30%;
+  padding: 16px;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: block;
+  margin: 40px auto 0;
+}
+
+.review-submit-btn:hover {
+  opacity: 0.9;
+}
+
+/* Сообщение об отправке */
+#review-message-box {
+  margin-top: 15px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+#review-message-box.success {
+  color: #337B57;
+}
+
+#review-message-box.error {
+  color: #ff6b6b;
+}
+
+
+/* Список отзывов */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-card {
+  background-color: rgba(9, 21, 15, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.review-author-avatar {
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-accent-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.review-author-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-author-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+.review-date {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.review-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.review-body h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  margin: 0 0 8px 0;
+}
+
+.review-body p {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.review-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+
+.review-helpful-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.review-helpful-btn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* похожие товары */
+.product-same-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+@media (max-width: 1000px) {
+  .product-top {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .product-gallery {
+    width: 100%;
+    flex-direction: column;               /* миниатюры под фото */
+    gap: 12px;
+  }
+
+  .gallery-main {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;                  /* квадратное на мобилке */
+    max-height: 400px;
+  }
+
+  .gallery-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .gallery-thumbnails {
+    flex-direction: row;                  /* миниатюры в ряд */
+    width: 100%;
+    gap: 8px;
+    overflow-x: auto;                     /* скролл если не влезают */
+  }
+
+  .gallery-thumb {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .gallery-nav {
+    width: 32px;
+    height: 32px;
+  }
+
+  .gallery-nav-icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .gallery-main {
+    max-height: 300px;
+  }
+
+  .gallery-thumb {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 600px) {
+  .product-title {
+    font-size: 24px;
+  }
+
+  .product-price {
+    font-size: 26px;
+  }
+
+  .product-buy-row {
+    flex-wrap: wrap;
+  }
+
+  .product-add-to-cart-btn {
+    min-width: 200px;
+  }
+
+  .review-form-row {
+    flex-direction: column;
+  }
+
+  .char-label {
+    width: 140px;
+  }
+}
+
+/* ========================
+   ЧАЙНЫЙ БЛОГ
+   ======================== */
+.blog-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 10px;
+  margin-bottom: 80px;
+}
+
+.blog-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.blog-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin: 0 auto 35px auto;
+  max-width: 800px;
+  line-height: 1.6;
+}
+
+/* Поиск */
+.blog-search-wrapper {
+  display: flex;
+  align-items: center;
+  max-width: 500px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 0 20px;
+  margin: 0 auto 30px auto;
+}
+
+.blog-search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: #09150F;
+}
+
+.blog-search-input::placeholder {
+  color: rgba#09150F;
+}
+
+/* Категории */
+.blog-categories {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.blog-category-btn {
+  padding: 10px 22px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.blog-category-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.blog-category-btn.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: var(--color-white);
+}
+
+/* ========================
+   СЕТКА СТАТЕЙ
+   ======================== */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto 50px auto;
+    
+}
+
+/* Когда карточка одна — занимает одну колонку и центрируется */
+.blog-card:only-child {
+  grid-column: 1 / -1;
+  max-width: 500px;
+  justify-self: center;
+  width: 100%;
+}
+
+/* ========================
+   КАРТОЧКА СТАТЬИ(91, 62, 62, 0.3)
+   ======================== */
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    to bottom right,
+    rgba(91, 62, 62, 0.3) 0%,
+    rgba(51, 123, 87, 0.3) 100%
+  );
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.blog-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+.blog-card-image {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.blog-card:hover .blog-card-img {
+  transform: scale(1.05);
+}
+
+.blog-card-category {
+  display: inline-block;
+  padding: 6px 14px;
+  background-color: rgba(51, 123, 87, 0.2);
+  border: 1px solid rgba(51, 123, 87, 0.3);
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+.blog-card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.blog-card-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--color-white);
+  margin: 0 0 10px 0;
+}
+
+.blog-card-excerpt {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+
+/* Кнопка "Читать далее" */
+.blog-read-more-btn {
+  align-self: flex-start;
+  padding: 10px 24px;
+  background: #5B3E3E;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-top: auto;
+}
+
+.blog-read-more-btn:hover {
+  opacity: 0.9;
+}
+
+/* ========================
+   ПАГИНАЦИЯ
+   ======================== */
+.blog-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination-btn {
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pagination-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.pagination-btn.active {
+  background-color: var(--color-accent-green);
+  border-color: var(--color-accent-green);
+  color: var(--color-white);
+}
+
+.pagination-next {
+  width: auto;
+  padding: 0 20px;
+}
+
+/* Скрытые статьи */
+.blog-card.hidden {
+  display: none;
+}
+/* Скрытый полный текст статьи */
+.blog-card-full-text {
+  display: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  margin: 0 0 16px 0;
+}
+
+.blog-card-full-text p {
+  margin-bottom: 12px;
+}
+
+.blog-card-full-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* ========================
+   АДАПТИВНОСТЬ БЛОГА
+   ======================== */
+@media (max-width: 900px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-card-featured {
+    flex-direction: column;
+  }
+
+  .blog-card-featured .blog-card-image {
+    width: 100%;
+    min-height: 240px;
+  }
+
+  .blog-card-featured .blog-card-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .blog-page-title {
+    font-size: 32px;
+  }
+
+  .blog-card-content {
+    padding: 18px;
+  }
+
+  .blog-card-title {
+    font-size: 16px;
+  }
+
+  .blog-card-featured .blog-card-image {
+    min-height: 200px;
+  }
+}
+/* ========================
+   МОДАЛЬНОЕ ОКНО ВХОД/РЕГИСТРАЦИЯ
+   ======================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);          /* просто затемнение, без блюра */
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-window {
+  background: linear-gradient(
+    to bottom right,
+    rgba(51, 123, 87, 0.35) 0%,
+    rgba(91, 62, 62, 0.35) 100%
+  );
+  border-radius: 24px;
+  padding: 40px;
+  width: 480px;
+  max-width: 90vw;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(30px);              /* размытие самого окна */
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Кнопка закрытия */
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0);
+  border: 1px solid rgba(255, 255, 255, 0);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0);
+}
+
+.modal-close-icon {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Табы (в стиле product-tabs) */
+.modal-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  border-bottom: none;
+}
+
+.modal-tab {
+  padding: 14px 28px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 5px 5px 0 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-tab:hover {
+  color: var(--color-white);
+}
+
+.modal-tab.active {
+  color: var(--color-white);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, #337B57, #5B3E3E) 1;
+  border-radius: 100px;
+}
+
+/* Формы */
+.modal-form {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-form.active {
+  display: flex;
+}
+
+.modal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgba(255, 255, 255);
+}
+
+.modal-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0 16px;
+  height: 48px;
+  transition: border-color 0.3s;
+}
+
+.modal-input-wrapper:focus-within {
+  border-color: #337B57;
+}
+
+.modal-input-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.modal-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: #fff;
+}
+
+.modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-submit-btn {
+  width: 70%;
+  height: 50px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-top: 20px;
+  align-self: center;
+}
+
+.modal-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.modal-footer-text {
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+/* ========================
+   ЛИЧНЫЙ КАБИНЕТ
+   ======================== */
+.account-main {
+  max-width: 900px;
+  margin: 10px auto 80px;
+  padding: 0 var(--page-margin);
+}
+/* Заголовок страницы личного кабинета */
+.account-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 35px;
+}
+
+
+
+/* Приветствие */
+.account-header {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  min-height: 160px;
+}
+
+/* Фоновое изображение с затемнением */
+.account-header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../pictures/fon.jpg') center/cover no-repeat;
+  filter: brightness(0.4);                 /* затемнение */
+  z-index: 0;
+}
+
+/* Контент поверх фона */
+.account-header-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 30px;
+  backdrop-filter: blur(2px);
+   min-height: 160px;    
+}
+/* Обёртка аватара с возможностью загрузки */
+.account-avatar-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #337B57, #0D2719);
+}
+
+.account-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Оверлей с иконкой камеры при наведении */
+.avatar-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.account-avatar-wrapper:hover .avatar-upload-overlay {
+  opacity: 1;
+}
+
+.avatar-upload-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Скрытый input */
+.avatar-input {
+  display: none;
+}
+
+.account-header-info {
+  flex: 1;
+}
+
+.account-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 500;
+  font-size: 28px;
+  color: var(--color-white);
+  margin: 0 0 4px 0;
+}
+
+.account-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.account-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0px 0px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 0px solid rgba(255, 80, 80, 0);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #ff6b6b;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-icon {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Табы */
+.account-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.account-tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 5px 5px 0 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.account-tab:hover {
+  color: var(--color-white);
+}
+
+.account-tab.active {
+  color: var(--color-white);
+  border-image: linear-gradient(to right, #337B57, #5B3E3E) 1;
+}
+
+/* Панели */
+.account-panel {
+  display: none;
+}
+
+.account-panel.active {
+  display: block;
+}
+
+/* Карточка */
+.account-card {
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.15), rgba(91, 62, 62, 0.15));
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.account-card-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  color: var(--color-white);
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+/* Форма профиля */
+.account-form .form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 0px;
+}
+
+.account-form .form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.account-form .form-group.full-width {
+  margin-bottom: 16px;
+}
+
+.account-form .form-label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.account-form .form-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: var(--color-white);
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.account-form .form-input:focus {
+  border-color: #337B57;
+}
+
+.account-save-btn {
+ 
+  padding: 14px 20px;
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: block;
+  margin: 0px auto 0;
+}
+
+.account-save-btn:hover {
+  opacity: 0.9;
+}
+
+/* ========================
+   ЗАКАЗЫ
+   ======================== */
+.order-card {
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.15), rgba(91, 62, 62, 0.15));
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.order-number {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+}
+
+.order-date {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ========================
+   СТАТУСЫ ЗАКАЗОВ
+   ======================== */
+.order-status {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+  color: #fff;                               /* текст всегда белый */
+}
+
+/* Доставлен */
+.order-status.delivered {
+  background: #337B57;
+}
+
+/* В обработке */
+.order-status.processing {
+  background: #5B3E3E;
+}
+
+/* В пути */
+.order-status.in-transit {
+  background: #3D5C3A;
+}
+
+/* Готов к выдаче */
+.order-status.ready-pickup {
+  background: #2E4A2C;
+}
+
+/* Отменён */
+.order-status.cancelled {
+  background: #6B3A3A;
+}
+
+.order-items {
+  margin-bottom: 18px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.order-item-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.order-item-info {
+  flex: 1;
+}
+
+.order-item-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.order-item-qty {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+.order-item-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  white-space: nowrap;
+}
+
+.order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.order-total {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+}
+
+.order-repeat-btn {
+  padding: 10px 20px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.order-repeat-btn:hover {
+  opacity: 0.8;
+}
+
+/* Настройки — удаление */
+/* ========================
+   НАСТРОЙКИ — СМЕНА ПАРОЛЯ
+   ======================== */
+.account-card .account-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;                    /* интервал как в профиле */
+}
+
+/* Поля ввода — уже и по центру */
+.account-card .account-form .form-input {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+.account-card .account-form .form-label {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+  text-align: left;
+}
+
+/* Кнопки в строку — тоже уже и по центру */
+.settings-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 0px;
+  max-width: 400px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.settings-buttons .account-save-btn {
+  flex: 1;
+  padding: 14px 20px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  display: block;                          /* переопределяем */
+  margin: 0;                               /* убираем старый отступ */
+}
+
+
+.account-save-btn:hover {
+  opacity: 0.9;
+}
+
+.account-delete-btn {
+  flex: 1;
+  padding: 14px 20px;
+  background: #5B3E3E;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background 0.3s;
+  white-space: nowrap;
+}
+
+.account-delete-btn:hover {
+  opacity: 0.9;
+}
+
+
+/* ========================
+   АДАПТИВ ЛИЧНОГО КАБИНЕТА
+   ======================== */
+@media (max-width: 700px) {
+  .account-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .account-logout-btn {
+    margin-top: 8px;
+  }
+
+  .account-tabs {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .account-tab {
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .account-form .form-row {
+    flex-direction: column;
+  }
+
+  
+}
+
+/* ========================
+   СТРАНИЦА ИЗБРАННОГО
+   ======================== */
+.favorites-main {
+  margin: 10px auto 80px;
+  padding: 0 var(--page-margin);
+}
+
+.favorites-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+.favorites-page-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin: 0 auto 40px auto;
+}
+
+/* Сетка */
+.favorites-main .cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+/* Карточка — анимация исчезновения */
+.favorite-card-item {
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.favorite-card-item.removing {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Пустое состояние */
+.favorites-empty {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.favorites-empty-icon {
+  width: 64px;
+  height: 64px;
+  opacity: 0.3;
+  margin-bottom: 20px;
+}
+
+.favorites-empty-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--color-white);
+  margin: 0 0 10px 0;
+}
+
+.favorites-empty-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 24px 0;
+}
+
+.favorites-empty-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.favorites-empty-btn:hover {
+  opacity: 0.9;
+}
+
+/* ========================
+   КОРЗИНА
+   ======================== */
+.cart-main {
+  max-width: 1320px;
+  margin: 10px auto 80px;
+  padding: 0 var(--page-margin);
+}
+
+.cart-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin: 0 0 40px 0;
+}
+
+/* Макет */
+.cart-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.cart-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Карточка товара */
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.1), rgba(91, 62, 62, 0.1));
+  border-radius: 16px;
+  padding: 16px 40px 16px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+/* Крестик удаления — внутри, правый верхний угол */
+.cart-item-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  transition: opacity 0.3s, transform 0.2s;
+  z-index: 2;
+  padding: 0;
+}
+
+.cart-item-remove:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.cart-remove-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Чекбокс — справа по центру */
+.cart-item-checkbox-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  order: -1;
+}
+
+.cart-item-checkbox {
+  display: none;
+}
+
+.cart-item-checkbox-custom {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.cart-item-checkbox:checked + .cart-item-checkbox-custom {
+  background: #0D2719;
+  border-color: #337B57;
+}
+
+.cart-item-checkbox:checked + .cart-item-checkbox-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: #337B57;
+  border-radius: 50%;
+}
+/* Изображение */
+.cart-item-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cart-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Инфо */
+.cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-item-name {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+  margin: 0 0 2px 0;
+}
+
+.cart-item-desc {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  max-width: 250px;                         /* ← ширина */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;  
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Количество */
+.cart-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 2px;                                  /* небольшой зазор между элементами */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 3px 4px;                          /* чуть больше воздуха */
+  flex-shrink: 0;
+  margin-right: 12px;    
+}
+
+.cart-qty-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;                   /* символ по центру */
+  line-height: 1;                            /* убираем лишнюю высоту строки */
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.cart-qty-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cart-qty-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.cart-qty-value {
+  min-width: 24px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+  user-select: none;
+  line-height: 1;
+}
+
+.cart-item-price {
+  display: flex;
+  flex-direction: row;                      /* ← было column */
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.cart-item-price-value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+.cart-item-price-unit {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================
+   СВОДКА
+   ======================== */
+.cart-summary {
+  width: 300px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 120px;
+}
+
+.cart-summary-card {
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.15), rgba(91, 62, 62, 0.15));
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.cart-summary-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-white);
+  margin: 0 0 20px 0;
+}
+
+.cart-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+}
+
+.cart-summary-row span:first-child {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.cart-summary-row span:last-child {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.cart-summary-free {
+  color: #337B57 !important;
+  font-weight: 500 !important;
+}
+
+.cart-summary-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 14px 0;
+}
+
+.cart-summary-total {
+  font-weight: 600 !important;
+  font-size: 18px !important;
+  color: var(--color-white) !important;
+}
+
+.cart-summary-total span:last-child {
+  font-size: 18px;
+  color: var(--color-white) !important;
+}
+
+.cart-checkout-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-top: 20px;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.cart-checkout-btn:hover {
+  opacity: 0.9;
+  color: var(--color-white);
+}
+
+.cart-summary-hint {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin: 12px 0 0 0;
+}
+
+
+/* Пустая корзина */
+.cart-empty {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.cart-empty-icon {
+  width: 64px;
+  height: 64px;
+  opacity: 0.3;
+  margin-bottom: 20px;
+}
+
+.cart-empty-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: var(--color-white);
+  margin: 0 0 10px 0;
+}
+
+.cart-empty-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 24px 0;
+}
+
+.cart-empty-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.cart-empty-btn:hover {
+  opacity: 0.9;
+}
+
+/* ========================
+   АДАПТИВ
+   ======================== */
+@media (max-width: 800px) {
+  .cart-layout {
+    flex-direction: column-reverse;
+  }
+
+  .cart-summary {
+    width: 100%;
+    position: static;
+    margin-bottom: 20px;
+  }
+
+  .cart-item {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 36px 14px 14px;
+  }
+
+  .cart-item-info {
+    flex: 1 1 60%;
+  }
+
+  .cart-item-qty {
+    order: 5;
+  }
+
+  .cart-item-price {
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    margin-right: 0;
+  }
+
+  .cart-item-checkbox-wrapper {
+    position: absolute;
+    right: 10px;
+    bottom: 14px;
+  }
+}
+
+/* ========================
+   ОФОРМЛЕНИЕ ЗАКАЗА
+   ======================== */
+.checkout-main {
+  max-width: 1320px;
+  margin: 10px auto 80px;
+  padding: 0 var(--page-margin);
+}
+
+.checkout-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin: 0 0 40px 0;
+}
+
+.checkout-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* Левая колонка */
+.checkout-form-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ========================
+   ШАГИ (АККОРДЕОН)
+   ======================== */
+.checkout-card {
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.1), rgba(91, 62, 62, 0.1));
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.checkout-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.checkout-card-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.checkout-card-header .step-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.checkout-card.done .step-check {
+  background: #337B57;
+  border-color: #337B57;
+  color: #fff;
+}
+
+.checkout-card-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  flex: 1;
+  transition: color 0.3s;
+}
+
+.checkout-card.active .checkout-card-title,
+.checkout-card.done .checkout-card-title {
+  color: #fff;
+}
+
+
+.step-arrow {
+  flex-shrink: 0;
+}
+
+.step-arrow-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  transition: transform 0.3s;
+  opacity: 0.3;
+}
+
+.checkout-card.active .step-arrow-icon {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.checkout-card.done.active .step-arrow-icon {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* Тело шага */
+.checkout-card-body {
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.checkout-card.active .checkout-card-body {
+  max-height: 600px;
+  padding: 0 24px 24px 24px;
+}
+.checkout-card.done.active .checkout-card-body {
+  max-height: 600px;
+  padding: 0 24px 24px 24px;
+}
+
+
+.checkout-card.locked .checkout-card-header {
+  pointer-events: none;    
+}
+
+
+/* Кнопка "Продолжить" */
+.step-next-btn {
+  display: block;
+  width: 40%;
+  padding: 14px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin: 16px auto 0 auto;       
+}
+
+.step-next-btn:hover {
+  opacity: 0.9;
+}
+
+/* Кнопка подтверждения */
+.checkout-confirm-wrapper {
+  margin-top: 8px;
+}
+
+.checkout-submit-btn {
+  width: 50%;
+  padding: 18px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border: none;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: block;
+  margin: 0 auto;
+}
+
+.checkout-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.checkout-submit-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Доставка */
+.delivery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delivery-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.delivery-option:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.delivery-option input {
+  display: none;
+}
+
+.delivery-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.delivery-option input:checked + .delivery-radio {
+  border-color: #337B57;
+  background: #0D2719;
+}
+
+.delivery-option input:checked + .delivery-radio::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: #337B57;
+  border-radius: 50%;
+}
+
+.delivery-info {
+  flex: 1;
+}
+
+.delivery-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.delivery-desc {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.delivery-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+.delivery-address {
+  margin-top: 14px;
+}
+
+/* Оплата */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.payment-option:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.payment-option input {
+  display: none;
+}
+
+.payment-radio {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.payment-option input:checked + .payment-radio {
+  border-color: #337B57;
+  background: #0D2719;
+}
+
+.payment-option input:checked + .payment-radio::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: #337B57;
+  border-radius: 50%;
+}
+
+.payment-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+/* Правая колонка */
+.checkout-summary-col {
+  width: 400px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 120px;
+}
+
+.checkout-summary-card {
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.15), rgba(91, 62, 62, 0.15));
+  border-radius: 20px;
+  padding: 24px 24px 16px 24px;  /* было padding: 24px; */
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.checkout-summary-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-white);
+  margin: 0 0 20px 0;
+}
+
+.checkout-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkout-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.checkout-item-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.checkout-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkout-item-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.checkout-item-qty {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkout-item-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+}
+
+.checkout-summary-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 14px 0;
+}
+
+.checkout-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+.checkout-summary-total {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-white);
+}
+
+/* Успешный заказ */
+.checkout-success {
+  text-align: center;
+  padding: 40px 20px;
+  min-height: 60vh;
+}
+
+.checkout-success-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: linear-gradient(to bottom right, rgba(51, 123, 87, 0.15), rgba(91, 62, 62, 0.15));
+  border-radius: 24px;
+  padding: 50px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.success-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-heart-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.success-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 500;
+  font-size: 28px;
+  color: var(--color-white);
+  margin: 0 0 12px;
+}
+
+.success-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 12px;
+}
+
+.success-order-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  color: rgba(255, 255, 255);
+  margin: 0 0 30px;
+}
+
+.success-home-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(to right, #0D2719, #337B57);
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.success-home-btn:hover {
+  opacity: 0.9;
+}
+
+/* Адаптив */
+@media (max-width: 800px) {
+  .checkout-layout {
+    flex-direction: column-reverse;
+  }
+
+  .checkout-summary-col {
+    width: 100%;
+    position: static;
+  }
 }

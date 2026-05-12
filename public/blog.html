@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Чайный блог — Forest Tea</title>
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+ <!-- ========================
+       ХЕДЕР
+       Высота 100px, фон #09150F, фиксированный
+       [Лого] [Навигация + Соцсети по центру] [Действия справа]
+       ======================== -->
+  <header>
+
+    <!-- Логотип — круг 64×64. Замените на <img src="logo.png" width="64" height="64" /> -->
+    <div class="header-logo"></div>
+
+    <!-- Центральная зона: навигация + иконки соцсетей сразу после «Контакты» -->
+    <div class="header-center">
+
+      <!-- Навигация — Montserrat Medium 18, белый -->
+      <nav class="header-nav">
+        <a href="glavnaya.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О нас</a>
+        <a href="contacts.html">Контакты</a>
+        <a href="blog.html">Блог</a>
+      </nav>
+
+      <!-- Соцсети 40×40 — вплотную правее пункта «Контакты»
+           Замените SVG на <img src="telegram.png" width="40" height="40" alt="Telegram" /> -->
+      <div class="header-socials">
+
+        <!-- Телеграм -->
+        <div class="header-icon" title="Telegram">
+          <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
+        </div>
+
+        <!-- YouTube -->
+        <div class="header-icon" title="YouTube">
+          <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
+        </div>
+
+        <!-- inst -->
+        <div class="header-icon" title="Instagram">
+          <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="header-actions">
+
+         <!-- Избранное (сердце) -->
+<a href="favorites.html" class="header-icon" title="Избранное">
+  <img src="pictures/love.png" width="35" height="35" alt="Избранное" />
+</a>
+
+        <!-- Корзина -->
+<a href="cart.html" class="header-icon" title="Корзина">
+  <img src="pictures/cart.png" width="35" height="35" alt="Корзина" />
+</a>
+
+      <!-- Аккаунт -->
+      <div class="header-icon" title="Аккаунт" id="accountIcon">
+        <img src="pictures/profile.png" width="35" height="35" alt="Telegram" />
+      </div>
+
+    </div>
+
+  </header>
+  <!-- Хлебные крошки -->
+<nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <ol class="breadcrumbs-list">
+    <li class="breadcrumbs-item">
+      <a href="/" class="breadcrumbs-link breadcrumbs-home">
+        Главная
+      </a>
+    </li>
+    <li class="breadcrumbs-item">
+      <span class="breadcrumbs-separator">/</span>
+      <a href="/blog" class="breadcrumbs-link">Чайный блог</a>
+    </li>
+  </ol>
+</nav>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<main class="blog-main">
+  
+  <!-- Заголовок -->
+  <h1 class="blog-page-title">Чайный блог</h1>
+  <p class="blog-subtitle">
+    Истории о чае, советы по завариванию и путешествия по чайным плантациям
+  </p>
+
+  <!-- Поиск по блогу -->
+  <div class="blog-search-wrapper">
+    <img src="pictures/search.png" alt="Поиск" class="search-icon">
+    <input type="text" class="blog-search-input" id="blogSearch" placeholder="Поиск по статьям...">
+  </div>
+
+  <!-- Категории блога -->
+  <div class="blog-categories">
+    <button class="blog-category-btn active" data-category="all">Все статьи</button>
+    <button class="blog-category-btn" data-category="guide">Гайды</button>
+    <button class="blog-category-btn" data-category="story">Истории</button>
+    <button class="blog-category-btn" data-category="recipe">Рецепты</button>
+    <button class="blog-category-btn" data-category="travel">Путешествия</button>
+    <button class="blog-category-btn" data-category="health">Здоровье</button>
+  </div>
+
+  <!-- Сетка статей -->
+  <div class="blog-grid">
+    
+<!-- Статья 1 -->
+<article class="blog-card" data-category="guide">
+  <div class="blog-card-image">
+    <img src="pictures/tea-guide.jpg" alt="Как правильно заваривать чай" class="blog-card-img">
+  </div>
+  <div class="blog-card-content">
+    <span class="blog-card-category">Гайды</span>
+    <h2 class="blog-card-title">Полный гайд по завариванию чая: температура, время и посуда</h2>
+    <p class="blog-card-excerpt">
+      Рассказываем, как правильно заваривать зелёный, чёрный, белый чай и улун. 
+      Какую воду использовать, какой посудой пользоваться и сколько времени настаивать 
+      каждый сорт. Бонус: таблица температур для всех видов чая.
+    </p>
+    <div class="blog-card-full-text">
+      <p>
+        Правильное заваривание чая — это целое искусство. Всё начинается с выбора воды: 
+        идеальна мягкая родниковая вода, но подойдёт и фильтрованная. Жёсткая вода 
+        из-под крана испортит вкус даже самого дорогого чая.
+      </p>
+      <p>
+        <strong>Зелёный чай:</strong> температура 70–80°C, настаивать 1–3 минуты. 
+        Слишком горячая вода сделает его горьким. Используйте стеклянную или керамическую посуду.
+      </p>
+      <p>
+        <strong>Чёрный чай:</strong> температура 90–95°C, настаивать 3–5 минут. 
+        Идеален в фарфоровом чайнике. Добавьте молоко или лимон по вкусу.
+      </p>
+      <p>
+        <strong>Улун:</strong> температура 85–90°C, настаивать 2–4 минуты. 
+        Улуны раскрываются постепенно — один и тот же лист можно заваривать до 5–7 раз, 
+        каждый раз получая новый оттенок вкуса.
+      </p>
+      <p>
+        <strong>Белый чай:</strong> температура 75–85°C, настаивать 4–5 минут. 
+        Самый нежный из всех — не используйте кипяток, дайте воде остыть пару минут после закипания.
+      </p>
+      <p>
+        <strong>Пуэр:</strong> температура 95–100°C, настаивать 3–4 минуты. 
+        Выдержанный пуэр любит крутой кипяток и глиняную посуду. Перед завариванием 
+        обязательно промойте лист горячей водой.
+      </p>
+      <p>
+        И главное правило: не передерживайте чай! Лучше заварить новый раз, чем 
+        получить горький напиток. Экспериментируйте с температурой и временем, 
+        чтобы найти свой идеальный вкус.
+      </p>
+    </div>
+    <button class="blog-read-more-btn">Читать далее</button>
+  </div>
+</article>
+
+    <!-- Статья 2 -->
+    <article class="blog-card" data-category="story">
+      <div class="blog-card-image">
+        <img src="pictures/tea-history.jpg" alt="История чая" class="blog-card-img">
+      </div>
+      <div class="blog-card-content">
+        <span class="blog-card-category">Истории</span>
+        <h2 class="blog-card-title">Путешествие чая: от древнего Китая до вашей чашки</h2>
+        <p class="blog-card-excerpt">
+          Как чай прошёл путь от лекарственного напитка китайских монахов до самого 
+          популярного напитка в мире. История длиной в 5000 лет.
+        </p>
+        <div class="blog-card-full-text">
+  <p>История чая начинается в древнем Китае около 2737 года до н.э. По легенде, 
+  император Шэнь-нун кипятил воду, и ветер занёс в котёл несколько чайных листьев. 
+  Попробовав напиток, император был восхищён его вкусом и бодрящим эффектом.</p>
+  <p>Из Китая чай распространился в Японию, Корею, а затем по Великому шёлковому пути — 
+  в Индию, Персию и Европу. В XVI веке португальские купцы привезли чай в Европу, 
+  где он быстро стал напитком аристократов.</p>
+  <p>Сегодня чай — самый популярный напиток в мире после воды. Каждая культура 
+  привнесла свои традиции: японская чайная церемония, индийское масала-чай, 
+  английское чаепитие с молоком, марокканский мятный чай.</p>
+</div>
+        <button class="blog-read-more-btn">Читать далее</button>
+      </div>
+    </article>
+
+    <!-- Статья 3 -->
+    <article class="blog-card" data-category="recipe">
+      <div class="blog-card-image">
+        <img src="pictures/matcha-latte.png" alt="Матча-латте" class="blog-card-img">
+      </div>
+      <div class="blog-card-content">
+        <span class="blog-card-category">Рецепты</span>
+        <h2 class="blog-card-title">Матча-латте дома: 3 простых рецепта</h2>
+        <p class="blog-card-excerpt">
+          Готовим классический матча-латте, матча-фраппе и матча с кокосовым молоком. 
+          Пошаговые инструкции.
+        </p>
+        <div class="blog-card-full-text">
+  <p>
+    Матча-латте — это не просто модный напиток из кофеен, это идеальный способ начать день. 
+    Мы подготовили три рецепта: от классического до экспериментального.
+  </p>
+  <p>
+    <strong>Классический матча-латте:</strong> просейте 2 г матчи в чашку, добавьте 60 мл 
+    горячей воды (80°C) и взбейте бамбуковым венчиком до полного растворения. Подогрейте 
+    180 мл молока (коровьего или растительного), вспеньте и влейте в чашку. Добавьте 
+    кленовый сироп или мёд по вкусу. Вкус получается бархатистым, с лёгкой сладостью.
+  </p>
+  <p>
+    <strong>Матча-фраппе:</strong> в блендер положите 2 кубика льда, 2 г матчи, 
+    150 мл молока и шарик ванильного мороженого. Взбейте до однородной консистенции. 
+    Сверху украсьте взбитыми сливками и посыпьте порошком матчи. Идеальный летний десерт!
+  </p>
+  <p>
+    <strong>Матча с кокосовым молоком:</strong> замените обычное молоко на кокосовое — 
+    получится лёгкий тропический вкус. Добавьте щепотку корицы и каплю ванильного экстракта. 
+    Этот вариант особенно хорош для тех, кто не употребляет лактозу.
+  </p>
+</div>
+        <button class="blog-read-more-btn">Читать далее</button>
+      </div>
+    </article>
+
+    <!-- Статья 4 -->
+    <article class="blog-card" data-category="travel">
+      <div class="blog-card-image">
+        <img src="pictures/japan-tea.jpg" alt="Чайные плантации Японии" class="blog-card-img">
+      </div>
+      <div class="blog-card-content">
+        <span class="blog-card-category">Путешествия</span>
+        <h2 class="blog-card-title">Чайные плантации Удзи: репортаж из Японии</h2>
+        <p class="blog-card-excerpt">
+          Побывали на легендарных плантациях Удзи, где выращивают лучшую матчу в мире. 
+          Рассказываем о процессе производства и дегустации.
+        </p>
+        <div class="blog-card-full-text">
+  <p>
+    Префектура Удзи расположена недалеко от Киото и считается родиной японской матчи. 
+    Именно здесь, на пологих холмах, окутанных утренним туманом, выращивают самый 
+    церемониальный чай в мире.
+  </p>
+  <p>
+    Чайные кусты в Удзи затеняют специальными навесами за 3–4 недели до сбора. Это 
+    замедляет рост листьев и увеличивает содержание хлорофилла — так матча получает 
+    свой знаменитый изумрудный цвет и насыщенный вкус с нотами умами.
+  </p>
+  <p>
+    Сбор происходит только вручную: срывают самые молодые и нежные листочки — флеши. 
+    Затем листья обрабатывают паром, чтобы остановить окисление, высушивают и 
+    перемалывают на каменных жерновах. Один такой жернов за час работы выдаёт 
+    всего 30–40 граммов чайного порошка.
+  </p>
+  <p>
+    В конце поездки мы посетили местную чайную, где провели дегустацию. Церемониальная 
+    матча из Удзи — это нечто невероятное: густая пена, глубокий изумрудный цвет и 
+    вкус, который раскрывается волнами — сначала травянистый, потом сливочный, с 
+    долгим сладковатым послевкусием. Если у вас будет возможность — обязательно 
+    попробуйте оригинальную матчу из Удзи.
+  </p>
+</div>
+        <button class="blog-read-more-btn">Читать далее</button>
+      </div>
+    </article>
+
+    <!-- Статья 5 -->
+    <article class="blog-card" data-category="health">
+      <div class="blog-card-image">
+        <img src="pictures/tea-health.jpg" alt="Чай и здоровье" class="blog-card-img">
+      </div>
+      <div class="blog-card-content">
+        <span class="blog-card-category">Здоровье</span>
+        <h2 class="blog-card-title">10 полезных свойств зелёного чая, подтверждённых наукой</h2>
+        <p class="blog-card-excerpt">
+          Разбираем научные исследования о пользе зелёного чая: от антиоксидантов 
+          до улучшения работы мозга. Только факты.
+        </p>
+        <div class="blog-card-full-text">
+  <p>
+    Зелёный чай — один из самых изученных напитков в мире. За последние 20 лет 
+    проведены сотни исследований, подтверждающих его пользу. Мы отобрали 10 самых 
+    убедительных научных фактов.
+  </p>
+  <p>
+    <strong>1. Мощный антиоксидант.</strong> Зелёный чай содержит катехины — вещества, 
+    которые нейтрализуют свободные радикалы и замедляют старение клеток. Особенно богат 
+    катехинами японский чай сэнча.
+  </p>
+  <p>
+    <strong>2. Ускоряет метаболизм.</strong> Сочетание кофеина и катехинов увеличивает 
+    расход энергии на 4–5% и ускоряет сжигание жиров. Поэтому экстракт зелёного чая 
+    часто добавляют в спортивные добавки.
+  </p>
+  <p>
+    <strong>3. Улучшает работу мозга.</strong> Кофеин и аминокислота L-теанин работают 
+    в паре: кофеин бодрит, а L-теанин снимает тревожность и улучшает концентрацию. 
+    Результат — спокойная сосредоточенность без нервозности.
+  </p>
+  <p>
+    <strong>4. Снижает риск диабета.</strong> Исследования показывают, что регулярное 
+    употребление зелёного чая повышает чувствительность к инсулину и снижает уровень 
+    сахара в крови на 10–15%.
+  </p>
+  <p>
+    <strong>5. Защищает сердце.</strong> Люди, пьющие 5 и более чашек в день, имеют 
+    на 20% меньший риск инфаркта и инсульта. Зелёный чай снижает уровень «плохого» 
+    холестерина и улучшает состояние сосудов.
+  </p>
+  <p>
+    И это только половина списка! Остальные 5 свойств — в нашем полном обзоре 
+    научных исследований на сайте.
+  </p>
+</div>
+        <button class="blog-read-more-btn">Читать далее</button>
+      </div>
+    </article>
+
+    <!-- Статья 6 -->
+    <article class="blog-card" data-category="recipe">
+      <div class="blog-card-image">
+        <img src="pictures/tea-cocktail.jpg" alt="Чайные коктейли" class="blog-card-img">
+      </div>
+      <div class="blog-card-content">
+        <span class="blog-card-category">Рецепты</span>
+        <h2 class="blog-card-title">Летние чайные коктейли: освежающие рецепты</h2>
+        <p class="blog-card-excerpt">
+          Готовим cold brew с цитрусами, чайный мохито и освежающий пунш с белым чаем. 
+          Идеально для жаркого дня.
+        </p>
+        <div class="blog-card-full-text">
+  <p>
+    Летние чайные коктейли — это свежо, вкусно и полезно. Никакого сахара из газировки, 
+    только натуральные ингредиенты и хороший чай. Вот три рецепта для жарких дней.
+  </p>
+  <p>
+    <strong>Cold brew с цитрусами:</strong> заварите 10 г зелёного чая в 500 мл холодной 
+    воды и поставьте в холодильник на 6–8 часов. Процедите, добавьте сок половины лимона, 
+    дольки апельсина и лёд. Освежающий напиток с лёгкой кислинкой.
+  </p>
+  <p>
+    <strong>Чайный мохито:</strong> в стакане разомните 5 листиков мяты с долькой лайма 
+    и чайной ложкой тростникового сахара. Залейте охлаждённым чёрным чаем, добавьте лёд 
+    и немного содовой. Безалкогольный мохито с чайным характером.
+  </p>
+  <p>
+    <strong>Пунш с белым чаем:</strong> заварите 3 чайные ложки белого чая в 300 мл 
+    воды (80°C, 4 минуты). Охладите, добавьте 100 мл ананасового сока, 50 мл 
+    персикового нектара и горсть свежих ягод. Идеальный коктейль для вечерних посиделок 
+    на террасе.
+  </p>
+</div>
+        <button class="blog-read-more-btn">Читать далее</button>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Пагинация -->
+  <div class="blog-pagination">
+    <button class="pagination-btn active">1</button>
+    <button class="pagination-btn">2</button>
+    <button class="pagination-btn">3</button>
+    <button class="pagination-btn pagination-next">Следующая ›</button>
+  </div>
+
+</main>
+
+  <!-- ФУТЕР -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-subscribe">
+        <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>
+        <div class="subscribe-input-wrapper">
+          <input type="email" id="subscribe-email" class="subscribe-input" placeholder="Email" required>
+          <button type="button" id="subscribe-btn" class="subscribe-btn">
+            <img src="pictures/send.png" alt="Отправить" class="send-icon">
+          </button>
+        </div>
+        <div id="email-error" class="email-error"></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+       <div class="footer-column">
+  <h4 class="footer-column-title">Контакты</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375291234567" class="footer-link">+375 (29) 123-45-67</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/phone.png" alt="Телефон" class="footer-icon">
+      <a href="tel:+375337654321" class="footer-link">+375 (33) 765-43-21</a>
+    </li>
+    <li class="footer-list-item">
+      <img src="pictures/email.png" alt="Почта" class="footer-icon">
+      <a href="mailto:info.foresttea@gmail.com" class="footer-link">info.foresttea@gmail.com</a>
+    </li>
+  </ul>
+</div>
+        <div class="footer-column">
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">О нас</h4>
+          <ul class="footer-list">
+            <li class="footer-list-item"><a href="delivery.html" class="footer-link">Оплата и доставка</a></li>
+            <li class="footer-list-item"><a href="faq.html" class="footer-link">FAQ</a></li>
+            <li class="footer-list-item"><a href="blog.html" class="footer-link">Чайный блог</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4 class="footer-column-title">Наши соцсети</h4>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
+          <h4 class="footer-column-title payment-title">Способы оплаты</h4>
+          <div class="footer-payments">
+            <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">
+            <img src="pictures/mastercard0.jpg" alt="Mastercard" class="payment-icon">
+            <img src="pictures/Mir.png" alt="Мир" class="payment-icon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+    <!-- Модальное окно Вход / Регистрация -->
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal-window">
+        
+        <button class="modal-close-btn" id="closeModal">
+          <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+        </button>
+
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="login">Вход</button>
+          <button class="modal-tab" data-tab="register">Регистрация</button>
+        </div>
+
+        <form class="modal-form active" id="loginForm">
+          <div class="modal-input-group">
+            <label class="modal-label">Email</label>
+            <div class="modal-input-wrapper">
+              <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+              <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+            </div>
+          </div>
+          <div class="modal-input-group">
+            <label class="modal-label">Пароль</label>
+            <div class="modal-input-wrapper">
+              <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+              <input type="password" class="modal-input" placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="modal-submit-btn">Войти</button>
+        </form>
+
+        <form class="modal-form" id="registerForm">
+          <div class="modal-input-group">
+            <label class="modal-label">Имя</label>
+            <div class="modal-input-wrapper">
+              <img src="pictures/profile.png" alt="Имя" class="modal-input-icon">
+              <input type="text" class="modal-input" placeholder="Ваше имя" required>
+            </div>
+          </div>
+          <div class="modal-input-group">
+            <label class="modal-label">Email</label>
+            <div class="modal-input-wrapper">
+              <img src="pictures/email.png" alt="Email" class="modal-input-icon">
+              <input type="email" class="modal-input" placeholder="example@mail.ru" required>
+            </div>
+          </div>
+          <div class="modal-input-group">
+            <label class="modal-label">Пароль</label>
+            <div class="modal-input-wrapper">
+              <img src="pictures/lock.png" alt="Пароль" class="modal-input-icon">
+              <input type="password" class="modal-input" placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+        </form>
+
+        <p class="modal-footer-text">Входя, вы соглашаетесь с условиями обработки данных</p>
+      </div>
+    </div>
+  <script src="blog.js"></script>
+</body>
+</html>
