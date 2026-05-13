@@ -273,48 +273,37 @@
         </div>
 
 <!-- Таб: Отзывы -->
+<!-- Таб: Отзывы -->
 <div class="tab-panel" id="tab-reviews">
   
   <!-- Форма добавления отзыва -->
   <div class="review-form-wrapper">
-    <h3 class="review-form-title">Оставте отзыв</h3>
+    <h3 class="review-form-title">Оставьте отзыв</h3>
     
-    <form class="review-form feedback-form" id="reviewForm">
+    <form class="review-form feedback-form" id="productReviewForm">
       
-      <div class="form-row">
-        <div class="form-group">
-          <label for="review-name" class="form-label">Ваше имя*</label>
-          <input type="text" id="review-name" class="form-input" placeholder="Иван" required>
-        </div>
-        <div class="form-group">
-          <label for="review-email" class="form-label">Email*</label>
-          <input type="email" id="review-email" class="form-input" placeholder="example@mail.ru" required>
-        </div>
-      </div>
-
       <!-- Оценка звёздами (PNG-иконки) -->
-    <div class="form-group full-width">
-  
-  <div class="rating-row">
-    <label class="form-label">Ваша оценка*</label>
+      <div class="form-group full-width">
+        <div class="rating-row">
+          <label class="form-label">Ваша оценка*</label>
 
-    <div class="stars-input" id="starsInput">
-          <button type="button" class="star-btn" data-value="1" title="Ужасно">
-            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
-          </button>
-          <button type="button" class="star-btn" data-value="2" title="Плохо">
-            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
-          </button>
-          <button type="button" class="star-btn" data-value="3" title="Нормально">
-            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
-          </button>
-          <button type="button" class="star-btn" data-value="4" title="Хорошо">
-            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
-          </button>
-          <button type="button" class="star-btn" data-value="5" title="Отлично">
-            <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
-          </button>
-        </div>
+          <div class="stars-input" id="starsInput">
+            <button type="button" class="star-btn" data-value="1" title="Ужасно">
+              <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+            </button>
+            <button type="button" class="star-btn" data-value="2" title="Плохо">
+              <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+            </button>
+            <button type="button" class="star-btn" data-value="3" title="Нормально">
+              <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+            </button>
+            <button type="button" class="star-btn" data-value="4" title="Хорошо">
+              <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+            </button>
+            <button type="button" class="star-btn" data-value="5" title="Отлично">
+              <img src="pictures/star-empty.png" alt="☆" class="star-icon" data-empty="pictures/star-empty.png" data-filled="pictures/star-filled.png">
+            </button>
+          </div>
         </div>
         <input type="hidden" id="review-rating" name="rating" value="0" required>
       </div>
@@ -331,100 +320,19 @@
         <textarea id="review-text" class="form-textarea" placeholder="Расскажите о вкусе, аромате и ваших впечатлениях..." rows="4" required></textarea>
       </div>
 
-      <button type="submit" class="review-submit-btn">Отправить</button>
+      <!-- Кнопка отправки -->
+      <button type="submit" class="review-submit-btn">Отправить отзыв</button>
       
-      <div id="review-message-box" class="feedback-message"></div>
+      <div id="review-message-box" class="feedback-message" style="display:none;"></div>
     </form>
   </div>
 
-          <!-- Список отзывов -->
-          <div class="reviews-list">
-            
-         <div class="review-card">
-  <div class="review-header">
-    <div class="review-author-avatar">А</div>
-    <div class="review-author-info">
-      <span class="review-author-name">Анна</span>
-      <span class="review-date">12 марта 2026</span>
-    </div>
-    <div class="review-stars">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-    </div>
+  <!-- Список отзывов -->
+  <div class="reviews-list">
+    <!-- Отзывы будут загружены динамически -->
   </div>
-  <div class="review-body">
-    <h4 class="review-title">Лучшая матча, которую я пробовала!</h4>
-    <p class="review-text">
-      Заказывала для чайной церемонии. Цвет потрясающий — ярко-изумрудный. 
-      Вкус нежный, без горечи, с приятной сладостью. Пена получается 
-      густая и бархатистая. Рекомендую всем ценителям!
-    </p>
-  </div>
-  <div class="review-footer">
-    <button class="review-helpful-btn">Полезно (12)</button>
-  </div>
-</div>
 
-            <div class="review-card">
-  <div class="review-header">
-    <div class="review-author-avatar">М</div>
-    <div class="review-author-info">
-      <span class="review-author-name">Михаил</span>
-      <span class="review-date">5 марта 2026</span>
-    </div>
-    <div class="review-stars">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-empty.png" alt="☆" class="star-icon-static">
-    </div>
-  </div>
-  <div class="review-body">
-    <h4 class="review-title">Отличное качество, но цена высоковата</h4>
-    <p class="review-text">
-      Качество на высоте — цвет, вкус, аромат. Делаю матча-латте по утрам, 
-      заряжает энергией на весь день. Единственное — хотелось бы упаковку 
-      побольше за эти деньги.
-    </p>
-  </div>
-  <div class="review-footer">
-    <button class="review-helpful-btn">Полезно (8)</button>
-  </div>
 </div>
-
-         <div class="review-card">
-  <div class="review-header">
-    <div class="review-author-avatar">Е</div>
-    <div class="review-author-info">
-      <span class="review-author-name">Екатерина</span>
-      <span class="review-date">28 февраля 2026</span>
-    </div>
-    <div class="review-stars">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-filled.png" alt="★" class="star-icon-static">
-      <img src="pictures/star-empty.png" alt="☆" class="star-icon-static">
-    </div>
-  </div>
-  <div class="review-body">
-    <h4 class="review-title">Хорошая матча для latte</h4>
-    <p class="review-text">
-      Для церемониальной, наверное, есть варианты и получше, но для 
-      повседневного использования и матча-латте — отличный выбор. 
-      Быстрая доставка, красивая упаковка.
-    </p>
-  </div>
-  <div class="review-footer">
-    <button class="review-helpful-btn">Полезно (5)</button>
-  </div>
-</div>
-
-          </div>
         </div>
 
       </div>
@@ -435,37 +343,6 @@
     <h2 class="product-same-title">Похожие товары</h2>
     <div class="cards-row">
       <!-- Карточки похожих товаров -->
-   <div class="product-card">
-    
-    <div class="stock-badge in-stock">В наличии</div>
-    
-    <div class="card-image-wrapper">
-      <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
-    </div>
-    
-    <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
-    
-    <div class="card-body">
-      <div class="card-name">Молочный улун</div>
-      <div class="card-desc">Нежный чай с карамельным ароматом</div>
-      
-      <div class="card-price">42 br <span class="card-price-unit">/ 50 г</span></div>
-      
-      <div class="qty-label">Выберите количество:</div>
-      <div class="qty-selector">
-        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-        <span class="qty-value">1</span>
-        <button class="qty-btn plus" aria-label="Увеличить">+</button>
-      </div>
-      
-      <div class="card-bottom-row">
-        <button class="card-btn add-to-cart-btn">В корзину</button>
-        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
-          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
-        </button>
-      </div>
-    </div>
-  </div>
 
       <!-- Можно добавить ещё 2 карточки -->
     </div>
@@ -507,9 +384,9 @@
         <div class="footer-column">
   <h4 class="footer-column-title">Каталог</h4>
   <ul class="footer-list">
-    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
-    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
-    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=zelenyj-chaj" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=chyornyj-chaj" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=travyanoj-chaj" class="footer-link">Травяной чай</a></li>
   </ul>
 </div>
         <div class="footer-column">

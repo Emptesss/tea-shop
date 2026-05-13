@@ -219,6 +219,9 @@ app.get('/', (req, res) => {
 app.get('/catalog', (req, res) => {
     res.sendFile(path.join(__dirname,'public', 'catalog.html'));
 });
+app.get('/product', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'product.html'));
+});
 
 // ========================
 // API — КАТЕГОРИИ
@@ -515,6 +518,58 @@ app.get('/api/products', async (req, res) => {
     } catch (error) {
         console.error('Ошибка получения товаров:', error);
         res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    }
+});
+
+// Получить товар по slug
+app.get('/api/products/:slug', async (req, res) => {
+    try {
+        const { slug } = req.params;
+        
+        const result = await pool.query(
+            `SELECT p.*, c.name as category_name, c.slug as category_slug
+             FROM products p
+             LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.slug = $1 AND p.is_active = true`,
+            [slug]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Товар не найден' });
+        }
+
+        const product = result.rows[0];
+
+        // Вкусы товара
+        const tastesResult = await pool.query(
+            `SELECT t.name, t.slug
+             FROM product_tastes pt
+             JOIN tastes t ON pt.taste_id = t.id
+             WHERE pt.product_id = $1`,
+            [product.id]
+        );
+        product.tastes = tastesResult.rows;
+
+// Похожие товары (по категории и вкусам)
+const similarResult = await pool.query(
+    `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.image1, p.purchase_count,
+            (SELECT COUNT(*) FROM product_tastes pt 
+             WHERE pt.product_id = p.id 
+             AND pt.taste_id IN (SELECT taste_id FROM product_tastes WHERE product_id = $1))
+            as matching_tastes
+     FROM products p
+     WHERE p.id != $1 AND p.is_active = true
+     ORDER BY matching_tastes DESC, RANDOM()
+     LIMIT 4`,
+    [product.id]
+);
+product.similar_products = similarResult.rows;
+
+        res.json(product);
+
+    } catch (error) {
+        console.error('Ошибка получения товара:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
 // ========================
@@ -968,6 +1023,198 @@ app.put('/api/auth/change-password', authenticateToken, async (req, res) => {
 
     } catch (error) {
         console.error('Ошибка смены пароля:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// ========================
+// API — ИЗБРАННОЕ
+// ========================
+
+// Получить избранное пользователя
+app.get('/api/favorites', authenticateToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.old_price,
+                    p.image1, p.in_stock, p.purchase_count, p.rating,
+                    c.name as category_name, c.slug as category_slug
+             FROM favorites f
+             JOIN products p ON f.product_id = p.id
+             LEFT JOIN categories c ON p.category_id = c.id
+             WHERE f.user_id = $1 AND p.is_active = true
+             ORDER BY f.created_at DESC`,
+            [req.user.id]
+        );
+        
+        res.json({ favorites: result.rows });
+    } catch (error) {
+        console.error('Ошибка получения избранного:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Добавить в избранное
+app.post('/api/favorites', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const userId = req.user.id;
+
+        if (!productId) {
+            return res.status(400).json({ error: 'ID товара обязателен' });
+        }
+
+        // Проверяем, есть ли уже в избранном
+        const existing = await pool.query(
+            'SELECT 1 FROM favorites WHERE user_id = $1 AND product_id = $2',
+            [userId, productId]
+        );
+
+        if (existing.rows.length > 0) {
+            return res.json({ message: 'Уже в избранном', inFavorites: true });
+        }
+
+        await pool.query(
+            'INSERT INTO favorites (user_id, product_id) VALUES ($1, $2)',
+            [userId, productId]
+        );
+
+        res.status(201).json({ message: 'Добавлено в избранное', inFavorites: true });
+
+    } catch (error) {
+        console.error('Ошибка добавления в избранное:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Удалить из избранного
+app.delete('/api/favorites/:productId', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const userId = req.user.id;
+
+        await pool.query(
+            'DELETE FROM favorites WHERE user_id = $1 AND product_id = $2',
+            [userId, productId]
+        );
+
+        res.json({ message: 'Удалено из избранного' });
+
+    } catch (error) {
+        console.error('Ошибка удаления из избранного:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Проверить, в избранном ли товар
+app.get('/api/favorites/check/:productId', authenticateToken, async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const userId = req.user.id;
+
+        const result = await pool.query(
+            'SELECT 1 FROM favorites WHERE user_id = $1 AND product_id = $2',
+            [userId, productId]
+        );
+
+        res.json({ inFavorites: result.rows.length > 0 });
+
+    } catch (error) {
+        console.error('Ошибка проверки избранного:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// ========================
+// API — ОТЗЫВЫ
+// ========================
+
+// Получить отзывы товара
+app.get('/api/reviews/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        
+        const result = await pool.query(
+            `SELECT r.id, r.author_name, r.author_avatar, r.rating, r.title, r.content,
+                    r.helpful_count, r.created_at, r.user_id,
+                    u.name as user_name
+             FROM reviews r
+             LEFT JOIN users u ON r.user_id = u.id
+             WHERE r.product_id = $1 AND r.is_approved = true
+             ORDER BY r.created_at DESC`,
+            [productId]
+        );
+        
+        res.json({ reviews: result.rows });
+    } catch (error) {
+        console.error('Ошибка получения отзывов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Добавить отзыв (только авторизованные)
+app.post('/api/reviews', authenticateToken, async (req, res) => {
+    try {
+        const { productId, rating, title, content } = req.body;
+        const userId = req.user.id;
+        
+        console.log('Получен запрос на отзыв:', { productId, rating, title, content, userId });
+        
+        if (!productId || !rating || !content) {
+            return res.status(400).json({ error: 'productId, rating и content обязательны' });
+        }
+        
+        // Проверяем существование товара
+        const productCheck = await pool.query('SELECT id FROM products WHERE id = $1', [productId]);
+        if (productCheck.rows.length === 0) {
+            return res.status(404).json({ error: 'Товар не найден' });
+        }
+        
+        // Получаем имя и аватар пользователя
+        const userResult = await pool.query(
+            'SELECT name, avatar FROM users WHERE id = $1',
+            [userId]
+        );
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        
+        const user = userResult.rows[0];
+        const authorName = user.name || 'Пользователь';
+        const authorAvatar = user.avatar || null;
+        
+        const result = await pool.query(
+            `INSERT INTO reviews (product_id, user_id, author_name, author_avatar, rating, title, content)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, author_name, author_avatar, rating, title, content, created_at`,
+            [productId, userId, authorName, authorAvatar, rating, title || '', content]
+        );
+        
+        console.log('Отзыв создан:', result.rows[0]);
+        
+        res.status(201).json({ message: 'Отзыв успешно добавлен', review: result.rows[0] });
+        
+    } catch (error) {
+        console.error('Ошибка добавления отзыва:', error);
+        res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    }
+});
+
+// Полезный отзыв
+app.post('/api/reviews/:id/helpful', async (req, res) => {
+    try {
+        const result = await pool.query(
+            'UPDATE reviews SET helpful_count = helpful_count + 1 WHERE id = $1 RETURNING helpful_count',
+            [req.params.id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Отзыв не найден' });
+        }
+        
+        res.json({ message: 'Спасибо!', helpfulCount: result.rows[0].helpful_count });
+    } catch (error) {
+        console.error('Ошибка helpful_count:', error);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });

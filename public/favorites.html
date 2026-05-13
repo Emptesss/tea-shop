@@ -68,84 +68,6 @@
     <!-- Сетка избранного -->
       <div class="cards-row" id="favoritesGrid">
       
-        <!-- Карточка 1 -->
-    <div class="product-card favorite-card-item">
-      <div class="stock-badge in-stock">В наличии</div>
-      <div class="card-image-wrapper">
-        <img src="pictures/tea1.jpg" alt="Горная матча" class="card-image">
-      </div>
-      <div class="card-badge">Купили <span class="purchase-count">156</span> раз</div>
-      <div class="card-body">
-        <div class="card-name">Горная матча</div>
-        <div class="card-desc">Премиальный порошковый чай высшего качества</div>
-        <div class="card-price">35 Br <span class="card-price-unit">/ 50 г</span></div>
-        <div class="qty-label">Выберите количество:</div>
-        <div class="qty-selector">
-          <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-          <span class="qty-value">1</span>
-          <button class="qty-btn plus" aria-label="Увеличить">+</button>
-        </div>
-        <div class="card-bottom-row">
-          <button class="card-btn add-to-cart-btn">В корзину</button>
-          <button class="card-favorite-bottom active" onclick="toggleFavorite(this)">
-            <img src="pictures/love.png" alt="В избранном" class="card-favorite-bottom-img">
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Карточка 2 -->
-    <div class="product-card favorite-card-item">
-      <div class="stock-badge in-stock">В наличии</div>
-      <div class="card-image-wrapper">
-        <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
-      </div>
-      <div class="card-badge">Купили <span class="purchase-count">89</span> раз</div>
-      <div class="card-body">
-        <div class="card-name">Молочный улун</div>
-        <div class="card-desc">Нежный чай с карамельным ароматом</div>
-        <div class="card-price">42 Br <span class="card-price-unit">/ 50 г</span></div>
-        <div class="qty-label">Выберите количество:</div>
-        <div class="qty-selector">
-          <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-          <span class="qty-value">1</span>
-          <button class="qty-btn plus" aria-label="Увеличить">+</button>
-        </div>
-        <div class="card-bottom-row">
-          <button class="card-btn add-to-cart-btn">В корзину</button>
-          <button class="card-favorite-bottom active" onclick="toggleFavorite(this)">
-            <img src="pictures/love.png" alt="В избранном" class="card-favorite-bottom-img">
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Карточка 3 -->
-    <div class="product-card favorite-card-item">
-      <div class="stock-badge in-stock">В наличии</div>
-      <div class="card-image-wrapper">
-        <img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="card-image">
-      </div>
-      <div class="card-badge">Купили <span class="purchase-count">67</span> раз</div>
-      <div class="card-body">
-        <div class="card-name">Выдержанный пуэр</div>
-        <div class="card-desc">Глубокий землистый вкус с древесными нотами</div>
-        <div class="card-price">58 Br <span class="card-price-unit">/ 50 г</span></div>
-        <div class="qty-label">Выберите количество:</div>
-        <div class="qty-selector">
-          <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-          <span class="qty-value">1</span>
-          <button class="qty-btn plus" aria-label="Увеличить">+</button>
-        </div>
-        <div class="card-bottom-row">
-          <button class="card-btn add-to-cart-btn">В корзину</button>
-          <button class="card-favorite-bottom active" onclick="toggleFavorite(this)">
-            <img src="pictures/love.png" alt="В избранном" class="card-favorite-bottom-img">
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <!-- Пустое состояние -->
@@ -182,13 +104,13 @@
           </ul>
         </div>
         <div class="footer-column">
-          <h4 class="footer-column-title">Каталог</h4>
-          <ul class="footer-list">
-            <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
-            <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
-            <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
-          </ul>
-        </div>
+  <h4 class="footer-column-title">Каталог</h4>
+  <ul class="footer-list">
+    <li class="footer-list-item"><a href="catalog.html?category=zelenyj-chaj" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=chyornyj-chaj" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=travyanoj-chaj" class="footer-link">Травяной чай</a></li>
+  </ul>
+</div>
         <div class="footer-column">
           <h4 class="footer-column-title">О нас</h4>
           <ul class="footer-list">
@@ -266,7 +188,6 @@
         </div>
         <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
       </form>
-      <p class="modal-footer-text">Входя, вы соглашаетесь с условиями обработки данных</p>
     </div>
   </div>
 

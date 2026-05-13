@@ -95,7 +95,7 @@
   <div class="hero-overlay">
     <h1 class="hero-title">Лучший чай с гор Китая</h1>
     <p class="hero-subtitle">Чай Билуочунь со скидкой 30%</p>
-    <button class="hero-btn">Каталог</button>
+    <a href="catalog.html" class="hero-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Каталог</a>
   </div>
 
 
@@ -120,109 +120,6 @@
     
 <!-- Три карточки в ряд -->
 <div class="cards-row">
-  <!-- Карточка #1 — Горная матча -->
-  <div class="product-card">
-    
-    <!-- Бейдж наличия -->
-    <div class="stock-badge in-stock">В наличии</div>
-    
-    <!-- Фото с лупой -->
-    <div class="card-image-wrapper">
-      <img src="pictures/tea1.jpg" alt="Горная матча" class="card-image">
-    </div>
-    
-    <!-- Бейдж покупок -->
-    <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
-    
-    <!-- Тело карточки -->
-    <div class="card-body">
-      <div class="card-name">Горная матча</div>
-      <div class="card-desc">Премиальный порошковый чай высшего качества</div>
-      
-      <div class="card-price">35 br <span class="card-price-unit">/ 50 г</span></div>
-      
-      <div class="qty-label">Выберите количество:</div>
-      <div class="qty-selector">
-        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-        <span class="qty-value">1</span>
-        <button class="qty-btn plus" aria-label="Увеличить">+</button>
-      </div>
-      
-      <div class="card-bottom-row">
-        <button class="card-btn add-to-cart-btn">В корзину</button>
-        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
-          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Карточка #2 — Молочный улун -->
-  <div class="product-card">
-    
-    <div class="stock-badge in-stock">В наличии</div>
-    
-    <div class="card-image-wrapper">
-      <img src="pictures/tea2.jpg" alt="Молочный улун" class="card-image">
-    </div>
-    
-    <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
-    
-    <div class="card-body">
-      <div class="card-name">Молочный улун</div>
-      <div class="card-desc">Нежный чай с карамельным ароматом</div>
-      
-      <div class="card-price">42 br <span class="card-price-unit">/ 50 г</span></div>
-      
-      <div class="qty-label">Выберите количество:</div>
-      <div class="qty-selector">
-        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-        <span class="qty-value">1</span>
-        <button class="qty-btn plus" aria-label="Увеличить">+</button>
-      </div>
-      
-      <div class="card-bottom-row">
-        <button class="card-btn add-to-cart-btn">В корзину</button>
-        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
-          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Карточка #3 — Выдержанный пуэр -->
-  <div class="product-card">
-    
-    <div class="stock-badge out-of-stock">Нет в наличии</div>
-    
-    <div class="card-image-wrapper">
-      <img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="card-image">
-    </div>
-    
-    <div class="card-badge">Купили <span class="purchase-count">0</span> раз</div>
-    
-    <div class="card-body">
-      <div class="card-name">Выдержанный пуэр</div>
-      <div class="card-desc">Глубокий землистый вкус с древесными нотами</div>
-      
-      <div class="card-price">58 br <span class="card-price-unit">/ 50 г</span></div>
-      
-      <div class="qty-label">Выберите количество:</div>
-      <div class="qty-selector">
-        <button class="qty-btn minus" aria-label="Уменьшить">−</button>
-        <span class="qty-value">1</span>
-        <button class="qty-btn plus" aria-label="Увеличить">+</button>
-      </div>
-      
-      <div class="card-bottom-row">
-        <button class="card-btn add-to-cart-btn">В корзину</button>
-        <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
-          <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
-        </button>
-      </div>
-    </div>
-  </div>
-
 </div><!-- /cards-row -->
 
   </section>
@@ -252,11 +149,11 @@
         </div>
 
         <div class="about-book-buttons">
-          <button class="about-book-btn">Китай</button>
-          <button class="about-book-btn">Тайвань</button>
-          <button class="about-book-btn">Индия</button>
-          <button class="about-book-btn">Япония</button>
-        </div>
+    <button class="about-book-btn" onclick="goToCatalog('Китай')">Китай</button>
+    <button class="about-book-btn" onclick="goToCatalog('Тайвань')">Тайвань</button>
+    <button class="about-book-btn" onclick="goToCatalog('Индия')">Индия</button>
+    <button class="about-book-btn" onclick="goToCatalog('Япония')">Япония</button>
+</div>
       </div>
     </div>
 
@@ -364,9 +261,9 @@
         <div class="footer-column">
   <h4 class="footer-column-title">Каталог</h4>
   <ul class="footer-list">
-    <li class="footer-list-item"><a href="#" class="footer-link">Зелёный чай</a></li>
-    <li class="footer-list-item"><a href="#" class="footer-link">Чёрный чай</a></li>
-    <li class="footer-list-item"><a href="#" class="footer-link">Травяной чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=zelenyj-chaj" class="footer-link">Зелёный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=chyornyj-chaj" class="footer-link">Чёрный чай</a></li>
+    <li class="footer-list-item"><a href="catalog.html?category=travyanoj-chaj" class="footer-link">Травяной чай</a></li>
   </ul>
 </div>
         <div class="footer-column">
