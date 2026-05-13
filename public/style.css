@@ -7127,3 +7127,78 @@ header {
     position: static;
   }
 }
+
+/* ========================
+   ГЛАЗИК ДЛЯ ПАРОЛЯ
+   ======================== */
+/* ========================
+   ГЛАЗИК ДЛЯ ПАРОЛЯ — УНИВЕРСАЛЬНЫЙ
+   ======================== */
+.modal-input-wrapper,
+.form-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* В модальном окне — по центру поля */
+.modal-input-wrapper .password-toggle {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* В формах — под label */
+.form-group .password-toggle {
+    top: 38px;
+    right: 10px;
+}
+
+.password-toggle:hover {
+    opacity: 0.7;
+}
+
+.password-toggle-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Отступ для текста */
+input[type="password"],
+input[type="text"].was-password {
+    padding-right: 36px;
+}
+/* ========================
+   ГЛАЗИК В НАСТРОЙКАХ АККАУНТА
+   ======================== */
+.account-card .account-form .form-group {
+    position: relative;
+}
+
+.account-card .account-form .form-group .password-toggle {
+    /* Вычисляем позицию: 50% ширины родителя + половина ширины поля ввода (400px/2 = 200px) - отступ */
+    right: calc(50% - 180px);
+    top: 34px;
+}
+
+/* На маленьких экранах - глазик внутри поля */
+@media (max-width: 500px) {
+    .account-card .account-form .form-group .password-toggle {
+        right: 10px;
+    }
+}
