@@ -1812,17 +1812,28 @@ header {
   margin-bottom: 40px;
 }
 
-/* Карточка в каталоге */
+/* Карточка — вертикальный flex */
 .catalog-product-card {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  height: auto;
-  min-height: 452px;
+  min-height: 452px;          /* можно оставить или убрать */
 }
 
-.catalog-product-card .card-image {
+/* Обёртка изображения — будет пропорционально растягиваться */
+.card-image-wrapper {
   width: 100%;
-  height: auto;
-  aspect-ratio: 300 / 264;
+  aspect-ratio: 300 / 264;    /* высота автоматически подстроится под ширину */
+  overflow: hidden;           /* чтобы object-fit обрезал аккуратно */
+  flex-shrink: 0;             /* не сжимаем, если контента много */
+}
+
+/* Само изображение */
+.card-image-wrapper .card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* заполняет контейнер, сохраняя пропорции */
 }
 
 /* ========================
