@@ -798,7 +798,7 @@ function renderReviews(reviews) {
     if (!container) return;
     
     if (!reviews || reviews.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">Пока нет отзывов. Будьте первым!</p>';
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.6);font-size: 20px;text-align:center;padding:20px;">Пока нет отзывов. Будьте первым!</p>';
         return;
     }
     

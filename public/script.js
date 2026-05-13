@@ -187,12 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================
 // ПОЛЗУНОК ЦЕНЫ (ВИЗУАЛ)
 // ========================
-// ========================
-// ПОЛЗУНОК ЦЕНЫ (ВИЗУАЛ) — диапазон 5–300 Br
-// ========================
-// ========================
-// ПОЛЗУНОК ЦЕНЫ (ВИЗУАЛ) — диапазон 5–300 Br
-// ========================
+
 function updatePriceSliderVisual() {
     const sliderMin = document.querySelector('.slider-min');
     const sliderMax = document.querySelector('.slider-max');
@@ -807,6 +802,84 @@ if (localStorage.getItem('orderPlaced') === 'true') {
     }
   });
 }
+
+// Hero-слайдер
+document.addEventListener('DOMContentLoaded', function() {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  
+  if (slides.length === 0) return;        // выходим если слайдера нет на странице
+  
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    dots.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+  }
+
+  function startSlider() {
+    stopSlider();
+    slideInterval = setInterval(nextSlide, 4000);
+  }
+
+  function stopSlider() {
+    clearInterval(slideInterval);
+  }
+
+  // Точки
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      currentSlide = parseInt(dot.dataset.index);
+      showSlide(currentSlide);
+      startSlider();
+    });
+  });
+  // Кнопки навигации
+const prevBtn = document.querySelector('.hero-prev');
+const nextBtn = document.querySelector('.hero-next');
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+    startSlider();
+  });
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+    startSlider();
+  });
+}
+
+  // Старт
+  showSlide(0);
+  startSlider();
+
+  // Ховер
+  const heroSection = document.querySelector('.hero-section');
+  if (heroSection) {
+    heroSection.addEventListener('mouseenter', stopSlider);
+    heroSection.addEventListener('mouseleave', startSlider);
+  }
+
+  // Видимость вкладки
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      startSlider();
+    } else {
+      stopSlider();
+    }
+  });
+});
 
 // ========================
 // ЗАГРУЗКА ТОВАРОВ КАТАЛОГА ИЗ БАЗЫ ДАННЫХ

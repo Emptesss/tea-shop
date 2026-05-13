@@ -86,20 +86,53 @@
        HERO SECTION
        Полная ширина × 567px
        ======================== -->
-  <section class="hero-section">
-
-   <!-- Фоновое изображение -->
-  <img src="pictures/hero1.jpg" alt="Чайные горы Китая" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;" />
-
-  <!-- Градиентный оверлей: чёрный сверху → #5B3E3E снизу, 66% прозрачности -->
-  <div class="hero-overlay">
-    <h1 class="hero-title">Лучший чай с гор Китая</h1>
-    <p class="hero-subtitle">Чай Билуочунь со скидкой 30%</p>
-    <a href="catalog.html" class="hero-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">Каталог</a>
+<section class="hero-section">
+  <!-- Слайдер -->
+  <div class="hero-slider" id="heroSlider">
+    <!-- Слайд 1 -->
+    <div class="hero-slide active">
+      <img src="pictures/hero1.jpg" alt="Чайные горы Китая" class="hero-slide-img" />
+      <div class="hero-overlay">
+        <h1 class="hero-title">Лучший чай с гор Китая</h1>
+        <p class="hero-subtitle">Чай Билочунь со скидкой 30%</p>
+        <a href="catalog.html" class="hero-btn">В каталог</a>
+      </div>
+    </div>
+    <!-- Слайд 2 – матча-коктейли -->
+    <div class="hero-slide">
+      <img src="pictures/matcha-latte.png" alt="Матча-латте" class="hero-slide-img" />
+      <div class="hero-overlay">
+        <h1 class="hero-title">Рецепты коктейлей из матчи</h1>
+        <p class="hero-subtitle">Освежающие напитки для лета</p>
+        <a href="blog.html" class="hero-btn">Читать</a>
+      </div>
+    </div>
+    <!-- Слайд 3 – Сенча -->
+    <div class="hero-slide">
+      <img src="pictures/hero3.jpg" alt="Сенча" class="hero-slide-img" />
+      <div class="hero-overlay">
+        <h1 class="hero-title">Сенча – японская классика</h1>
+        <p class="hero-subtitle">Свежий урожай 2026 уже в каталоге</p>
+        <a href="catalog.html" class="hero-btn">В каталог</a>
+      </div>
+    </div>
+  </div>
+  <!-- Индикаторы слайдера -->
+  <div class="hero-dots" id="heroDots">
+    <span class="hero-dot active" data-index="0"></span>
+    <span class="hero-dot" data-index="1"></span>
+    <span class="hero-dot" data-index="2"></span>
   </div>
 
+  <!-- Кнопки навигации слайдера -->
+<button class="hero-nav hero-prev" aria-label="Предыдущий слайд">
+  <img src="pictures/arrow-left.png" alt="←" class="hero-nav-icon">
+</button>
+<button class="hero-nav hero-next" aria-label="Следующий слайд">
+  <img src="pictures/arrow-right.png" alt="→" class="hero-nav-icon">
+</button>
 
-  </section>
+</section>
 
   <!-- ========================
        СЕКЦИЯ "ТОВАРЫ МЕСЯЦА"

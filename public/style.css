@@ -126,27 +126,46 @@ header {
 }
 
 /* ========================
-   HERO SECTION
-   Полная ширина × 567px
+   HERO SECTION (слайдер)
    ======================== */
 .hero-section {
   position: relative;
-  margin-top: 100px;              /* Отступ под фиксированный хедер */
+  margin-top: 100px;
   width: 100%;
   height: 567px;
   overflow: hidden;
 }
 
-/* Фоновое изображение Hero.
-   Замените div на <img> или задайте background-image:
-   background-image: url('hero.jpg'); background-size: cover; background-position: center; */
-.hero-bg {
+/* Слайдер-обёртка */
+.hero-slider {
   position: absolute;
   inset: 0;
-  background-color: #2a3a30;
+  width: 100%;
+  height: 100%;
 }
 
-/* Градиентный оверлей: чёрный сверху → #5B3E3E снизу, 66% */
+/* Один слайд */
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hero-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Оверлей с контентом (заменяет старый .hero-overlay) */
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -161,27 +180,67 @@ header {
   justify-content: center;
   gap: 5px;
   padding: 0 40px 120px 40px;
+  color: var(--color-white);
+  text-align: center;
+}
+/* Кнопки навигации слайдера */
+.hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: rgba(9, 21, 15, 0.6);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, transform 0.2s;
+  z-index: 2;
+  padding: 0;
 }
 
-/* Главный заголовок — Montserrat Alternates SemiBold 48 */
+.hero-nav:hover {
+  background: rgba(9, 21, 15, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero-prev {
+  left: 20px;
+}
+
+.hero-next {
+  right: 20px;
+}
+
+.hero-nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Заголовок */
 .hero-title {
   font-family: 'Montserrat Alternates', sans-serif;
   font-weight: 600;
   font-size: 48px;
   color: var(--color-white);
-  text-align: center;
+  margin: 0;
 }
 
-/* Подзаголовок — Montserrat Alternates Regular 32 */
+/* Подзаголовок */
 .hero-subtitle {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 24px;
   color: var(--color-white);
-  text-align: center;
+  margin: 0;
 }
 
-/* Кнопка «Каталог» — 318×82, скругление 100, зелёный градиент */
+/* Кнопка */
 .hero-btn {
   width: 180px;
   height: 50px;
@@ -193,12 +252,42 @@ header {
   font-size: 18px;
   color: var(--color-white);
   cursor: pointer;
-  margin-top: 5px;
-  position: absolute; bottom: 80px
+  position: absolute;
+  bottom: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: opacity 0.3s;
 }
 
-.hero-btn:hover { opacity: 0.9; }
+.hero-btn:hover {
+  opacity: 0.9;
+}
 
+/* Точки навигации */
+.hero-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.hero-dot.active {
+  background: #337B57;
+}
 /* ========================
    СЕКЦИЯ "ТОВАРЫ МЕСЯЦА"
    Поток документа — всё выровнено по центру страницы
@@ -4792,7 +4881,7 @@ header {
 .review-form {
   background-color: #5b3e3e30;
   border-radius: 20px;
-  padding: 40px 40px 10px;
+  padding: 40px 40px 40px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
