@@ -280,5 +280,33 @@
   </footer>
 
   <script src="account.js"></script>
+
+  <!-- Модальное окно удаления аккаунта -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-window" style="text-align:center;max-width:450px;">
+    <button class="modal-close-btn" id="closeDeleteModal">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+    <div style="padding:20px;">
+      <img src="pictures/attention.png" alt="Внимание" style="width:64px;height:64px;margin-bottom:16px;">
+      <h3 style="font-family:'Montserrat Alternates',sans-serif;font-weight:600;font-size:22px;color:#fff;margin-bottom:12px;">
+        Удаление аккаунта
+      </h3>
+      <p style="font-family:'Montserrat',sans-serif;font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:24px;line-height:1.6;">
+        Вы уверены, что хотите удалить аккаунт?<br>
+        <strong style="color:#ff6b6b;">Это действие нельзя отменить.</strong><br>
+        Все ваши данные, заказы и отзывы будут удалены.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button id="cancelDeleteBtn" style="padding:12px 28px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:100px;color:white;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:15px;">
+          Нет, оставить
+        </button>
+        <button id="confirmDeleteBtn" style="padding:12px 28px;background:#ff4444;border:none;border-radius:100px;color:white;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;">
+          Да, удалить
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

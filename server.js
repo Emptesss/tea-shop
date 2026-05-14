@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'info.foresttea@gmail.com',           // ← замените на свой
-        pass: 'wlsnvienguhzibta'          // ← 16-значный пароль
+        pass: 'fwcivniolbjtyhww'          // ← 16-значный пароль
     }
 });
 
@@ -29,24 +29,43 @@ async function sendSubscriptionEmail(to, confirmationLink) {
     const mailOptions = {
         from: '"Forest Tea" <info.foresttea@gmail.com>',
         to: to,
-        subject: 'Подтверждение подписки на дрочилку Forest Tea',
+        subject: 'Подписка на рассылку Forest Tea',
         html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px;">
-                <h2 style="color: #2c3e50;">🌿 Спасибо за подписку!</h2>
-                <p>Вы подписались на новости и акции Forest Tea.</p>
-                <p>Для подтверждения подписки, пожалуйста, перейдите по ссылке:</p>
-                <a href="${confirmationLink}" style="display: inline-block; background: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Подтвердить подписку</a>
-                <p style="margin-top: 20px; font-size: 12px; color: #7f8c8d;">Если вы не подписывались, просто проигнорируйте это письмо.</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="color: #1a3a2a; margin: 0;">🌿 Forest Tea</h1>
+                </div>
+                <div style="background: #f9f9f9; border-radius: 10px; padding: 30px;">
+                    <h2 style="color: #2c3e50; margin-top: 0;">Спасибо за подписку!</h2>
+                    <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                        Вы подписались на новости и акции Forest Tea. 
+                        Мы будем присылать вам информацию о новинках, специальных предложениях и чайных советах.
+                    </p>
+                    <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                        Для подтверждения подписки, пожалуйста, перейдите по ссылке:
+                    </p>
+                    <div style="text-align: center; margin: 25px 0;">
+                        <a href="${confirmationLink}" 
+                           style="display: inline-block; background: #27ae60; color: white; 
+                                  padding: 12px 30px; text-decoration: none; border-radius: 25px;
+                                  font-size: 16px; font-weight: bold;">
+                            Подтвердить подписку
+                        </a>
+                    </div>
+                    <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                        Если вы не подписывались на рассылку, просто проигнорируйте это письмо.
+                    </p>
+                </div>
             </div>
         `
     };
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Письмо отправлено на ${to}, ID: ${info.messageId}');
+        console.log('✅ Письмо отправлено на ' + to + ', ID: ' + info.messageId);
         return info;
     } catch (error) {
-        console.error('❌ Ошибка отправки на ${to}:', error);
+        console.error('❌ Ошибка отправки на ' + to + ':', error);
         throw error;
     }
 }
@@ -200,13 +219,46 @@ function generateSlug(text) {
         .replace(/-+$/, '');
 }
 
-// Функция для генерации номера заказа
-function generateOrderNumber() {
+// Функция для генерации уникального номера заказа
+async function generateOrderNumber() {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    return `FT-${year}-${month}-${random}`;
+    const day = String(date.getDate()).padStart(2, '0');
+    const prefix = `${year}${month}${day}`;
+    
+    try {
+        // Ищем максимальный номер за сегодня
+        const result = await pool.query(
+            `SELECT order_number FROM orders 
+             WHERE order_number LIKE $1 
+             ORDER BY order_number DESC LIMIT 1`,
+            [prefix + '%']
+        );
+        
+        let nextNumber = 1;
+        
+        if (result.rows.length > 0) {
+            // Извлекаем последний номер и увеличиваем на 1
+            const lastOrderNumber = result.rows[0].order_number;
+            const lastNumber = parseInt(lastOrderNumber.split('-').pop());
+            nextNumber = lastNumber + 1;
+        }
+        
+        // Добавляем случайную задержку для предотвращения коллизий
+        const randomDelay = Math.floor(Math.random() * 10);
+        await new Promise(resolve => setTimeout(resolve, randomDelay));
+        
+        const sequential = String(nextNumber).padStart(4, '0');
+        return `${prefix}-${sequential}`;
+        
+    } catch (error) {
+        console.error('Ошибка генерации номера заказа:', error);
+        // Запасной вариант с timestamp и случайным числом
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+        return `${year}${month}${day}-${timestamp.toString().slice(-6)}-${random}`;
+    }
 }
 
 // ========================
@@ -231,7 +283,7 @@ app.get('/product', (req, res) => {
 app.get('/api/categories', async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, name, name_ru, slug, description, image_url, display_order 
+            `SELECT id, name, slug, display_order 
              FROM categories 
              WHERE is_active = true 
              ORDER BY display_order`
@@ -248,7 +300,7 @@ app.get('/api/categories/:slug', async (req, res) => {
     try {
         const { slug } = req.params;
         const result = await pool.query(
-            `SELECT id, name, name_ru, slug, description, image_url 
+            `SELECT id, name, slug
              FROM categories 
              WHERE slug = $1 AND is_active = true`,
             [slug]
@@ -264,7 +316,6 @@ app.get('/api/categories/:slug', async (req, res) => {
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
-// Получить все товары с фильтрацией и пагинацией
 // Получить все товары с фильтрацией и пагинацией
 app.get('/api/products', async (req, res) => {
     try {
@@ -522,12 +573,27 @@ app.get('/api/products', async (req, res) => {
 });
 
 // Получить товар по slug
+// Получить товар по slug
 app.get('/api/products/:slug', async (req, res) => {
     try {
         const { slug } = req.params;
         
         const result = await pool.query(
-            `SELECT p.*, c.name as category_name, c.slug as category_slug
+            `SELECT 
+                p.*,
+                COALESCE(
+                    (SELECT ROUND(AVG(rating)::numeric, 1) 
+                     FROM reviews 
+                     WHERE product_id = p.id AND is_approved = true),
+                    0
+                ) as rating,
+                COALESCE(
+                    (SELECT COUNT(*) 
+                     FROM reviews 
+                     WHERE product_id = p.id AND is_approved = true),
+                    0
+                ) as reviews_count,
+                c.name as category_name, c.slug as category_slug
              FROM products p
              LEFT JOIN categories c ON p.category_id = c.id
              WHERE p.slug = $1 AND p.is_active = true`,
@@ -550,20 +616,26 @@ app.get('/api/products/:slug', async (req, res) => {
         );
         product.tastes = tastesResult.rows;
 
-// Похожие товары (по категории и вкусам)
-const similarResult = await pool.query(
-    `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.image1, p.purchase_count,
-            (SELECT COUNT(*) FROM product_tastes pt 
-             WHERE pt.product_id = p.id 
-             AND pt.taste_id IN (SELECT taste_id FROM product_tastes WHERE product_id = $1))
-            as matching_tastes
-     FROM products p
-     WHERE p.id != $1 AND p.is_active = true
-     ORDER BY matching_tastes DESC, RANDOM()
-     LIMIT 4`,
-    [product.id]
-);
-product.similar_products = similarResult.rows;
+        // Похожие товары (по категории и вкусам)
+        const similarResult = await pool.query(
+            `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.image1, p.purchase_count,
+                    COALESCE(
+                        (SELECT ROUND(AVG(rating)::numeric, 1) 
+                         FROM reviews 
+                         WHERE product_id = p.id AND is_approved = true),
+                        0
+                    ) as rating,
+                    (SELECT COUNT(*) FROM product_tastes pt 
+                     WHERE pt.product_id = p.id 
+                     AND pt.taste_id IN (SELECT taste_id FROM product_tastes WHERE product_id = $1))
+                    as matching_tastes
+             FROM products p
+             WHERE p.id != $1 AND p.is_active = true
+             ORDER BY matching_tastes DESC, RANDOM()
+             LIMIT 4`,
+            [product.id]
+        );
+        product.similar_products = similarResult.rows;
 
         res.json(product);
 
@@ -1218,6 +1290,735 @@ app.post('/api/reviews/:id/helpful', async (req, res) => {
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
+
+// ========================
+// API — ЗАКАЗЫ
+// ========================
+
+// Создать заказ
+app.post('/api/orders', async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+        const {
+            name, surname, phone, email,
+            delivery_method, delivery_address,
+            payment_method, comment
+        } = req.body;
+        
+        // Проверяем авторизацию
+        let userId = null;
+        let sessionId = null;
+        const authHeader = req.headers['authorization'];
+        if (authHeader) {
+            const token = authHeader.split(' ')[1];
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+                userId = decoded.id;
+            } catch (err) {}
+        }
+        
+        if (!userId) {
+            sessionId = req.body.sessionId;
+            if (!sessionId) {
+                return res.status(400).json({ error: 'Требуется авторизация или sessionId' });
+            }
+        }
+        
+        // Валидация
+        if (!name || !surname || !phone) {
+            return res.status(400).json({ error: 'Имя, фамилия и телефон обязательны' });
+        }
+        if (!delivery_method) {
+            return res.status(400).json({ error: 'Выберите способ доставки' });
+        }
+        if (!payment_method) {
+            return res.status(400).json({ error: 'Выберите способ оплаты' });
+        }
+        
+        await client.query('BEGIN');
+        
+        // Получаем корзину
+        let cartQuery = `
+            SELECT c.quantity, c.product_id, p.name, p.price, p.image1
+            FROM cart c
+            JOIN products p ON c.product_id = p.id
+            WHERE p.is_active = true AND p.in_stock = true AND
+        `;
+        const cartParams = [];
+        
+        if (userId) {
+            cartQuery += `c.user_id = $1`;
+            cartParams.push(userId);
+        } else {
+            cartQuery += `c.session_id = $1`;
+            cartParams.push(sessionId);
+        }
+        
+        const cartResult = await client.query(cartQuery, cartParams);
+        
+        if (cartResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ error: 'Корзина пуста' });
+        }
+        
+        // Считаем сумму
+        const subtotal = cartResult.rows.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Стоимость доставки
+        let deliveryPrice = 0;
+        if (delivery_method === 'courier') deliveryPrice = 10;
+        if (delivery_method === 'post') deliveryPrice = 5;
+        
+        const total = subtotal + deliveryPrice;
+        
+        // Генерируем номер заказа
+        // Генерируем номер заказа с повторными попытками при коллизии
+let orderNumber;
+let retries = 3;
+
+while (retries > 0) {
+    try {
+        orderNumber = await generateOrderNumber();
+        
+        // Проверяем, не существует ли уже такой номер
+        const existingOrder = await client.query(
+            'SELECT id FROM orders WHERE order_number = $1',
+            [orderNumber]
+        );
+        
+        if (existingOrder.rows.length === 0) {
+            break; // Номер уникальный, выходим из цикла
+        }
+        
+        retries--;
+        console.log(`Номер ${orderNumber} уже существует, попытка ${3 - retries + 1}`);
+    } catch (error) {
+        console.error('Ошибка при генерации номера:', error);
+        retries--;
+    }
+}
+
+if (retries === 0) {
+    throw new Error('Не удалось сгенерировать уникальный номер заказа');
+}
+        
+        // Создаём заказ
+        const orderResult = await client.query(
+            `INSERT INTO orders (order_number, user_id, session_id, name, surname, phone, email,
+             delivery_method, delivery_address, payment_method, comment,
+             subtotal, delivery_price, total, status)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'processing')
+             RETURNING id, order_number`,
+            [orderNumber, userId, sessionId || null, name, surname, phone, email || null,
+             delivery_method, delivery_address || null, payment_method, comment || null,
+             subtotal, deliveryPrice, total]
+        );
+        
+        const orderId = orderResult.rows[0].id;
+        
+        // Добавляем товары в заказ
+        for (const item of cartResult.rows) {
+            await client.query(
+                `INSERT INTO order_items (order_id, product_id, product_name, product_image, price, quantity, total)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [orderId, item.product_id, item.name, item.image1, item.price, item.quantity, item.price * item.quantity]
+            );
+            
+            // Обновляем счётчик покупок
+            await client.query(
+                'UPDATE products SET purchase_count = purchase_count + $1 WHERE id = $2',
+                [item.quantity, item.product_id]
+            );
+        }
+        
+        // Очищаем корзину
+        if (userId) {
+            await client.query('DELETE FROM cart WHERE user_id = $1', [userId]);
+        } else {
+            await client.query('DELETE FROM cart WHERE session_id = $1', [sessionId]);
+        }
+        
+        await client.query('COMMIT');
+        
+        res.status(201).json({
+            message: 'Заказ успешно создан',
+            order: {
+                id: orderId,
+                orderNumber: orderResult.rows[0].order_number,
+                total: total
+            }
+        });
+        
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Ошибка создания заказа:', error);
+        res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// Получить заказы пользователя
+app.get('/api/orders', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        
+        const ordersResult = await pool.query(
+            `SELECT id, order_number, status, total, delivery_method, payment_method, created_at
+             FROM orders
+             WHERE user_id = $1
+             ORDER BY created_at DESC`,
+            [userId]
+        );
+        
+        // Получаем товары для каждого заказа
+        const orders = [];
+        for (const order of ordersResult.rows) {
+            const itemsResult = await pool.query(
+                `SELECT product_id, product_name, product_image, price, quantity, total
+                 FROM order_items
+                 WHERE order_id = $1`,
+                [order.id]
+            );
+            order.items = itemsResult.rows;
+            orders.push(order);
+        }
+        
+        res.json({ orders });
+        
+    } catch (error) {
+        console.error('Ошибка получения заказов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// ========================
+// API — УДАЛЕНИЕ АККАУНТА
+// ========================
+app.delete('/api/auth/account', authenticateToken, async (req, res) => {
+    const client = await pool.connect();
+    
+    try {
+        const userId = req.user.id;
+        
+        await client.query('BEGIN');
+        
+        // Удаляем отзывы пользователя
+        await client.query('DELETE FROM reviews WHERE user_id = $1', [userId]);
+        
+        // Удаляем избранное
+        await client.query('DELETE FROM favorites WHERE user_id = $1', [userId]);
+        
+        // Удаляем корзину
+        await client.query('DELETE FROM cart WHERE user_id = $1', [userId]);
+        
+        // Удаляем заказы и товары в заказах (каскадно)
+        await client.query('DELETE FROM orders WHERE user_id = $1', [userId]);
+        
+        // Удаляем аватар с сервера если есть
+        const avatarResult = await client.query('SELECT avatar FROM users WHERE id = $1', [userId]);
+        const avatar = avatarResult.rows[0]?.avatar;
+        if (avatar && avatar !== 'pictures/cat.png' && avatar.startsWith('/pictures/avatars/')) {
+            const avatarPath = path.join(__dirname, 'public', avatar);
+            if (fs.existsSync(avatarPath)) {
+                fs.unlinkSync(avatarPath);
+            }
+        }
+        
+        // Удаляем пользователя
+        await client.query('DELETE FROM users WHERE id = $1', [userId]);
+        
+        await client.query('COMMIT');
+        
+        res.json({ message: 'Аккаунт успешно удалён' });
+        
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Ошибка удаления аккаунта:', error);
+        res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// ========================
+// API — ПОДПИСКА НА РАССЫЛКУ
+// ========================
+app.post('/api/subscribe', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Некорректный email' });
+        }
+        
+        // Проверяем, есть ли уже такой подписчик
+        const existing = await pool.query(
+            'SELECT id, is_confirmed FROM subscribers WHERE email = $1',
+            [email]
+        );
+        
+        if (existing.rows.length > 0) {
+            if (existing.rows[0].is_confirmed) {
+                return res.json({ message: 'Вы уже подписаны!', alreadySubscribed: true });
+            }
+            // Отправляем письмо повторно
+            const confirmationLink = `http://localhost:3000/api/subscribe/confirm?email=${encodeURIComponent(email)}`;
+            await sendSubscriptionEmail(email, confirmationLink);
+            return res.json({ message: 'Письмо отправлено повторно. Проверьте почту!' });
+        }
+        
+        // Сохраняем подписчика
+        await pool.query(
+            'INSERT INTO subscribers (email) VALUES ($1)',
+            [email]
+        );
+        
+        // Отправляем письмо
+        const confirmationLink = `http://localhost:3000/api/subscribe/confirm?email=${encodeURIComponent(email)}`;
+        await sendSubscriptionEmail(email, confirmationLink);
+        
+        res.status(201).json({ message: 'Спасибо за подписку! Проверьте почту для подтверждения.' });
+        
+    } catch (error) {
+        console.error('Ошибка подписки:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Подтверждение подписки
+app.get('/api/subscribe/confirm', async (req, res) => {
+    try {
+        const { email } = req.query;
+        
+        await pool.query(
+            'UPDATE subscribers SET is_confirmed = true, confirmed_at = NOW() WHERE email = $1',
+            [email]
+        );
+        
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="ru">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Подписка подтверждена — Forest Tea</title>
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet">
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        font-family: 'Montserrat', sans-serif;
+                        background: #09150F;
+                        color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                    }
+                    .confirm-card {
+                        background: linear-gradient(160deg, rgba(31, 77, 46, 0.8) 0%, rgba(9, 21, 15, 0.9) 100%);
+                        border-radius: 24px;
+                        padding: 50px 40px;
+                        text-align: center;
+                        max-width: 500px;
+                        width: 90%;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        backdrop-filter: blur(10px);
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                    }
+                
+                    h1 {
+                        font-family: 'Montserrat Alternates', sans-serif;
+                        font-weight: 600;
+                        font-size: 28px;
+                        color: #fff;
+                        margin-bottom: 16px;
+                    }
+                    p {
+                        font-size: 16px;
+                        color: rgba(255, 255, 255, 0.8);
+                        line-height: 1.6;
+                        margin-bottom: 30px;
+                    }
+                    .back-btn {
+                        display: inline-block;
+                        padding: 14px 32px;
+                        background: linear-gradient(to right, #0D2719, #337B57);
+                        border-radius: 100px;
+                        color: #fff;
+                        text-decoration: none;
+                        font-weight: 500;
+                        font-size: 16px;
+                        transition: opacity 0.3s;
+                    }
+                    .back-btn:hover {
+                        opacity: 0.9;
+                    }
+                    .brand {
+                        position: fixed;
+                        top: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        font-family: 'Montserrat Alternates', sans-serif;
+                        font-weight: 600;
+                        font-size: 20px;
+                        color: rgba(255, 255, 255, 0.6);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="brand">Forest Tea</div>
+                <div class="confirm-card">
+                    <div class="confirm-icon">
+    <img src="/pictures/confirmed.png" alt="Подтверждено" style="width:50px;height:50px;object-fit:contain;">
+</div>
+                    <h1>Подписка подтверждена!</h1>
+                    <p>Спасибо, что подписались на рассылку Forest Tea.<br>Теперь вы будете первыми узнавать о новинках, акциях и чайных советах.</p>
+                    <a href="/" class="back-btn">Вернуться на сайт</a>
+                </div>
+            </body>
+            </html>
+        `);
+        
+    } catch (error) {
+        res.status(500).send(`
+            <!DOCTYPE html>
+            <html lang="ru">
+            <head>
+                <meta charset="UTF-8">
+                <title>Ошибка — Forest Tea</title>
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Montserrat', sans-serif; background: #09150F; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+                    .error-card { background: rgba(139, 0, 0, 0.2); border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; }
+                    h1 { color: #ff6b6b; margin-bottom: 16px; }
+                    a { color: #337B57; }
+                </style>
+            </head>
+            <body>
+                <div class="error-card">
+                    <h1>❌ Ошибка подтверждения</h1>
+                    <p>Не удалось подтвердить подписку. Попробуйте позже или свяжитесь с нами.</p>
+                    <a href="/">Вернуться на сайт</a>
+                </div>
+            </body>
+            </html>
+        `);
+    }
+});
+// ========================
+// API — ОБРАТНАЯ СВЯЗЬ
+// ========================
+app.post('/api/feedback', async (req, res) => {
+    try {
+        const { name, email, phone, theme, message } = req.body;
+        
+        if (!name || !email || !message) {
+            return res.status(400).json({ error: 'Имя, email и сообщение обязательны' });
+        }
+        
+        // Маппинг темы
+        const themeMap = {
+            'order': 'Вопрос по заказу',
+            'product': 'Консультация по товару',
+            'delivery': 'Доставка и оплата',
+            'other': 'Другое'
+        };
+        
+        const themeText = themeMap[theme] || 'Не указана';
+        
+        // Отправляем письмо вам
+        await transporter.sendMail({
+            from: '"Forest Tea - Обратная связь" <info.foresttea@gmail.com>',
+            to: 'info.foresttea@gmail.com',
+            subject: `Новое сообщение: ${themeText} от ${name}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px;">
+                    <h2 style="color: #1a3a2a;">🌿 Новое сообщение с сайта Forest Tea</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr><td style="padding: 8px; color: #666; width: 120px;"><strong>Имя:</strong></td><td style="padding: 8px;">${name}</td></tr>
+                        <tr><td style="padding: 8px; color: #666;"><strong>Email:</strong></td><td style="padding: 8px;"><a href="mailto:${email}">${email}</a></td></tr>
+                        <tr><td style="padding: 8px; color: #666;"><strong>Телефон:</strong></td><td style="padding: 8px;">${phone || 'Не указан'}</td></tr>
+                        <tr><td style="padding: 8px; color: #666;"><strong>Тема:</strong></td><td style="padding: 8px;">${themeText}</td></tr>
+                    </table>
+                    <div style="background: #f5f5f5; border-radius: 10px; padding: 16px; margin: 16px 0;">
+                        <p style="margin: 0; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <p style="color: #999; font-size: 12px;">Сообщение отправлено с сайта Forest Tea</p>
+                </div>
+            `
+        });
+        
+        // Отправляем подтверждение пользователю
+        await transporter.sendMail({
+            from: '"Forest Tea" <info.foresttea@gmail.com>',
+            to: email,
+            subject: 'Мы получили ваше сообщение — Forest Tea',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="color: #1a3a2a; margin: 0;">🌿 Forest Tea</h1>
+                    </div>
+                    <div style="background: #f9f9f9; border-radius: 10px; padding: 30px;">
+                        <h2 style="color: #2c3e50;">${name}, спасибо за обращение!</h2>
+                        <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                            Мы получили ваше сообщение и ответим в ближайшее время (обычно в течение 24 часов).
+                        </p>
+                        <p style="font-size: 14px; color: #666;">
+                            Тема: <strong>${themeText}</strong>
+                        </p>
+                        <p style="font-size: 16px; color: #333; line-height: 1.6;">
+                            Если у вас появились дополнительные вопросы, просто ответьте на это письмо.
+                        </p>
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <p style="font-size: 14px; color: #999;">
+                                С уважением,<br>команда Forest Tea
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        });
+        
+        res.json({ message: 'Сообщение отправлено!' });
+        
+    } catch (error) {
+        console.error('Ошибка отправки обратной связи:', error);
+        res.status(500).json({ error: 'Ошибка отправки. Попробуйте позже.' });
+    }
+});
+
+// Тестовый маршрут для проверки отправки почты
+app.get('/api/test-email', async (req, res) => {
+    try {
+        console.log('📧 Пробую отправить тестовое письмо...');
+        
+        const info = await transporter.sendMail({
+            from: '"Forest Tea Test" <info.foresttea@gmail.com>',
+            to: 'info.foresttea@gmail.com',
+            subject: 'Тестовое письмо от Forest Tea',
+            text: 'Если вы видите это письмо — nodemailer работает!'
+        });
+        
+        console.log('✅ Тестовое письмо отправлено! ID:', info.messageId);
+        res.json({ success: true, messageId: info.messageId });
+        
+    } catch (error) {
+        console.error('❌ Ошибка отправки тестового письма:', error);
+        res.status(500).json({ 
+            error: error.message,
+            code: error.code,
+            command: error.command 
+        });
+    }
+});
+
+// ========================
+// API — АДМИН-ПАНЕЛЬ
+// ========================
+
+// Статистика
+app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const [products, orders, users, reviews] = await Promise.all([
+            pool.query('SELECT COUNT(*) as count FROM products WHERE is_active = true'),
+            pool.query('SELECT COUNT(*) as count FROM orders'),
+            pool.query('SELECT COUNT(*) as count FROM users'),
+            pool.query('SELECT COUNT(*) as count FROM reviews WHERE is_approved = true')
+        ]);
+        res.json({
+            products: parseInt(products.rows[0].count),
+            orders: parseInt(orders.rows[0].count),
+            users: parseInt(users.rows[0].count),
+            reviews: parseInt(reviews.rows[0].count)
+        });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Все заказы (админ)
+app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { limit } = req.query;
+        const result = await pool.query(
+            `SELECT * FROM orders ORDER BY created_at DESC ${limit ? 'LIMIT $1' : ''}`,
+            limit ? [limit] : []
+        );
+        res.json({ orders: result.rows });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Обновить статус заказа
+app.put('/api/admin/orders/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { status } = req.body;
+        await pool.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, req.params.id]);
+        res.json({ message: 'Статус обновлён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Все пользователи
+app.get('/api/admin/users', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, email, name, phone, is_admin, is_blocked, created_at FROM users ORDER BY id');
+        res.json({ users: result.rows });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Заблокировать/разблокировать пользователя
+app.put('/api/admin/users/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { is_blocked } = req.body;
+        await pool.query('UPDATE users SET is_blocked = $1 WHERE id = $2', [is_blocked, req.params.id]);
+        res.json({ message: 'Пользователь обновлён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Все отзывы
+app.get('/api/admin/reviews', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT r.*, p.name as product_name FROM reviews r LEFT JOIN products p ON r.product_id = p.id ORDER BY r.created_at DESC`
+        );
+        res.json({ reviews: result.rows });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Обновить отзыв
+app.put('/api/admin/reviews/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { is_approved } = req.body;
+        await pool.query('UPDATE reviews SET is_approved = $1 WHERE id = $2', [is_approved, req.params.id]);
+        res.json({ message: 'Отзыв обновлён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Удалить отзыв
+app.delete('/api/admin/reviews/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        await pool.query('DELETE FROM reviews WHERE id = $1', [req.params.id]);
+        res.json({ message: 'Отзыв удалён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+const productStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = path.join(__dirname, 'public', 'pictures', 'tea');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        const ext = path.extname(file.originalname);
+        cb(null, 'product-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
+    }
+});
+
+const uploadProduct = multer({ storage: productStorage, limits: { fileSize: 10 * 1024 * 1024 } });
+// Создать товар (админ)
+app.post('/api/admin/products', authenticateToken, requireAdmin, uploadProduct.fields([
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 }
+]), async (req, res) => {
+    try {
+        const data = req.body;
+        let image1 = null, image2 = null;
+        if (req.files && req.files['image1']) image1 = '/pictures/tea/' + req.files['image1'][0].filename;
+        if (req.files && req.files['image2']) image2 = '/pictures/tea/' + req.files['image2'][0].filename;
+        
+        const result = await pool.query(
+            `INSERT INTO products (name, slug, category_id, price, old_price, short_desc, full_desc, 
+             tea_type, temperature, brewing_time, shelf_life, country, caffeine, class, year, in_stock, is_active, image1, image2)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19) RETURNING id`,
+            [data.name, data.slug, data.category_id||null, data.price, data.old_price||null,
+             data.short_desc, data.full_desc, data.tea_type, data.temperature, data.brewing_time,
+             data.shelf_life, data.country, data.caffeine, data.class, data.year||null,
+             data.in_stock==='true', data.is_active==='true', image1, image2]
+        );
+        res.status(201).json({ id: result.rows[0].id });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Обновить товар (админ)
+app.put('/api/admin/products/:id', authenticateToken, requireAdmin, uploadProduct.fields([
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 }
+]), async (req, res) => {
+    try {
+        const data = req.body;
+        const old = await pool.query('SELECT image1, image2 FROM products WHERE id=$1', [req.params.id]);
+        let image1 = old.rows[0]?.image1;
+        let image2 = old.rows[0]?.image2;
+        
+        if (req.files && req.files['image1']) {
+            if (image1) { const p = path.join(__dirname,'public',image1); if(fs.existsSync(p)) fs.unlinkSync(p); }
+            image1 = '/pictures/tea/' + req.files['image1'][0].filename;
+        }
+        if (req.files && req.files['image2']) {
+            if (image2) { const p = path.join(__dirname,'public',image2); if(fs.existsSync(p)) fs.unlinkSync(p); }
+            image2 = '/pictures/tea/' + req.files['image2'][0].filename;
+        }
+        
+        await pool.query(
+            `UPDATE products SET name=$1,slug=$2,category_id=$3,price=$4,old_price=$5,short_desc=$6,full_desc=$7,
+             tea_type=$8,temperature=$9,brewing_time=$10,shelf_life=$11,country=$12,caffeine=$13,class=$14,year=$15,
+             in_stock=$16,is_active=$17,image1=$18,image2=$19,updated_at=NOW() WHERE id=$20`,
+            [data.name,data.slug,data.category_id||null,data.price,data.old_price||null,
+             data.short_desc,data.full_desc,data.tea_type,data.temperature,data.brewing_time,
+             data.shelf_life,data.country,data.caffeine,data.class,data.year||null,
+             data.in_stock==='true',data.is_active==='true',image1,image2,req.params.id]
+        );
+        res.json({ message: 'Товар обновлён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+// Удалить товар (админ)
+app.delete('/api/admin/products/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        await pool.query('DELETE FROM products WHERE id = $1', [req.params.id]);
+        res.json({ message: 'Товар удалён' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Создать категорию (админ)
+app.post('/api/admin/categories', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { name, slug, display_order } = req.body;
+        const result = await pool.query(
+            'INSERT INTO categories (name, slug, display_order, is_active) VALUES ($1,$2,$3,true) RETURNING id',
+            [name, slug, display_order || 0]
+        );
+        res.status(201).json({ id: result.rows[0].id });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Обновить категорию (админ)
+app.put('/api/admin/categories/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { name, slug, display_order } = req.body;
+        await pool.query(
+            'UPDATE categories SET name=$1, slug=$2, display_order=$3 WHERE id=$4', 
+            [name, slug, display_order || 0, req.params.id]
+        );
+        res.json({ message: 'Категория обновлена' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Удалить категорию (админ)
+app.delete('/api/admin/categories/:id', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        await pool.query('UPDATE products SET category_id = NULL WHERE category_id = $1', [req.params.id]);
+        await pool.query('DELETE FROM categories WHERE id = $1', [req.params.id]);
+        res.json({ message: 'Категория удалена' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Страница админ-панели
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin', 'admin.html'));
+});
+
+// Статические файлы админки
+app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+
 // ========================
 // ЗАПУСК СЕРВЕРА
 // ========================

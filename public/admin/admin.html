@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ-панель — Forest Tea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-title">Вход в админ-панель</div>
+      <div class="form-group">
+        <input type="email" class="form-input" id="loginEmail" placeholder="Email администратора">
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-input" id="loginPassword" placeholder="Пароль">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="login()">Войти</button>
+    </div>
+  </div>
+
+  <div class="admin-container hidden" id="adminContainer">
+    <aside class="sidebar">
+      <div class="sidebar-logo">Forest Tea</div>
+      <nav>
+        <a class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard')">Дашборд</a>
+        <a class="nav-item" data-panel="products" onclick="switchPanel('products')">Товары</a>
+        <a class="nav-item" data-panel="orders" onclick="switchPanel('orders')">Заказы</a>
+        <a class="nav-item" data-panel="users" onclick="switchPanel('users')">Пользователи</a>
+        <a class="nav-item" data-panel="reviews" onclick="switchPanel('reviews')">Отзывы</a>
+        <a class="nav-item" data-panel="categories" onclick="switchPanel('categories')">Категории</a>
+      </nav>
+      <div style="margin-top:auto;">
+        <a class="nav-item" onclick="logout()" style="color: var(--danger);">Выйти</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- Дашборд -->
+      <div class="panel active" id="panel-dashboard">
+        <h1 class="page-title">Дашборд</h1>
+        <div class="dashboard-grid" id="dashboardStats"></div>
+        <div class="panel" style="display:block;">
+          <h2 class="section-title">Последние заказы</h2>
+          <div class="table-wrapper" id="recentOrdersTable"></div>
+        </div>
+      </div>
+
+      <!-- Товары -->
+      <div class="panel" id="panel-products">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h1 class="page-title" style="margin:0;">Товары</h1>
+          <button class="btn btn-primary" onclick="openProductForm()">+ Добавить товар</button>
+        </div>
+        <div class="table-wrapper" id="productsTable"></div>
+      </div>
+
+      <!-- Заказы -->
+      <div class="panel" id="panel-orders">
+        <h1 class="page-title">Заказы</h1>
+        <div class="table-wrapper" id="ordersTable"></div>
+      </div>
+
+      <!-- Пользователи -->
+      <div class="panel" id="panel-users">
+        <h1 class="page-title">Пользователи</h1>
+        <div class="table-wrapper" id="usersTable"></div>
+      </div>
+
+      <!-- Отзывы -->
+      <div class="panel" id="panel-reviews">
+        <h1 class="page-title">Отзывы</h1>
+        <div class="table-wrapper" id="reviewsTable"></div>
+      </div>
+
+      <!-- Категории -->
+      <div class="panel" id="panel-categories">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h1 class="page-title" style="margin:0;">Категории</h1>
+          <button class="btn btn-primary" onclick="openCategoryForm()">+ Добавить категорию</button>
+        </div>
+        <div class="table-wrapper" id="categoriesTable"></div>
+      </div>
+
+      <!-- Модальное окно товара -->
+      <div class="modal-overlay hidden" id="productModal">
+  <div class="modal-content">
+    <h2 class="section-title" id="modalTitle">Добавить товар</h2>
+    
+    <div class="form-group"><label class="form-label">Название*</label><input class="form-input" id="prodName" oninput="generateSlugFromName()"></div>
+    <div class="form-group"><label class="form-label">Slug* (для URL)</label><input class="form-input" id="prodSlug" placeholder="nazvanie-tovara"></div>
+    
+    <div class="form-group">
+      <label class="form-label">Категория</label>
+      <select class="form-select" id="prodCategory"></select>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Цена (Br)*</label><input type="number" class="form-input" id="prodPrice" step="0.01"></div>
+      <div class="form-group"><label class="form-label">Старая цена</label><input type="number" class="form-input" id="prodOldPrice" step="0.01"></div>
+    </div>
+    
+    <!-- Загрузка изображений -->
+    <div class="form-group">
+      <label class="form-label">Основное изображение</label>
+      <input type="file" class="form-input" id="prodImage1" accept="image/*" style="padding:8px;">
+      <img id="preview1" style="max-width:200px;max-height:200px;margin-top:8px;display:none;border-radius:8px;">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дополнительное изображение</label>
+      <input type="file" class="form-input" id="prodImage2" accept="image/*" style="padding:8px;">
+      <img id="preview2" style="max-width:200px;max-height:200px;margin-top:8px;display:none;border-radius:8px;">
+    </div>
+    
+    <div class="form-group"><label class="form-label">Краткое описание</label><textarea class="form-textarea" id="prodShortDesc" rows="2"></textarea></div>
+    <div class="form-group"><label class="form-label">Полное описание</label><textarea class="form-textarea" id="prodFullDesc" style="min-height:100px;"></textarea></div>
+    
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Вид чая</label><input class="form-input" id="prodTeaType"></div>
+      <div class="form-group"><label class="form-label">Температура воды</label><input class="form-input" id="prodTemp"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Время заваривания</label><input class="form-input" id="prodTime"></div>
+      <div class="form-group"><label class="form-label">Срок хранения</label><input class="form-input" id="prodShelf"></div>
+    </div>
+          <div class="form-group">
+            <label class="form-label">Страна</label>
+            <select class="form-select" id="prodCountry">
+              <option value="">-- Не выбрана --</option>
+              <option>Китай</option><option>Япония</option><option>Индия</option>
+              <option>Тайвань</option><option>Шри-Ланка</option><option>Вьетнам</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Кофеин</label>
+            <select class="form-select" id="prodCaffeine">
+              <option value="">-- Не указан --</option>
+              <option>Высокий</option><option>Средний</option><option>Низкий</option><option>Без кофеина</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Класс</label>
+            <select class="form-select" id="prodClass">
+              <option value="">-- Не указан --</option>
+              <option>Органический</option><option>Церемониальный</option><option>Премиум</option><option>Классический</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Год сбора</label>
+            <select class="form-select" id="prodYear">
+              <option value="">-- Не указан --</option>
+              <option value="2026">2026 (свежий)</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">Выдержанный (старше)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">В наличии</label>
+            <select class="form-select" id="prodInStock">
+              <option value="true">Да</option><option value="false">Нет</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Активен</label>
+            <select class="form-select" id="prodIsActive">
+              <option value="true">Да</option><option value="false">Нет</option>
+            </select>
+          </div>
+           <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn btn-outline" onclick="closeProductForm()">Отмена</button>
+      <button class="btn btn-primary" id="saveProductBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+      <!-- Модальное окно категории -->
+<div class="modal-overlay hidden" id="categoryModal">
+    <div class="modal-content" style="max-width:500px;">
+        <h2 class="section-title" id="categoryModalTitle">Добавить категорию</h2>
+        <div class="form-group"><label class="form-label">Название*</label><input class="form-input" id="catName"></div>
+        <div class="form-group"><label class="form-label">Slug*</label><input class="form-input" id="catSlug" placeholder="zelenyj-chaj"></div>
+        <div class="form-group"><label class="form-label">Порядок отображения</label><input type="number" class="form-input" id="catOrder" value="0"></div>
+        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;">
+            <button class="btn btn-outline" onclick="closeCategoryForm()">Отмена</button>
+            <button class="btn btn-primary" id="saveCategoryBtn">Сохранить</button>
+        </div>
+    </div>
+</div>
+    </main>
+  </div>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

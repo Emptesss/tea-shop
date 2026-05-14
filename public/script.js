@@ -222,6 +222,18 @@ function applyPriceFilter() {
     clearTimeout(priceFilterTimeout);
     priceFilterTimeout = setTimeout(() => {
         const filters = getCurrentFilters();
+        
+        // Сохраняем категорию
+        const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
+    }
+}
+        currentFilters = filters;
         loadProducts(filters);
     }, 300);
 }
@@ -319,17 +331,108 @@ if (sliderMin && sliderMax) {
   
   
   // ========================
-  // ЧИПСЫ КАТЕГОРИЙ
-  // ========================
-  const categoryChips = document.querySelectorAll('.category-chip');
-  
-  categoryChips.forEach(chip => {
-    chip.addEventListener('click', function() {
-      categoryChips.forEach(c => c.classList.remove('active'));
-      this.classList.add('active');
-      console.log('Выбрана категория:', this.textContent);
+// ЗАГРУЗКА КАТЕГОРИЙ В КАТАЛОГЕ (ДИНАМИЧЕСКИЕ ЧИПСЫ)
+// ========================
+async function loadCategoryChips() {
+    const container = document.querySelector('.categories-scroll');
+    if (!container) return;
+    
+    try {
+        const res = await fetch('/api/categories');
+        const categories = await res.json();
+        
+        if (!Array.isArray(categories) || categories.length === 0) return;
+        
+        let chipsHTML = '<button class="category-chip active" data-slug="">Все</button>';
+        
+        categories.forEach(cat => {
+            chipsHTML += `<button class="category-chip" data-slug="${cat.slug}">${cat.name}</button>`;
+        });
+        
+        container.innerHTML = chipsHTML;
+        
+        // Навешиваем обработчики
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                
+                const slug = this.dataset.slug;
+                currentPage = 1;
+                const filters = getCurrentFilters();
+                
+                if (slug) {
+                    filters.category = slug;
+                } else {
+                    delete filters.category;
+                }
+                
+                if (window.history.pushState) {
+                    const newUrl = window.location.pathname + (slug ? '?category=' + slug : '');
+                    window.history.pushState({}, '', newUrl);
+                }
+                
+                currentFilters = filters;
+                loadProducts(filters);
+            });
+        });
+        
+        // Проверяем URL параметр
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCategory = urlParams.get('category');
+        if (urlCategory) {
+            const chip = container.querySelector(`[data-slug="${urlCategory}"]`);
+            if (chip) {
+                container.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            }
+        }
+        
+    } catch(e) {
+        console.error('Ошибка загрузки категорий:', e);
+    }
+}
+
+// Вызываем при загрузке страницы (один раз)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadCategoryChips);
+} else {
+    loadCategoryChips();
+}
+
+function setupCategoryChipsListeners() {
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            
+            const slug = this.dataset.slug;
+            
+            currentPage = 1;
+            const filters = getCurrentFilters();
+            
+            if (slug) {
+                filters.category = slug;
+            } else {
+                delete filters.category;
+            }
+            
+            // Обновляем URL
+            if (window.history.pushState) {
+                const newUrl = window.location.pathname + (slug ? '?category=' + slug : '');
+                window.history.pushState({}, '', newUrl);
+            }
+            
+            currentFilters = filters;
+            loadProducts(filters);
+        });
     });
-  });
+}
+
+// Вызываем при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategoryChips();
+});
   
   // ========================
   // КНОПКА "ПОКАЗАТЬ ЕЩЁ"
@@ -634,10 +737,17 @@ if (localFavs.length > 0) {
             }
             
             isLoggedIn = true;
-            updateHeaderAvatar();
-            modal.classList.remove('open');
-            document.body.style.overflow = '';
-            window.location.href = 'account.html';
+updateHeaderAvatar();
+modal.classList.remove('open');
+document.body.style.overflow = '';
+
+// Проверяем роль и редиректим
+const payload = JSON.parse(atob(data.token.split('.')[1]));
+if (payload.role === 'admin') {
+    window.location.href = '/admin';
+} else {
+    window.location.href = 'account.html';
+}
         } else {
             alert(data.error || 'Ошибка входа');
         }
@@ -733,8 +843,12 @@ function updateHeaderAvatar() {
 // МОДАЛЬНОЕ ОКНО «СПАСИБО ЗА ЗАКАЗ»
 // ========================
 if (localStorage.getItem('orderPlaced') === 'true') {
-  // Удаляем флаг, чтобы окно не показывалось при следующем обновлении
+  // Получаем номер заказа
+  const orderNumber = localStorage.getItem('lastOrderNumber') || '---';
+  
+  // Удаляем флаги
   localStorage.removeItem('orderPlaced');
+  localStorage.removeItem('lastOrderNumber');
 
   // Создаём оверлей
   const overlay = document.createElement('div');
@@ -742,13 +856,13 @@ if (localStorage.getItem('orderPlaced') === 'true') {
   overlay.style.display = 'flex';
   overlay.style.zIndex = '10000';
 
-  // Само окно (копия стиля входа/регистрации)
-  const modal = document.createElement('div');
-  modal.className = 'modal-window';
-  modal.style.textAlign = 'center';
-  modal.style.maxWidth = '480px';
+  // Само окно
+  const thanksModal = document.createElement('div');
+  thanksModal.className = 'modal-window';
+  thanksModal.style.textAlign = 'center';
+  thanksModal.style.maxWidth = '480px';
 
-  modal.innerHTML = `
+  thanksModal.innerHTML = `
     <button class="modal-close-btn" id="closeThanksModal">
       <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
     </button>
@@ -767,19 +881,18 @@ if (localStorage.getItem('orderPlaced') === 'true') {
       </p>
       <p style="font-family: 'Montserrat', sans-serif; font-size: 18px; 
                 color: #fff; margin: 0 0 24px;">
-        Номер заказа: <strong style="color: #337B57;">#0042</strong>
+        Номер заказа: <strong style="color: #337B57;">#${orderNumber}</strong>
       </p>
     </div>
   `;
 
-  overlay.appendChild(modal);
+  overlay.appendChild(thanksModal);
   document.body.appendChild(overlay);
 
-  // Блокируем прокрутку страницы пока окно открыто
   document.body.style.overflow = 'hidden';
 
   // Закрытие по крестику
-  const closeBtn = modal.querySelector('#closeThanksModal');
+  const closeBtn = thanksModal.querySelector('#closeThanksModal');
   closeBtn.addEventListener('click', function() {
     overlay.remove();
     document.body.style.overflow = '';
@@ -909,6 +1022,9 @@ async function loadProducts(filters = {}, append = false) {
             currentPage = 1;
         }
         
+        // Сохраняем текущие фильтры
+        currentFilters = {...filters};
+        
         let url = `/api/products?limit=12&page=${currentPage}`;
         
         if (filters.category) url += `&category=${encodeURIComponent(filters.category)}`;
@@ -923,11 +1039,13 @@ async function loadProducts(filters = {}, append = false) {
         if (filters.years && filters.years.length > 0) url += `&years=${filters.years.join(',')}`;
         if (filters.tastes && filters.tastes.length > 0) url += `&tastes=${filters.tastes.join(',')}`;
         
+        console.log('Загрузка товаров. URL:', url, 'append:', append, 'page:', currentPage);
+        
         const response = await fetch(url);
         const data = await response.json();
         
         const countSpan = document.getElementById('productsCount');
-        if (countSpan) {
+        if (countSpan && !append) {
             countSpan.textContent = data.pagination.totalCount;
         }
         
@@ -979,7 +1097,9 @@ document.addEventListener('click', function(e) {
         btn.textContent = 'Загрузка...';
         btn.disabled = true;
         currentPage++;
-        loadProducts(currentFilters, true); // true = добавить к существующим
+        // Важно! Передаём текущие фильтры, а не currentFilters
+        const filters = getCurrentFilters();
+        loadProducts(filters, true); // true = добавить к существующим
     }
 });
 
@@ -1225,58 +1345,54 @@ async function addToCartApi(productId, quantity, button) {
 function setupFilterListeners() {
     // Поиск
     const searchInput = document.querySelector('.catalog-search-input');
-    if (searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                currentPage = 1;
-                const filters = getCurrentFilters();
-                loadProducts(filters);
-            }, 500);
-        });
+if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentPage = 1;
+            const filters = getCurrentFilters();
+            
+            // Сохраняем категорию
+            const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
     }
+}
+            
+            currentFilters = filters;
+            loadProducts(filters);
+        }, 500);
+    });
+}
+
     
-    // Категории (чипсы)
-    // Категории (чипсы)
-document.querySelectorAll('.category-chip').forEach(chip => {
-    chip.addEventListener('click', function() {
-        document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        
-        const categoryName = this.textContent.trim();
-        const categoryMap = {
-            'Все': '', 'Зелёный чай': 'zelenyj-chaj', 'Чёрный чай': 'chyornyj-chaj',
-            'Травяной чай': 'travyanoj-chaj', 'Улун': 'ulun', 'Пуэр': 'puer',
-            'Белый чай': 'belyj-chaj', 'Матча': 'matcha', 'Наборы': 'nabory'
-        };
-        
+    // Тумблер "Только в наличии"
+    const inStockToggle = document.getElementById('inStockToggle');
+if (inStockToggle) {
+    inStockToggle.addEventListener('change', function() {
         currentPage = 1;
-        // Создаём новые фильтры (сбрасываем страну и всё остальное)
-        const filters = {};
-        const catSlug = categoryMap[categoryName] || '';
-        if (catSlug) filters.category = catSlug;
+        const filters = getCurrentFilters();
         
-        // Очищаем URL-параметры в адресной строке
-        if (window.history.pushState) {
-            const newUrl = window.location.pathname + (catSlug ? '?category=' + catSlug : '');
-            window.history.pushState({}, '', newUrl);
-        }
+        // Сохраняем категорию
+        const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
+    }
+}
         
         currentFilters = filters;
         loadProducts(filters);
     });
-});
-    
-    // Тумблер "Только в наличии"
-    const inStockToggle = document.getElementById('inStockToggle');
-    if (inStockToggle) {
-        inStockToggle.addEventListener('change', function() {
-            currentPage = 1;
-            const filters = getCurrentFilters();
-            loadProducts(filters);
-        });
-    }
+}
     
     // Ползунок цены
     const sliderMin = document.querySelector('.slider-min');
@@ -1287,13 +1403,25 @@ document.querySelectorAll('.category-chip').forEach(chip => {
     if (sliderMin && sliderMax) {
         let priceTimeout;
         function applyPriceFilter() {
-            clearTimeout(priceTimeout);
-            priceTimeout = setTimeout(() => {
-                currentPage = 1;
-                const filters = getCurrentFilters();
-                loadProducts(filters);
-            }, 500);
-        }
+    clearTimeout(priceFilterTimeout);
+    priceFilterTimeout = setTimeout(() => {
+        const filters = getCurrentFilters();
+        
+        // Сохраняем категорию
+        const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
+    }
+}
+        
+        currentFilters = filters;
+        loadProducts(filters);
+    }, 300);
+}
         
         sliderMin.addEventListener('change', applyPriceFilter);
         sliderMax.addEventListener('change', applyPriceFilter);
@@ -1316,55 +1444,103 @@ document.querySelectorAll('.category-chip').forEach(chip => {
     
     // Все чекбоксы в сайдбаре
     document.querySelectorAll('.catalog-sidebar .checkbox-input').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            currentPage = 1;
-            const filters = getCurrentFilters();
-            loadProducts(filters);
-        });
+    checkbox.addEventListener('change', function() {
+        currentPage = 1;
+        // Берём все фильтры, включая текущую категорию
+        const filters = getCurrentFilters();
+        
+        // Добавляем категорию из активного чипса
+        const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
+    }
+}
+        currentFilters = filters;
+        loadProducts(filters);
     });
+});
     
     // Сортировка
     const sortSelect = document.querySelector('.sort-select');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            currentPage = 1;
-            const filters = getCurrentFilters();
-            filters.sort = this.value;
-            loadProducts(filters);
-        });
+if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+        currentPage = 1;
+        const filters = getCurrentFilters();
+        filters.sort = this.value;
+        
+        // Сохраняем категорию
+        const activeChip = document.querySelector('.category-chip.active');
+if (activeChip) {
+    const slug = activeChip.dataset.slug;
+    if (slug) {
+        filters.category = slug;
+    } else {
+        delete filters.category;
     }
+}
+        
+        currentFilters = filters;
+        loadProducts(filters);
+    });
+}
     
     // Кнопка "Сбросить фильтры"
     const resetBtn = document.querySelector('.reset-filters-btn');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            document.querySelectorAll('.catalog-sidebar .checkbox-input').forEach(cb => cb.checked = false);
-            const inStockToggle = document.getElementById('inStockToggle');
-            if (inStockToggle) inStockToggle.checked = false;
-            
-            const sliderMin = document.querySelector('.slider-min');
-            const sliderMax = document.querySelector('.slider-max');
-            if (sliderMin) sliderMin.value = 5;
-            if (sliderMax) sliderMax.value = 300;
-            
-            const priceMinInput = document.querySelector('.price-min-input');
-            const priceMaxInput = document.querySelector('.price-max-input');
-            if (priceMinInput) priceMinInput.value = 5;
-            if (priceMaxInput) priceMaxInput.value = 300;
-            
-            const sliderFill = document.querySelector('.slider-fill');
-            if (sliderFill) { sliderFill.style.left = '0%'; sliderFill.style.right = '0%'; }
-            
-            const sortSelect = document.querySelector('.sort-select');
-            if (sortSelect) sortSelect.value = 'popular';
-            
-            const searchInput = document.querySelector('.catalog-search-input');
-            if (searchInput) searchInput.value = '';
-            
-            currentPage = 1;
-            loadProducts();
-        });
-    }
+if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+        // Сбрасываем все чекбоксы
+        document.querySelectorAll('.catalog-sidebar .checkbox-input').forEach(cb => cb.checked = false);
+        
+        // Сбрасываем тумблер
+        const inStockToggle = document.getElementById('inStockToggle');
+        if (inStockToggle) inStockToggle.checked = false;
+        
+        // Сбрасываем ползунки цены
+        const sliderMin = document.querySelector('.slider-min');
+        const sliderMax = document.querySelector('.slider-max');
+        if (sliderMin) sliderMin.value = 5;
+        if (sliderMax) sliderMax.value = 300;
+        
+        // Сбрасываем поля ввода цены
+        const priceMinInput = document.querySelector('.price-min-input');
+        const priceMaxInput = document.querySelector('.price-max-input');
+        if (priceMinInput) priceMinInput.value = 5;
+        if (priceMaxInput) priceMaxInput.value = 300;
+        
+        // Сбрасываем визуал ползунка
+        const sliderFill = document.querySelector('.slider-fill');
+        if (sliderFill) { sliderFill.style.left = '0%'; sliderFill.style.right = '0%'; }
+        
+        // Сбрасываем сортировку
+        const sortSelect = document.querySelector('.sort-select');
+        if (sortSelect) sortSelect.value = 'popular';
+        
+        // Сбрасываем поиск
+        const searchInput = document.querySelector('.catalog-search-input');
+        if (searchInput) searchInput.value = '';
+        
+        // Сбрасываем чипсы категорий
+        document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+        const allChip = document.querySelector('.category-chip');
+        if (allChip) allChip.classList.add('active');
+        
+        // Сбрасываем URL
+        if (window.history.pushState) {
+            window.history.pushState({}, '', window.location.pathname);
+        }
+        
+        // Сбрасываем страницу и фильтры
+        currentPage = 1;
+        currentFilters = {};
+        
+        // Загружаем все товары
+        loadProducts({});
+    });
+}
     // Проверяем URL параметры при загрузке каталога
 const urlParams = new URLSearchParams(window.location.search);
 const urlCountry = urlParams.get('country');
@@ -1388,28 +1564,10 @@ if (urlCountry) {
 // Проверяем URL параметр категории
 const urlCategory = urlParams.get('category');
 if (urlCategory) {
-    // Снимаем active со всех чипсов
     document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
+    const chip = document.querySelector(`.category-chip[data-slug="${urlCategory}"]`);
+    if (chip) chip.classList.add('active');
     
-    const categoryMap = {
-        'zelenyj-chaj': 'Зелёный чай',
-        'chyornyj-chaj': 'Чёрный чай',
-        'travyanoj-chaj': 'Травяной чай',
-        'ulun': 'Улун',
-        'puer': 'Пуэр',
-        'belyj-chaj': 'Белый чай',
-        'matcha': 'Матча',
-        'nabory': 'Наборы'
-    };
-    const categoryName = categoryMap[urlCategory];
-    if (categoryName) {
-        document.querySelectorAll('.category-chip').forEach(chip => {
-            if (chip.textContent.trim() === categoryName) {
-                chip.classList.add('active');
-            }
-        });
-    }
-    // Загружаем с фильтром
     currentPage = 1;
     const filters = { category: urlCategory };
     currentFilters = filters;
@@ -1635,27 +1793,27 @@ function getCurrentFilters() {
         if (maxVal < 300) filters.maxPrice = maxVal;
     }
     
-    // ========================
-    // СТРАНЫ (выбранные чекбоксы)
-    // ========================
-    const selectedCountries = [];
-    document.querySelectorAll('.catalog-sidebar .checkbox-input[value="china"], .catalog-sidebar .checkbox-input[value="japan"], .catalog-sidebar .checkbox-input[value="india"], .catalog-sidebar .checkbox-input[value="taiwan"], .catalog-sidebar .checkbox-input[value="sri-lanka"], .catalog-sidebar .checkbox-input[value="vietnam"]').forEach(cb => {
-        if (cb.checked) {
-            // Маппинг значений чекбоксов на названия стран в БД
-            const countryMap = {
-                'china': 'Китай',
-                'japan': 'Япония',
-                'india': 'Индия',
-                'taiwan': 'Тайвань',
-                'sri-lanka': 'Шри-Ланка',
-                'vietnam': 'Вьетнам'
-            };
-            selectedCountries.push(countryMap[cb.value] || cb.value);
-        }
-    });
-    if (selectedCountries.length > 0) {
-        filters.countries = selectedCountries;
+
+   // ========================
+// СТРАНЫ (выбранные чекбоксы)
+// ========================
+const selectedCountries = [];
+document.querySelectorAll('.catalog-sidebar .checkbox-input[value="china"], .catalog-sidebar .checkbox-input[value="japan"], .catalog-sidebar .checkbox-input[value="india"], .catalog-sidebar .checkbox-input[value="taiwan"], .catalog-sidebar .checkbox-input[value="sri-lanka"], .catalog-sidebar .checkbox-input[value="vietnam"]').forEach(cb => {
+    if (cb.checked) {
+        const countryMap = {
+            'china': 'Китай',
+            'japan': 'Япония',
+            'india': 'Индия',
+            'taiwan': 'Тайвань',
+            'sri-lanka': 'Шри-Ланка',
+            'vietnam': 'Вьетнам'
+        };
+        selectedCountries.push(countryMap[cb.value] || cb.value);
     }
+});
+if (selectedCountries.length > 0) {
+    filters.countries = selectedCountries;
+}
     
     // ========================
     // ВКУСЫ
@@ -1671,24 +1829,45 @@ function getCurrentFilters() {
     // ========================
     // УРОВЕНЬ КОФЕИНА
     // ========================
-    const selectedCaffeine = [];
-    document.querySelectorAll('.catalog-sidebar .checkbox-input[value="high"], .catalog-sidebar .checkbox-input[value="medium"], .catalog-sidebar .checkbox-input[value="low"], .catalog-sidebar .checkbox-input[value="caffeine-free"]').forEach(cb => {
-        if (cb.checked) selectedCaffeine.push(cb.value);
-    });
-    if (selectedCaffeine.length > 0) {
-        filters.caffeine = selectedCaffeine;
-    }
-    
     // ========================
-    // КЛАСС ЧАЯ
-    // ========================
-    const selectedClass = [];
-    document.querySelectorAll('.catalog-sidebar .checkbox-input[value="organic"], .catalog-sidebar .checkbox-input[value="ceremonial"], .catalog-sidebar .checkbox-input[value="premium"], .catalog-sidebar .checkbox-input[value="classic"]').forEach(cb => {
-        if (cb.checked) selectedClass.push(cb.value);
-    });
-    if (selectedClass.length > 0) {
-        filters.class = selectedClass;
+// УРОВЕНЬ КОФЕИНА
+// ========================
+const selectedCaffeine = [];
+document.querySelectorAll('.catalog-sidebar .checkbox-input[value="high"], .catalog-sidebar .checkbox-input[value="medium"], .catalog-sidebar .checkbox-input[value="low"], .catalog-sidebar .checkbox-input[value="caffeine-free"]').forEach(cb => {
+    if (cb.checked) {
+        // Маппинг английских значений на русские (как в БД)
+        const caffeineMap = {
+            'high': 'Высокий',
+            'medium': 'Средний',
+            'low': 'Низкий',
+            'caffeine-free': 'Без кофеина'
+        };
+        selectedCaffeine.push(caffeineMap[cb.value] || cb.value);
     }
+});
+if (selectedCaffeine.length > 0) {
+    filters.caffeine = selectedCaffeine;
+}
+
+// ========================
+// КЛАСС ЧАЯ
+// ========================
+const selectedClass = [];
+document.querySelectorAll('.catalog-sidebar .checkbox-input[value="organic"], .catalog-sidebar .checkbox-input[value="ceremonial"], .catalog-sidebar .checkbox-input[value="premium"], .catalog-sidebar .checkbox-input[value="classic"]').forEach(cb => {
+    if (cb.checked) {
+        // Маппинг английских значений на русские (как в БД)
+        const classMap = {
+            'organic': 'Органический',
+            'ceremonial': 'Церемониальный',
+            'premium': 'Премиум',
+            'classic': 'Классический'
+        };
+        selectedClass.push(classMap[cb.value] || cb.value);
+    }
+});
+if (selectedClass.length > 0) {
+    filters.class = selectedClass;
+}
     
     // ========================
     // ГОД СБОРА

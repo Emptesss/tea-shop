@@ -172,9 +172,6 @@ document.addEventListener('DOMContentLoaded', setupPasswordToggles);
     });
   }
 
-  // ========================
-  // СОХРАНЕНИЕ ПРОФИЛЯ
-  // ========================
     // ========================
   // СОХРАНЕНИЕ ПРОФИЛЯ
   // ========================
@@ -363,5 +360,223 @@ if (logoutBtn) {
 }
 
   // Загружаем профиль при открытии
+    // ========================
+  // УДАЛЕНИЕ АККАУНТА
+  // ========================
+  const deleteBtn = document.querySelector('.account-delete-btn');
+  const deleteModal = document.getElementById('deleteModal');
+  const closeDeleteModal = document.getElementById('closeDeleteModal');
+  const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+  // Открыть модальное окно
+  if (deleteBtn) {
+      deleteBtn.addEventListener('click', function() {
+          if (deleteModal) {
+              deleteModal.classList.add('open');
+              deleteModal.style.display = 'flex';
+              document.body.style.overflow = 'hidden';
+          }
+      });
+  }
+
+  // Закрыть модальное окно
+  function closeDeleteModalWindow() {
+      if (deleteModal) {
+          deleteModal.classList.remove('open');
+          deleteModal.style.display = 'none';
+          document.body.style.overflow = '';
+      }
+  }
+
+  if (closeDeleteModal) {
+      closeDeleteModal.addEventListener('click', closeDeleteModalWindow);
+  }
+
+  if (cancelDeleteBtn) {
+      cancelDeleteBtn.addEventListener('click', closeDeleteModalWindow);
+  }
+
+  // Клик по оверлею
+  if (deleteModal) {
+      deleteModal.addEventListener('click', function(e) {
+          if (e.target === deleteModal) {
+              closeDeleteModalWindow();
+          }
+      });
+  }
+
+  // Подтверждение удаления
+  if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener('click', async function() {
+          const token = localStorage.getItem('token');
+          if (!token) return;
+          
+          // Блокируем кнопки
+          confirmDeleteBtn.disabled = true;
+          confirmDeleteBtn.textContent = 'Удаление...';
+          cancelDeleteBtn.disabled = true;
+          
+          try {
+              const response = await fetch('/api/auth/account', {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+              
+              if (response.ok) {
+                  // Очищаем всё
+                  localStorage.clear();
+                  
+                  // Обновляем иконку в хедере
+                  const headerIcon = document.querySelector('#accountIcon img');
+                  if (headerIcon) {
+                      headerIcon.src = 'pictures/profile.png';
+                      headerIcon.style.width = '35px';
+                      headerIcon.style.height = '35px';
+                      headerIcon.style.borderRadius = '0';
+                      headerIcon.style.objectFit = 'contain';
+                  }
+                  
+                  alert('Аккаунт успешно удалён');
+                  window.location.href = 'glavnaya.html';
+              } else {
+                  const data = await response.json();
+                  alert(data.error || 'Ошибка удаления аккаунта');
+                  confirmDeleteBtn.disabled = false;
+                  confirmDeleteBtn.textContent = 'Да, удалить';
+                  cancelDeleteBtn.disabled = false;
+              }
+          } catch (error) {
+              console.error('Ошибка:', error);
+              alert('Ошибка соединения с сервером');
+              confirmDeleteBtn.disabled = false;
+              confirmDeleteBtn.textContent = 'Да, удалить';
+              cancelDeleteBtn.disabled = false;
+          }
+      });
+  }
+
+  // Закрытие по ESC
+  document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && deleteModal && deleteModal.classList.contains('open')) {
+          closeDeleteModalWindow();
+      }
+  });
+
+  // Загружаем профиль при открытии
   loadProfile();
+
+  loadOrders();
 });
+// ========================
+// ЗАГРУЗКА ЗАКАЗОВ
+// ========================
+async function loadOrders() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+        const response = await fetch('/api/orders', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            console.error('Ошибка загрузки заказов:', response.status);
+            return;
+        }
+        
+        const data = await response.json();
+        renderOrders(data.orders);
+        
+    } catch (error) {
+        console.error('Ошибка загрузки заказов:', error);
+    }
+}
+
+function renderOrders(orders) {
+    const container = document.getElementById('panel-orders');
+    if (!container) return;
+    
+    // Если нет заказов
+    if (!orders || orders.length === 0) {
+        container.innerHTML = `
+            <div class="account-card" style="text-align:center;padding:40px;">
+                <p style="color:rgba(255,255,255,0.5);font-size:16px;">У вас пока нет заказов</p>
+                <a href="catalog.html" style="display:inline-block;margin-top:16px;padding:12px 24px;background:linear-gradient(to right, #0D2719, #337B57);border-radius:100px;color:white;text-decoration:none;">Перейти в каталог</a>
+            </div>
+        `;
+        return;
+    }
+    
+    // Статусы и их стили
+    const statusMap = {
+        'processing': { text: 'В обработке', class: 'processing' },
+        'in-transit': { text: 'В пути', class: 'in-transit' },
+        'delivered': { text: 'Доставлен', class: 'delivered' },
+        'cancelled': { text: 'Отменён', class: 'cancelled' }
+    };
+    
+    // Методы доставки
+    const deliveryMap = {
+        'pickup': 'Самовывоз',
+        'courier': 'Курьером',
+        'post': 'Почтой'
+    };
+    
+    // Методы оплаты
+    const paymentMap = {
+        'card': 'Картой онлайн',
+        'cash': 'Наличными',
+        'erip': 'ЕРИП'
+    };
+    
+    container.innerHTML = orders.map(order => {
+        const status = statusMap[order.status] || { text: order.status, class: '' };
+        const date = new Date(order.created_at);
+        const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+        const dateStr = `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        
+        // Товары в заказе
+        const itemsHtml = order.items.map(item => {
+            const imgSrc = item.product_image || 'pictures/placeholder.jpg';
+            return `
+            <div class="order-item">
+                <img src="${imgSrc}" alt="${item.product_name}" class="order-item-img">
+                <div class="order-item-info">
+                    <span class="order-item-name">${item.product_name}</span>
+                    <span class="order-item-qty">× ${item.quantity}</span>
+                </div>
+                <span class="order-item-price">${item.total} Br</span>
+            </div>
+            `;
+        }).join('');
+        
+        return `
+        <div class="order-card">
+            <div class="order-header">
+                <span class="order-number">Заказ №${order.order_number}</span>
+                <span class="order-date">${dateStr}</span>
+                <span class="order-status ${status.class}">${status.text}</span>
+            </div>
+            <div style="display:flex;gap:20px;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,0.5);">
+                <span>🚚 ${deliveryMap[order.delivery_method] || order.delivery_method}</span>
+                <span>💳 ${paymentMap[order.payment_method] || order.payment_method}</span>
+            </div>
+            <div class="order-items">
+                ${itemsHtml}
+            </div>
+            <div class="order-footer">
+                <span class="order-total">Итого: ${order.total} Br</span>
+                <button class="order-repeat-btn" onclick="repeatOrder('${order.order_number}')">Повторить заказ</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// Повторить заказ
+window.repeatOrder = async function(orderNumber) {
+    alert('Функция повтора заказа будет добавлена позже');
+};
+
+loadOrders();

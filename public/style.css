@@ -7302,3 +7302,34 @@ input[type="text"].was-password {
         right: 10px;
     }
 }
+/* ========================
+   ОТСТУПЫ МЕЖДУ ТОВАРАМИ В ЗАКАЗЕ
+   ======================== */
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;                    /* отступ между товарами */
+}
+
+.order-item {
+    padding: 8px 0;               /* отступ сверху и снизу */
+}
+
+/* Если несколько товаров — добавляем разделитель */
+.order-item + .order-item {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+}
+
+/* Модальное окно удаления */
+#deleteModal {
+    z-index: 10001;
+}
+
+#deleteModal .modal-window {
+    background: linear-gradient(
+        to bottom right,
+        rgba(139, 0, 0, 0.3) 0%,
+        rgba(91, 62, 62, 0.35) 100%
+    );
+}
