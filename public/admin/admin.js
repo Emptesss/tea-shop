@@ -122,10 +122,10 @@ async function loadProducts() {
                 <td><span class="badge ${p.in_stock ? 'badge-success' : 'badge-danger'}">${p.in_stock ? 'Да' : 'Нет'}</span></td>
                 <td>
                     <button class="btn btn-sm btn-outline" onclick="editProduct(${p.id})">
-    <img src="/pictures/edit.png" alt="Ред." style="width:16px;height:16px;">
+    <img src="/pictures/edit.png" alt="Ред." style="width:20px;height:20px;">
 </button>
-<button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">
-    <img src="/pictures/delete.png" alt="Уд." style="width:16px;height:16px;">
+<button class="btn btn-sm btn-outline" onclick="deleteProduct(${p.id})">
+    <img src="/pictures/delete.png" alt="Уд." style="width:20px;height:20px;">
 </button>
                 </td>
             </tr>
@@ -361,7 +361,7 @@ async function loadOrders() {
             <tr>
                 <td>${o.order_number}</td><td>${o.name} ${o.surname}</td><td>${o.phone}</td><td>${o.total} Br</td>
                 <td>
-                    <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-select" style="width:auto;padding:4px 8px;">
+                    <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-select" style="width:150px;padding:8px 28px 8px 8px;">
                         ${Object.entries(statusMap).map(([k,v]) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                     </select>
                 </td>
@@ -388,10 +388,10 @@ async function loadUsers() {
         ${users.map(u => `
             <tr>
                 <td>${u.id}</td><td>${u.name || ''}</td><td>${u.email}</td><td>${u.phone || ''}</td>
-                <td><span class="badge ${u.is_admin ? 'badge-success' : 'badge-info'}">${u.is_admin ? 'Да' : 'Нет'}</span></td>
-                <td><span class="badge ${u.is_blocked ? 'badge-danger' : 'badge-success'}">${u.is_blocked ? 'Да' : 'Нет'}</span></td>
+                <td>${u.is_admin ? 'Да' : 'Нет'}</td>
+                <td>${u.is_blocked ? 'Да' : 'Нет'}</td>
                 <td>
-                    <button class="btn btn-sm btn-outline" onclick="toggleBlockUser(${u.id}, ${!u.is_blocked})">${u.is_blocked ? 'Разблокировать' : 'Заблокировать'}</button>
+                    <button class="btn btn-sm ${u.is_blocked ? 'btn-primary' : 'btn-danger'}" onclick="toggleBlockUser(${u.id}, ${!u.is_blocked})">${u.is_blocked ? 'Разблокировать' : 'Заблокировать'}</button>
                 </td>
             </tr>
         `).join('')}
@@ -470,10 +470,10 @@ async function loadCategories() {
                             <td>${c.id}</td><td>${c.name}</td><td>${c.slug}</td><td>${c.display_order || 0}</td>
                             <td>
                                 <button class="btn btn-sm btn-outline" onclick="editCategory(${c.id})">
-    <img src="/pictures/edit.png" alt="Ред." style="width:16px;height:16px;">
+    <img src="/pictures/edit.png" alt="Редактировать" style="width:20px;height:20px;">
 </button>
-<button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})">
-    <img src="/pictures/delete.png" alt="Уд." style="width:16px;height:16px;">
+<button class="btn btn-sm btn-outline" onclick="deleteCategory(${c.id})">
+    <img src="/pictures/delete.png" alt="Удалить" style="width:20px;height:20px;">
 </button>
                             </td>
                         </tr>

@@ -125,7 +125,7 @@ td { color: var(--text); }
 .btn-primary:hover { background: var(--accent-hover); }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .btn-outline:hover { background: rgba(255,255,255,0.05); }
-.btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+.btn-danger { background: #5e3e3e; color: white; }
 .btn-danger:hover { background: rgba(255,80,80,0.1); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 
@@ -219,4 +219,8 @@ select.form-select option { background: #1a2a1a; color: #fff; }
 .btn-sm img {
     width: 14px;
     height: 14px;
+}
+#panel-users .btn-sm {
+  min-width: 130px;
+  justify-content: center;
 }
