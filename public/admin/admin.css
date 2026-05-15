@@ -224,3 +224,84 @@ select.form-select option { background: #1a2a1a; color: #fff; }
   min-width: 130px;
   justify-content: center;
 }
+/* Перенос текста в модальном окне заказа */
+#orderDetailContent {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#orderDetailContent > div {
+    min-width: 0; /* позволяет тексту переноситься */
+}
+
+/* Для адреса и комментария */
+#orderDetailContent div[style*="grid-column"] {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Комментарий */
+#orderDetailContent div[style*="white-space:pre-wrap"] {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    line-height: 1.6;
+}
+
+/* Адаптив для модалки */
+@media (max-width: 600px) {
+    #orderDetailContent div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* Стили для модального окна отзыва */
+#reviewDetailContent {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#reviewDetailContent > div {
+    min-width: 0;
+}
+
+#reviewDetailContent div[style*="word-wrap"] {
+    max-width: 100%;
+    line-height: 1.6;
+}
+
+/* Адаптив */
+@media (max-width: 600px) {
+    #reviewDetailContent div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* Цветные полоски для статусов */
+#ordersStatusStats .stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+#ordersStatusStats .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+}
+
+#ordersStatusStats .stat-card:nth-child(1)::before { background: #f4a742; }
+#ordersStatusStats .stat-card:nth-child(2)::before { background: #3498db; }
+#ordersStatusStats .stat-card:nth-child(3)::before { background: #27ae60; }
+#ordersStatusStats .stat-card:nth-child(4)::before { background: #e74c3c; }
+
+/* Анимация для карточек */
+.stat-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}

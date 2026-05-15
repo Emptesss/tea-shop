@@ -71,7 +71,10 @@ function renderFavorites(products) {
             <div class="card-badge">Купили <span class="purchase-count">${product.purchase_count || 0}</span> раз</div>
             <div class="card-body">
                 <a href="product.html?slug=${product.slug}" class="card-name-link"><div class="card-name">${product.name}</div></a>
-                <div class="card-desc">${product.short_desc || ''}</div>
+                <!-- ✅ ДОБАВЛЕНА ССЫЛКА НА ОПИСАНИЕ -->
+                <a href="product.html?slug=${product.slug}" class="card-desc-link">
+                    <div class="card-desc">${product.short_desc || ''}</div>
+                </a>
                 <div class="card-price">${product.price} Br <span class="card-price-unit">/ 50 г</span></div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">

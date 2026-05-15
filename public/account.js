@@ -175,7 +175,10 @@ document.addEventListener('DOMContentLoaded', setupPasswordToggles);
     // ========================
   // СОХРАНЕНИЕ ПРОФИЛЯ
   // ========================
-  const profileForm = document.querySelector('#panel-profile .account-form');
+// ========================
+// СОХРАНЕНИЕ ПРОФИЛЯ
+// ========================
+const profileForm = document.querySelector('#panel-profile .account-form');
 if (profileForm) {
     profileForm.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -188,15 +191,15 @@ if (profileForm) {
       const phone = this.querySelector('input[type="tel"]')?.value;
       const birthDate = this.querySelector('input[type="date"]')?.value;
       
-      // Валидация телефона
+      // ✅ Валидация телефона ТОЛЬКО если он не пустой
+      let formattedPhone = '';
       if (phone && phone.trim() !== '') {
           if (!validateBelarusPhone(phone)) {
-              alert('Неверный формат телефона!\n\nПравильные форматы:\n+375 (29) 123-45-67\n+375291234567\n80291234567\n\nКоды операторов: 29, 33, 44, 25');
+              alert('Неверный формат телефона!\n\nПравильные форматы:\n+375 (29) 123-45-67\n+375291234567\n80291234567\n\nКоды операторов: 29, 33, 44, 25\n\nИли оставьте поле пустым');
               return;
           }
+          formattedPhone = formatBelarusPhone(phone);
       }
-      
-      const formattedPhone = phone ? formatBelarusPhone(phone) : '';
       
       const token = localStorage.getItem('token');
       
@@ -211,7 +214,7 @@ if (profileForm) {
             name, 
             lastName, 
             middleName, 
-            phone: formattedPhone,
+            phone: formattedPhone || null,  // ✅ Отправляем null если пусто
             birthDate: birthDate || null
           })
         });

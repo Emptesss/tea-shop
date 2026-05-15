@@ -954,38 +954,48 @@ app.get('/api/auth/profile', authenticateToken, async (req, res) => {
 });
 
 
+
+// Обновить профиль
 // Обновить профиль
 app.put('/api/auth/profile', authenticateToken, async (req, res) => {
     try {
         const { name, lastName, middleName, phone, birthDate } = req.body;
         const userId = req.user.id;
 
-        // Валидация телефона
+        // Валидация телефона только если он передан и не пустой
         if (phone && phone.trim() !== '') {
             const cleaned = phone.replace(/[\s\(\)\-]/g, '');
             const phoneRegex = /^(\+375|80)(29|33|44|25|17)\d{7}$/;
             if (!phoneRegex.test(cleaned)) {
-                return res.status(400).json({ error: 'Неверный формат телефона. Используйте: +375 (29) 123-45-67' });
+                return res.status(400).json({ error: 'Неверный формат телефона. Используйте: +375 (29) 123-45-67 или оставьте пустым' });
             }
         }
 
+        // ✅ Явное приведение типов для параметров
         await pool.query(
-    `UPDATE users 
-     SET name = COALESCE($1, name),
-         last_name = COALESCE($2, last_name),
-         middle_name = COALESCE($3, middle_name),
-         phone = COALESCE($4, phone),
-         birth_date = CASE WHEN $5::date IS NOT NULL THEN $5::date ELSE birth_date END,
-         updated_at = NOW()
-     WHERE id = $6`,
-    [name, lastName, middleName, phone, birthDate || null, userId]
-);
+            `UPDATE users 
+             SET name = COALESCE($1::text, name),
+                 last_name = COALESCE($2::text, last_name),
+                 middle_name = COALESCE($3::text, middle_name),
+                 phone = $4::text,
+                 birth_date = $5::date,
+                 updated_at = NOW()
+             WHERE id = $6`,
+            [
+                name || null, 
+                lastName || null, 
+                middleName || null, 
+                phone || null,        // Если пустая строка — отправится null
+                birthDate || null, 
+                userId
+            ]
+        );
 
         res.json({ message: 'Профиль обновлён' });
 
     } catch (error) {
         console.error('Ошибка обновления профиля:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
     }
 });
 // ========================
@@ -1819,21 +1829,68 @@ app.get('/api/test-email', async (req, res) => {
 // ========================
 
 // Статистика
+// Статистика (расширенная)
 app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const [products, orders, users, reviews] = await Promise.all([
+        const [
+            products, orders, users, reviews,
+            ordersByStatus, topProducts, bottomProducts
+        ] = await Promise.all([
             pool.query('SELECT COUNT(*) as count FROM products WHERE is_active = true'),
             pool.query('SELECT COUNT(*) as count FROM orders'),
             pool.query('SELECT COUNT(*) as count FROM users'),
-            pool.query('SELECT COUNT(*) as count FROM reviews WHERE is_approved = true')
+            pool.query('SELECT COUNT(*) as count FROM reviews WHERE is_approved = true'),
+            
+            // Заказы по статусам
+            pool.query(`
+                SELECT 
+                    COUNT(*) FILTER (WHERE status = 'processing') as processing,
+                    COUNT(*) FILTER (WHERE status = 'delivered') as delivered,
+                    COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled,
+                    COUNT(*) FILTER (WHERE status = 'in-transit') as in_transit
+                FROM orders
+            `),
+            
+            // Топ-3 продаваемых товара
+            pool.query(`
+                SELECT p.id, p.name, p.price, p.image1, p.purchase_count
+                FROM products p
+                WHERE p.is_active = true
+                ORDER BY p.purchase_count DESC
+                LIMIT 3
+            `),
+            
+            // Топ-3 непродаваемых товара (в наличии, но мало купили)
+            pool.query(`
+                SELECT p.id, p.name, p.price, p.image1, p.purchase_count
+                FROM products p
+                WHERE p.is_active = true AND p.in_stock = true
+                ORDER BY p.purchase_count ASC
+                LIMIT 3
+            `)
         ]);
+        
         res.json({
             products: parseInt(products.rows[0].count),
             orders: parseInt(orders.rows[0].count),
             users: parseInt(users.rows[0].count),
-            reviews: parseInt(reviews.rows[0].count)
+            reviews: parseInt(reviews.rows[0].count),
+            
+            ordersByStatus: {
+                processing: parseInt(ordersByStatus.rows[0].processing),
+                delivered: parseInt(ordersByStatus.rows[0].delivered),
+                cancelled: parseInt(ordersByStatus.rows[0].cancelled),
+                inTransit: parseInt(ordersByStatus.rows[0].in_transit)
+            },
+            
+            topProducts: topProducts.rows,
+            bottomProducts: bottomProducts.rows
         });
-    } catch(e) { res.status(500).json({ error: e.message }); }
+        
+    } catch(e) { 
+        console.error('Ошибка статистики:', e);
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 // Все заказы (админ)
@@ -1841,11 +1898,34 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
     try {
         const { limit } = req.query;
         const result = await pool.query(
-            `SELECT * FROM orders ORDER BY created_at DESC ${limit ? 'LIMIT $1' : ''}`,
+            `SELECT o.*, 
+                    COALESCE(
+                        (SELECT json_agg(json_build_object(
+                            'product_name', oi.product_name,
+                            'product_image', oi.product_image,
+                            'price', oi.price,
+                            'quantity', oi.quantity,
+                            'total', oi.total
+                        )) FROM order_items oi WHERE oi.order_id = o.id),
+                        '[]'::json
+                    ) as items
+             FROM orders o 
+             ORDER BY o.created_at DESC 
+             ${limit ? 'LIMIT $1' : ''}`,
             limit ? [limit] : []
         );
-        res.json({ orders: result.rows });
-    } catch(e) { res.status(500).json({ error: e.message }); }
+        
+        // Преобразуем items из строки JSON в массив
+        const orders = result.rows.map(order => ({
+            ...order,
+            items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items
+        }));
+        
+        res.json({ orders });
+    } catch(e) { 
+        console.error(e);
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 // Обновить статус заказа
@@ -2018,6 +2098,71 @@ app.get('/admin', (req, res) => {
 
 // Статические файлы админки
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+
+// ========================
+// API — ВКУСЫ (TASTES)
+// ========================
+
+// Получить все вкусы
+app.get('/api/tastes', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, name, slug FROM tastes ORDER BY name');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Ошибка получения вкусов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Получить вкусы товара
+app.get('/api/products/:id/tastes', async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT t.id, t.name, t.slug 
+             FROM product_tastes pt 
+             JOIN tastes t ON pt.taste_id = t.id 
+             WHERE pt.product_id = $1`,
+            [req.params.id]
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Ошибка получения вкусов товара:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Обновить вкусы товара
+app.put('/api/products/:id/tastes', authenticateToken, requireAdmin, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const { tasteIds } = req.body; // массив ID вкусов
+        const productId = req.params.id;
+        
+        await client.query('BEGIN');
+        
+        // Удаляем старые связи
+        await client.query('DELETE FROM product_tastes WHERE product_id = $1', [productId]);
+        
+        // Добавляем новые
+        if (tasteIds && tasteIds.length > 0) {
+            for (const tasteId of tasteIds) {
+                await client.query(
+                    'INSERT INTO product_tastes (product_id, taste_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+                    [productId, tasteId]
+                );
+            }
+        }
+        
+        await client.query('COMMIT');
+        res.json({ message: 'Вкусы обновлены' });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Ошибка обновления вкусов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    } finally {
+        client.release();
+    }
+});
 
 // ========================
 // ЗАПУСК СЕРВЕРА

@@ -360,12 +360,13 @@ header {
     #5B3E3E 100%
   );
   border-radius: 25px;
-  overflow: hidden;
+  overflow: visible;
   flex-shrink: 0;
   position: relative;
   
   transition: transform 0.3s, box-shadow 0.3s;
 }
+
 
 /* Фото товара */
 .card-image {
@@ -7332,4 +7333,332 @@ input[type="text"].was-password {
         rgba(139, 0, 0, 0.3) 0%,
         rgba(91, 62, 62, 0.35) 100%
     );
+}
+
+/* ========================
+   АНИМАЦИИ ПОЯВЛЕНИЯ КАРТОЧЕК ПРИ СКРОЛЛЕ
+   ======================== */
+
+/* Исходное состояние — скрыто */
+.product-card.animate-hidden {
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Левая карточка — вылетает слева */
+.product-card.animate-from-left {
+    transform: translateX(-150px) rotate(-5deg) scale(0.7);
+    filter: blur(10px);
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.8s ease;
+}
+/* Центральная карточка — вылетает снизу с увеличением */
+.product-card.animate-from-bottom {
+    transform: translateY(120px) scale(0.5);
+    filter: blur(12px);
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.8s ease;
+}
+
+/* Правая карточка — вылетает справа */
+.product-card.animate-from-right {
+    transform: translateX(150px) rotate(5deg) scale(0.7);
+    filter: blur(10px);
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.8s ease;
+}
+
+/* Появление — сбрасываем всё к нормальному состоянию */
+.product-card.animate-visible {
+    opacity: 1 !important;
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1) !important;
+    filter: blur(0) !important;
+}
+
+/* Задержки для последовательного появления */
+.product-card.animate-delay-1 {
+    transition-delay: 0.1s;
+}
+
+.product-card.animate-delay-2 {
+    transition-delay: 0.25s;
+}
+
+.product-card.animate-delay-3 {
+    transition-delay: 0.4s;
+}
+
+/* ========================
+   АНИМАЦИЯ ДЛЯ ЗАГОЛОВКА "ТОВАРЫ МЕСЯЦА"
+   ======================== */
+.section-title.animate-hidden {
+    opacity: 0;
+    transform: translateY(-30px);
+    filter: blur(5px);
+    transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.section-title.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Анимация для подзаголовка */
+.section-subtitle.animate-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: 0.15s;
+}
+
+.section-subtitle.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Анимация для разделительной линии */
+.divider-line.animate-hidden {
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.divider-line.animate-visible {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* ========================
+   АНИМАЦИЯ ДЛЯ СЕКЦИИ "ПОЧЕМУ ВЫБИРАЮТ НАС"
+   ======================== */
+.why-us-card.animate-hidden {
+    opacity: 0;
+    transform: translateX(-80px) scale(0.85);
+    filter: blur(6px);
+    transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                filter 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.7s ease;
+}
+
+.why-us-card.animate-visible {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+}
+
+/* Задержки для карточек преимуществ */
+.why-us-card.animate-delay-1 { transition-delay: 0.05s; }
+.why-us-card.animate-delay-2 { transition-delay: 0.2s; }
+.why-us-card.animate-delay-3 { transition-delay: 0.35s; }
+
+/* ========================
+   АНИМАЦИЯ ДЛЯ БАННЕРА "О НАС"
+   ======================== */
+.about-book.animate-hidden {
+    opacity: 0;
+    transform: perspective(1000px) rotateY(15deg);
+    transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.about-book.animate-visible {
+    opacity: 1;
+    transform: perspective(1000px) rotateY(0);
+}
+
+/* Эффект свечения при появлении */
+@keyframes glow-pulse {
+    0% { box-shadow: 0 0 20px rgba(51, 123, 87, 0); }
+    50% { box-shadow: 0 0 40px rgba(51, 123, 87, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(51, 123, 87, 0); }
+}
+
+.product-card.animate-visible {
+    animation: glow-pulse 1.5s ease-in-out;
+}
+
+/* ========================
+   HOVER НА КАРТОЧКИ (после анимаций, чтобы переопределить)
+   ======================== */
+.product-card:hover {
+    transform: translateY(-8px) !important;
+    z-index: 10;
+}
+
+.why-us-card:hover {
+    transform: translateY(-8px) !important;
+}
+
+
+/* ========================
+   АНИМАЦИИ ДЛЯ СТРАНИЦЫ "О НАС"
+   ======================== */
+
+/* Заголовок */
+.about-page-title.animate-hidden,
+.about-page-subtitle.animate-hidden {
+    opacity: 0;
+    transform: translateY(-30px);
+    filter: blur(5px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.7s ease;
+}
+.about-page-title.animate-visible,
+.about-page-subtitle.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Книга истории */
+.about-history-book.animate-hidden {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(20deg) scale(0.85);
+    filter: blur(6px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.34, 1.56, 0.64, 1), filter 1s ease;
+}
+.about-history-book.animate-visible {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0) scale(1);
+    filter: blur(0);
+}
+
+/* Заголовки секций */
+.about-section-title.animate-hidden,
+.about-section-title-desc.animate-hidden {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.about-section-title.animate-visible,
+.about-section-title-desc.animate-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Подзаголовок пути чая */
+.about-section-desc.animate-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.about-section-desc.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Карточки ценностей — вылетают слева */
+.about-value-card.animate-hidden {
+    opacity: 0;
+    transform: translateX(-80px) scale(0.85);
+    filter: blur(6px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.7s ease;
+}
+.about-value-card.animate-visible {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+}
+.about-value-card.animate-delay-1 { transition-delay: 0.05s; }
+.about-value-card.animate-delay-2 { transition-delay: 0.2s; }
+.about-value-card.animate-delay-3 { transition-delay: 0.35s; }
+
+/* Шаги пути чая */
+.journey-step.animate-hidden {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+.journey-step.animate-visible {
+    opacity: 1;
+}
+
+/* Карточка слева */
+.journey-card-left.animate-from-left {
+    transform: translateX(-120px) scale(0.85);
+    filter: blur(6px);
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.8s ease;
+}
+.journey-card-left.animate-visible {
+    transform: translateX(0) scale(1) !important;
+    filter: blur(0) !important;
+}
+
+/* Карточка справа */
+.journey-card-right.animate-from-right {
+    transform: translateX(120px) scale(0.85);
+    filter: blur(6px);
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.8s ease;
+}
+.journey-card-right.animate-visible {
+    transform: translateX(0) scale(1) !important;
+    filter: blur(0) !important;
+}
+
+/* Номер шага */
+.journey-marker.animate-hidden {
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+.journey-marker.animate-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* CTA */
+.about-cta.animate-hidden {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+    filter: blur(4px);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.9s ease;
+}
+.about-cta.animate-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+}
+
+/* Разделители */
+.about-main .divider-line.animate-hidden {
+    opacity: 0;
+    transform: scaleX(0);
+    transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+}
+.about-main .divider-line.animate-visible {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* ✅ HOVER для ценностей */
+.about-value-card:hover {
+    transform: translateY(-8px) !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* ✅ HOVER для шагов */
+.journey-card:hover {
+    transform: translateY(-4px) !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* ✅ ФИКСИРУЕМ НОМЕРА НА ЛИНИИ ПОСЛЕ АНИМАЦИИ */
+.journey-marker.animate-hidden,
+.journey-marker.animate-visible {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+/* Только scale меняется при анимации */
+.journey-marker.animate-hidden {
+    opacity: 0;
+    transform: translateX(-50%) scale(0) !important;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.journey-marker.animate-visible {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) !important;
 }

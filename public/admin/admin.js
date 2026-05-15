@@ -1,5 +1,12 @@
 const BASE = '';  // Все запросы идут напрямую к /api/...
-let token = localStorage.getItem('token');
+let token = localStorage.getItem('adminToken');
+
+if (token) {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'admin') showAdmin();
+    } catch(e) {}
+}
 let categories = [];
 let editingProductId = null;
 let editingCategoryId = null;
@@ -23,7 +30,8 @@ async function login() {
                 alert('Доступ запрещён! Только для администраторов.');
                 return;
             }
-            localStorage.setItem('token', data.token);
+            // ✅ Сохраняем в ОТДЕЛЬНЫЙ ключ, не затрагивая основной сайт
+            localStorage.setItem('adminToken', data.token);
             token = data.token;
             showAdmin();
         } else {
@@ -36,8 +44,10 @@ async function login() {
 }
 
 function logout() {
-    localStorage.removeItem('token');
-    window.location.href = '/';
+    // Удаляем ТОЛЬКО токен админки
+    localStorage.removeItem('adminToken');
+    // Перенаправляем на страницу входа в админку (она же перезагрузится)
+    window.location.href = '/admin';
 }
 
 function showAdmin() {
@@ -68,7 +78,7 @@ function switchPanel(name) {
 // ======================== API-ЗАПРОСЫ ========================
 async function api(url, options = {}) {
     if (!options.headers) options.headers = {};
-    options.headers['Authorization'] = `Bearer ${token}`;
+    options.headers['Authorization'] = `Bearer ${token}`; // token уже adminToken
     options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
     const res = await fetch(url, options);
     return res.json();
@@ -90,22 +100,112 @@ async function loadDashboard() {
             api('/api/admin/orders?limit=5')
         ]);
         
+        // Основные счётчики
         document.getElementById('dashboardStats').innerHTML = `
-            <div class="stat-card"><div class="stat-value">${stats.products || 0}</div><div class="stat-label">Товаров</div></div>
-            <div class="stat-card"><div class="stat-value">${stats.orders || 0}</div><div class="stat-label">Заказов</div></div>
-            <div class="stat-card"><div class="stat-value">${stats.users || 0}</div><div class="stat-label">Пользователей</div></div>
-            <div class="stat-card"><div class="stat-value">${stats.reviews || 0}</div><div class="stat-label">Отзывов</div></div>
+            <div class="stat-card">
+                <div class="stat-value">${stats.products || 0}</div>
+                <div class="stat-label">Товаров</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${stats.orders || 0}</div>
+                <div class="stat-label">Заказов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${stats.users || 0}</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${stats.reviews || 0}</div>
+                <div class="stat-label">Отзывов</div>
+            </div>
         `;
         
+        // Статистика по статусам заказов
+        const os = stats.ordersByStatus || {};
+        document.getElementById('ordersStatusStats').innerHTML = `
+            <div class="stat-card" style="border-left: 4px solid #f4a742;">
+                <div class="stat-value" style="color: #f4a742;">${os.processing || 0}</div>
+                <div class="stat-label">В обработке</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #3498db;">
+                <div class="stat-value" style="color: #3498db;">${os.inTransit || 0}</div>
+                <div class="stat-label">В пути</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #27ae60;">
+                <div class="stat-value" style="color: #27ae60;">${os.delivered || 0}</div>
+                <div class="stat-label">Доставлено</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+                <div class="stat-value" style="color: #e74c3c;">${os.cancelled || 0}</div>
+                <div class="stat-label">Отменено</div>
+            </div>
+        `;
+        
+        // Топ продаваемых товаров
+        const topProducts = stats.topProducts || [];
+        document.getElementById('topProductsTable').innerHTML = `
+            <div class="section-title" style="margin-top:24px;">Самые продаваемые товары</div>
+            <table>
+                <thead><tr><th>Товар</th><th>Цена</th><th>Продано</th></tr></thead>
+                <tbody>
+                    ${topProducts.map(p => `
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <img src="${p.image1 ? (p.image1.startsWith('/') ? p.image1 : '/' + p.image1) : '/pictures/placeholder.jpg'}" 
+                                         style="width:40px;height:40px;border-radius:8px;object-fit:cover;"
+                                         onerror="this.src='/pictures/placeholder.jpg'">
+                                    <span>${p.name}</span>
+                                </div>
+                            </td>
+                            <td>${p.price} Br</td>
+                            <td><span class="badge badge-success">${p.purchase_count || 0} шт.</span></td>
+                        </tr>
+                    `).join('')}
+                    ${topProducts.length === 0 ? '<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">Нет данных</td></tr>' : ''}
+                </tbody>
+            </table>
+        `;
+        
+        // Топ непродаваемых товаров
+        const bottomProducts = stats.bottomProducts || [];
+        document.getElementById('bottomProductsTable').innerHTML = `
+            <div class="section-title" style="margin-top:24px;">Наименее продаваемые товары</div>
+            <table>
+                <thead><tr><th>Товар</th><th>Цена</th><th>Продано</th></tr></thead>
+                <tbody>
+                    ${bottomProducts.map(p => `
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <img src="${p.image1 ? (p.image1.startsWith('/') ? p.image1 : '/' + p.image1) : '/pictures/placeholder.jpg'}" 
+                                         style="width:40px;height:40px;border-radius:8px;object-fit:cover;"
+                                         onerror="this.src='/pictures/placeholder.jpg'">
+                                    <span>${p.name}</span>
+                                </div>
+                            </td>
+                            <td>${p.price} Br</td>
+                            <td><span class="badge badge-warning">${p.purchase_count || 0} шт.</span></td>
+                        </tr>
+                    `).join('')}
+                    ${bottomProducts.length === 0 ? '<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">Нет данных</td></tr>' : ''}
+                </tbody>
+            </table>
+        `;
+        
+        // Последние заказы
         const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
         const orders = ordersRes.orders || [];
         document.getElementById('recentOrdersTable').innerHTML = `
+            <div class="section-title" style="margin-top:24px;">Последние заказы</div>
             <table><thead><tr><th>Номер</th><th>Клиент</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>
             ${orders.map(o => `
                 <tr><td>${o.order_number}</td><td>${o.name}</td><td>${o.total} Br</td>
                 <td><span class="badge badge-${o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning'}">${statusMap[o.status] || o.status}</span></td></tr>
             `).join('')}
+            ${orders.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">Нет заказов</td></tr>' : ''}
             </tbody></table>`;
+            
     } catch(e) { console.error('Ошибка дашборда:', e); }
 }
 
@@ -180,6 +280,8 @@ async function openProductForm(id = null) {
         document.getElementById('prodTemp').value = p.temperature || '';
         document.getElementById('prodTime').value = p.brewing_time || '';
         document.getElementById('prodShelf').value = p.shelf_life || '';
+        
+        // ✅ ИСПРАВЛЕНИЕ: Явно устанавливаем значения select'ов
         document.getElementById('prodCountry').value = p.country || '';
         document.getElementById('prodCaffeine').value = p.caffeine || '';
         document.getElementById('prodClass').value = p.class || '';
@@ -192,31 +294,30 @@ async function openProductForm(id = null) {
             catSelect.value = p.category_id;
         }
         
+        // ✅ ЗАГРУЗКА ВКУСОВ
+        await loadTastesForProduct(id);
+        
         // ✅ Превью изображений
-        // ✅ Превью изображений
-const preview1 = document.getElementById('preview1');
-const preview2 = document.getElementById('preview2');
+        const preview1 = document.getElementById('preview1');
+        const preview2 = document.getElementById('preview2');
 
-if (p.image1) {
-    // Добавляем слеш если путь без него
-    const imgPath = p.image1.startsWith('/') ? p.image1 : '/' + p.image1;
-    preview1.src = imgPath;
-    preview1.style.display = 'block';
-    console.log('Превью 1:', imgPath);
-} else {
-    preview1.src = '';
-    preview1.style.display = 'none';
-}
+        if (p.image1) {
+            const imgPath = p.image1.startsWith('/') ? p.image1 : '/' + p.image1;
+            preview1.src = imgPath;
+            preview1.style.display = 'block';
+        } else {
+            preview1.src = '';
+            preview1.style.display = 'none';
+        }
 
-if (p.image2) {
-    const imgPath = p.image2.startsWith('/') ? p.image2 : '/' + p.image2;
-    preview2.src = imgPath;
-    preview2.style.display = 'block';
-    console.log('Превью 2:', imgPath);
-} else {
-    preview2.src = '';
-    preview2.style.display = 'none';
-}
+        if (p.image2) {
+            const imgPath = p.image2.startsWith('/') ? p.image2 : '/' + p.image2;
+            preview2.src = imgPath;
+            preview2.style.display = 'block';
+        } else {
+            preview2.src = '';
+            preview2.style.display = 'none';
+        }
         
         document.getElementById('modalTitle').textContent = 'Редактировать товар';
         document.getElementById('saveProductBtn').textContent = 'Обновить';
@@ -234,6 +335,9 @@ if (p.image2) {
         // Скрываем превью
         document.getElementById('preview1').style.display = 'none';
         document.getElementById('preview2').style.display = 'none';
+        
+        // ✅ Загружаем вкусы для нового товара (пустые чекбоксы)
+        await loadTastesForProduct(null);
         
         document.getElementById('modalTitle').textContent = 'Добавить товар';
         document.getElementById('saveProductBtn').textContent = 'Добавить';
@@ -324,11 +428,25 @@ document.getElementById('saveProductBtn').addEventListener('click', async functi
         const res = await fetch(url, {
             method,
             headers: { 'Authorization': `Bearer ${token}` },
-            body: formData  // НЕ ставим Content-Type для FormData!
+            body: formData
         });
         const data = await res.json();
         
         if (res.ok) {
+            // ✅ Сохраняем вкусы (если редактируем или создаём новый)
+            const productId = editingProductId || data.id;
+            if (productId) {
+                const tasteIds = getSelectedTasteIds();
+                await fetch(`/api/products/${productId}/tastes`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ tasteIds })
+                });
+            }
+            
             closeProductForm();
             loadProducts();
             alert(editingProductId ? 'Товар обновлён!' : 'Товар добавлен!');
@@ -349,33 +467,145 @@ async function deleteProduct(id) {
     loadProducts();
 }
 
+
+// ======================== ЗАКАЗЫ ========================
 // ======================== ЗАКАЗЫ ========================
 async function loadOrders() {
     const data = await api('/api/admin/orders?limit=50');
     const orders = data.orders || [];
     const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
+    const deliveryMap = { pickup: 'Самовывоз', courier: 'Курьером', post: 'Почтой' };
+    const paymentMap = { card: 'Картой', cash: 'Наличными', erip: 'ЕРИП' };
+    
+    // Сохраняем заказы для использования в модальном окне
+    window.allOrders = orders;
     
     document.getElementById('ordersTable').innerHTML = `
-        <table><thead><tr><th>Номер</th><th>Клиент</th><th>Телефон</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr></thead><tbody>
+        <table><thead><tr>
+            <th>Номер</th><th>Клиент</th><th>Телефон</th><th>Доставка</th><th>Сумма</th><th>Статус</th><th>Дата</th><th></th>
+        </tr></thead><tbody>
         ${orders.map(o => `
             <tr>
-                <td>${o.order_number}</td><td>${o.name} ${o.surname}</td><td>${o.phone}</td><td>${o.total} Br</td>
+                <td><strong>${o.order_number}</strong></td>
+                <td>${o.name} ${o.surname}</td>
+                <td>${o.phone}</td>
+                <td>${deliveryMap[o.delivery_method] || o.delivery_method}</td>
+                <td>${o.total} Br</td>
                 <td>
                     <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-select" style="width:150px;padding:8px 28px 8px 8px;">
                         ${Object.entries(statusMap).map(([k,v]) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                     </select>
                 </td>
                 <td>${new Date(o.created_at).toLocaleDateString('ru-RU')}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})">
+                        Подробнее
+                    </button>
+                </td>
             </tr>
         `).join('')}
         </tbody></table>`;
 }
 
+// Показать детали заказа
+function showOrderDetail(orderId) {
+    const order = (window.allOrders || []).find(o => o.id === orderId);
+    if (!order) return;
+    
+    const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
+    const deliveryMap = { pickup: 'Самовывоз', courier: 'Курьером', post: 'Почтой' };
+    const paymentMap = { card: 'Банковской картой', cash: 'Наличными', erip: 'Через ЕРИП' };
+    
+    document.getElementById('orderDetailContent').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Номер заказа</div>
+                <div style="font-weight:600;">${order.order_number}</div>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Статус</div>
+                <span class="badge badge-${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}">${statusMap[order.status] || order.status}</span>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Дата</div>
+                <div>${new Date(order.created_at).toLocaleString('ru-RU')}</div>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Сумма</div>
+                <div style="font-weight:600;color:var(--accent);">${order.total} Br</div>
+            </div>
+        </div>
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Клиент</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
+            <div><span style="color:var(--text-secondary);">Имя:</span> ${order.name} ${order.surname}</div>
+            <div><span style="color:var(--text-secondary);">Телефон:</span> ${order.phone}</div>
+            <div><span style="color:var(--text-secondary);">Email:</span> ${order.email || '—'}</div>
+        </div>
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Доставка и оплата</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
+            <div><span style="color:var(--text-secondary);">Способ:</span> ${deliveryMap[order.delivery_method] || order.delivery_method}</div>
+            <div><span style="color:var(--text-secondary);">Оплата:</span> ${paymentMap[order.payment_method] || order.payment_method}</div>
+            <div style="grid-column:1/-1;"><span style="color:var(--text-secondary);">Адрес:</span> ${order.delivery_address || '—'}</div>
+        </div>
+        
+        ${order.comment ? `
+        <h3 style="font-size:16px;margin-bottom:12px;">Комментарий</h3>
+        <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:20px;white-space:pre-wrap;">${order.comment}</div>
+        ` : ''}
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Товары (${order.items ? order.items.length : 0} шт.)</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            ${(order.items || []).map(item => `
+                <div style="display:flex;align-items:center;gap:12px;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;">
+                    <img src="${item.product_image ? (item.product_image.startsWith('/') ? item.product_image : '/' + item.product_image) : '/pictures/placeholder.jpg'}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;" onerror="this.src='/pictures/placeholder.jpg'">
+                    <div style="flex:1;">
+                        <div>${item.product_name}</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">×${item.quantity} × ${item.price} Br</div>
+                    </div>
+                    <div style="font-weight:600;">${item.total} Br</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    document.getElementById('orderDetailModal').classList.remove('hidden');
+}
+
+// Закрыть детали заказа
+function closeOrderDetail() {
+    document.getElementById('orderDetailModal').classList.add('hidden');
+}
+
+// Закрытие по клику на оверлей
+document.getElementById('orderDetailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeOrderDetail();
+});
+
 async function updateOrderStatus(id, status) {
-    await api(`/api/admin/orders/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ status })
-    });
+    try {
+        const res = await fetch(`/api/admin/orders/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            // Перезагружаем список заказов для обновления сумм
+            await loadOrders();
+            console.log('✅ Статус заказа обновлён');
+        } else {
+            alert('Ошибка: ' + (data.error || 'Не удалось обновить статус'));
+        }
+    } catch(e) {
+        console.error('Ошибка обновления статуса:', e);
+    }
 }
 
 // ======================== ПОЛЬЗОВАТЕЛИ ========================
@@ -411,24 +641,89 @@ async function loadReviews() {
     const data = await api('/api/admin/reviews');
     const reviews = data.reviews || [];
     
+    // Сохраняем отзывы для модального окна
+    window.allReviews = reviews;
+    
     document.getElementById('reviewsTable').innerHTML = `
         <table><thead><tr><th>ID</th><th>Автор</th><th>Товар</th><th>Оценка</th><th>Текст</th><th>Одобрен</th><th></th></tr></thead><tbody>
         ${reviews.map(r => `
             <tr>
                 <td>${r.id}</td><td>${r.author_name}</td><td>${r.product_name || ''}</td>
                 <td>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</td>
-                <td>${(r.content || '').substring(0, 50)}...</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(r.content || '').substring(0, 60)}...</td>
                 <td><span class="badge ${r.is_approved ? 'badge-success' : 'badge-warning'}">${r.is_approved ? 'Да' : 'Нет'}</span></td>
-                <td>
+                <td style="white-space:nowrap;">
+                    <button class="btn btn-sm btn-outline" onclick="showReviewDetail(${r.id})">Подробнее</button>
                     <button class="btn btn-sm ${r.is_approved ? 'btn-outline' : 'btn-primary'}" onclick="toggleApproveReview(${r.id}, ${!r.is_approved})">${r.is_approved ? 'Скрыть' : 'Одобрить'}</button>
-<button class="btn btn-sm btn-danger" onclick="deleteReview(${r.id})">
-    <img src="/pictures/delete.png" alt="Уд." style="width:16px;height:16px;">
-</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteReview(${r.id})">
+                        <img src="/pictures/delete.png" alt="Уд." style="width:16px;height:16px;">
+                    </button>
                 </td>
             </tr>
         `).join('')}
         </tbody></table>`;
 }
+// ======================== ДЕТАЛИ ОТЗЫВА ========================
+function showReviewDetail(reviewId) {
+    const review = (window.allReviews || []).find(r => r.id === reviewId);
+    if (!review) return;
+    
+    const date = new Date(review.created_at);
+    const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+    const dateStr = `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    
+    document.getElementById('reviewDetailContent').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">ID отзыва</div>
+                <div style="font-weight:600;">#${review.id}</div>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Дата</div>
+                <div>${dateStr}</div>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Статус</div>
+                <span class="badge ${review.is_approved ? 'badge-success' : 'badge-warning'}">${review.is_approved ? 'Одобрен' : 'Не одобрен'}</span>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Полезно</div>
+                <div>${review.helpful_count || 0}</div>
+            </div>
+        </div>
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Автор</h3>
+        <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:20px;">
+            <div style="margin-bottom:4px;"><span style="color:var(--text-secondary);">Имя:</span> ${review.author_name || '—'}</div>
+            <div><span style="color:var(--text-secondary);">Email:</span> ${review.author_email || review.email || '—'}</div>
+        </div>
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Товар</h3>
+        <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:20px;">
+            <div style="margin-bottom:4px;">${review.product_name || 'Товар не указан'}</div>
+            <div style="color:var(--accent);font-size:18px;">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+        </div>
+        
+        ${review.title ? `
+        <h3 style="font-size:16px;margin-bottom:12px;">Заголовок</h3>
+        <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:20px;font-weight:500;">${review.title}</div>
+        ` : ''}
+        
+        <h3 style="font-size:16px;margin-bottom:12px;">Текст отзыва</h3>
+        <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:20px;word-wrap:break-word;overflow-wrap:break-word;word-break:break-word;line-height:1.6;white-space:pre-wrap;">${review.content || '—'}</div>
+    `;
+    
+    document.getElementById('reviewDetailModal').classList.remove('hidden');
+}
+
+function closeReviewDetail() {
+    document.getElementById('reviewDetailModal').classList.add('hidden');
+}
+
+// Закрытие по клику на оверлей
+document.getElementById('reviewDetailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReviewDetail();
+});
 
 async function toggleApproveReview(id, approve) {
     await api(`/api/admin/reviews/${id}`, {
@@ -547,4 +842,55 @@ async function deleteCategory(id) {
     if (!confirm('Удалить категорию?')) return;
     await api(`/api/admin/categories/${id}`, { method: 'DELETE' });
     loadCategories();
+}
+
+// ======================== РАБОТА С ВКУСАМИ ========================
+
+// Загрузка всех вкусов и отметка выбранных для товара
+async function loadTastesForProduct(productId) {
+    try {
+        // Загружаем все вкусы
+        const allTastesRes = await fetch('/api/tastes', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const allTastes = await allTastesRes.json();
+        
+        // Загружаем вкусы товара (если редактируем)
+        let productTastes = [];
+        if (productId) {
+            const productTastesRes = await fetch(`/api/products/${productId}/tastes`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            productTastes = await productTastesRes.json();
+        }
+        
+        const productTasteIds = productTastes.map(t => t.id);
+        
+        // Рендерим чекбоксы
+        const container = document.getElementById('tastesCheckboxes');
+        if (!container) {
+            console.error('❌ Контейнер для вкусов не найден (tastesCheckboxes)');
+            return;
+        }
+        
+        container.innerHTML = allTastes.map(taste => `
+            <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;">
+                <input type="checkbox" 
+                       value="${taste.id}" 
+                       class="taste-checkbox"
+                       ${productTasteIds.includes(taste.id) ? 'checked' : ''}>
+                <span>${taste.name}</span>
+            </label>
+        `).join('');
+        
+        console.log('✅ Вкусы загружены:', allTastes.length, 'шт.');
+    } catch (e) {
+        console.error('Ошибка загрузки вкусов:', e);
+    }
+}
+
+// Получить массив выбранных ID вкусов
+function getSelectedTasteIds() {
+    const checkboxes = document.querySelectorAll('.taste-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
 }

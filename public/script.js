@@ -701,10 +701,23 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         const data = await response.json();
         
         if (response.ok) {
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('token', data.token);  // ← ВОТ ЗДЕСЬ
+            const payload = JSON.parse(atob(data.token.split('.')[1]));
             
-            // 👇 ВСТАВЬ СЮДА ЭТОТ КОД
+            // ✅ АДМИН — входит ТОЛЬКО в админку, основной сайт НЕ входит
+            if (payload.role === 'admin') {
+                localStorage.setItem('adminToken', data.token);
+                // НЕ сохраняем token, isLoggedIn и остальное для основного сайта
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+                window.location.href = '/admin';
+                return; // ← ВАЖНО: выходим, не выполняя код ниже
+            }
+            
+            // ✅ ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ — входит на основной сайт
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('token', data.token);
+            
+            // Слияние гостевой корзины
             const guestSessionId = localStorage.getItem('cartSessionId');
             if (guestSessionId) {
                 fetch('/api/cart/merge', {
@@ -716,18 +729,19 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
                     body: JSON.stringify({ sessionId: guestSessionId })
                 }).then(() => localStorage.removeItem('cartSessionId'));
             }
+            
             // Переносим локальное избранное
-const localFavs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-if (localFavs.length > 0) {
-    for (const pid of localFavs) {
-        fetch('/api/favorites', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.token}` },
-            body: JSON.stringify({ productId: pid })
-        }).catch(() => {});
-    }
-    localStorage.removeItem('localFavorites');
-}
+            const localFavs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
+            if (localFavs.length > 0) {
+                for (const pid of localFavs) {
+                    fetch('/api/favorites', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${data.token}` },
+                        body: JSON.stringify({ productId: pid })
+                    }).catch(() => {});
+                }
+                localStorage.removeItem('localFavorites');
+            }
             
             localStorage.setItem('userName', data.user.name || '');
             if (data.user.avatar) {
@@ -737,17 +751,11 @@ if (localFavs.length > 0) {
             }
             
             isLoggedIn = true;
-updateHeaderAvatar();
-modal.classList.remove('open');
-document.body.style.overflow = '';
-
-// Проверяем роль и редиректим
-const payload = JSON.parse(atob(data.token.split('.')[1]));
-if (payload.role === 'admin') {
-    window.location.href = '/admin';
-} else {
-    window.location.href = 'account.html';
-}
+            updateHeaderAvatar();
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+            window.location.href = 'account.html';
+            
         } else {
             alert(data.error || 'Ошибка входа');
         }
@@ -1611,7 +1619,10 @@ function createMainPageCard(product) {
                 <a href="product.html?slug=${product.slug}" class="card-name-link">
                     <div class="card-name">${product.name}</div>
                 </a>
-                <div class="card-desc">${product.short_desc || ''}</div>
+                <!-- ✅ ДОБАВЛЕНА ССЫЛКА НА ОПИСАНИЕ -->
+                <a href="product.html?slug=${product.slug}" class="card-desc-link">
+                    <div class="card-desc">${product.short_desc || ''}</div>
+                </a>
                 <div class="card-price">${product.price} br <span class="card-price-unit">/ 50 г</span></div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">
@@ -1680,6 +1691,10 @@ function setupMainPageCardListeners() {
     
     // Проверка избранного
     checkMainPageFavorites();
+
+    setTimeout(() => {
+        setupProductCardsAnimation();
+    }, 200);
 }
 
 async function checkMainPageFavorites() {
@@ -1890,3 +1905,227 @@ if (selectedClass.length > 0) {
     
     return filters;
 }
+
+// ========================
+// АНИМАЦИИ ПРИ СКРОЛЛЕ
+// ========================
+// ========================
+// АНИМАЦИИ ПРИ СКРОЛЛЕ
+// ========================
+document.addEventListener('DOMContentLoaded', function() {
+    // Для статических элементов — запускаем сразу
+    setupStaticAnimations();
+    
+    // Для динамических карточек — будем запускать после загрузки
+    // (вызывается из setupMainPageCardListeners)
+});
+
+// Анимация для статических элементов (заголовки, линия, преимущества, баннер)
+function setupStaticAnimations() {
+    const sectionTitle = document.querySelector('.products-section .section-title');
+    const sectionSubtitle = document.querySelector('.products-section .section-subtitle');
+    const dividerLine = document.querySelector('.products-section .divider-line');
+    const whyUsCards = document.querySelectorAll('.why-us-card');
+    const aboutBook = document.querySelector('.about-book');
+    
+    if (sectionTitle) sectionTitle.classList.add('animate-hidden');
+    if (sectionSubtitle) sectionSubtitle.classList.add('animate-hidden');
+    if (dividerLine) dividerLine.classList.add('animate-hidden');
+    
+    whyUsCards.forEach((card, index) => {
+        card.classList.add('animate-hidden');
+        if (index === 0) card.classList.add('animate-delay-1');
+        if (index === 1) card.classList.add('animate-delay-2');
+        if (index === 2) card.classList.add('animate-delay-3');
+    });
+    
+    if (aboutBook) {
+        aboutBook.classList.add('animate-hidden');
+    }
+    
+    // Функция проверки видимости
+    function isElementInViewport(el, offset = 100) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top <= (window.innerHeight - offset) && rect.bottom >= 0;
+    }
+    
+    function checkAnimations() {
+        if (isElementInViewport(dividerLine)) dividerLine?.classList.add('animate-visible');
+        if (isElementInViewport(sectionTitle)) sectionTitle?.classList.add('animate-visible');
+        if (isElementInViewport(sectionSubtitle)) sectionSubtitle?.classList.add('animate-visible');
+        
+        whyUsCards.forEach(card => {
+    if (isElementInViewport(card, 50)) {
+        card.classList.add('animate-visible');
+        setTimeout(() => {
+            card.style.transition = 'transform 0.2s ease';
+        }, 800);
+    }
+});
+        
+        if (isElementInViewport(aboutBook, 100)) aboutBook?.classList.add('animate-visible');
+    }
+    
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => {
+            scrollTimeout = null;
+            checkAnimations();
+        }, 20);
+    }, { passive: true });
+    
+    setTimeout(checkAnimations, 300);
+}
+
+// ✅ НОВАЯ ФУНКЦИЯ — анимация для динамических карточек товаров
+function setupProductCardsAnimation() {
+    const productCards = document.querySelectorAll('.products-section .product-card');
+    
+    if (productCards.length === 0) return;
+    
+    // Добавляем классы анимации
+    productCards.forEach((card, index) => {
+        // Сбрасываем старые классы если есть
+        card.classList.remove('animate-visible', 'animate-from-left', 'animate-from-bottom', 'animate-from-right', 'animate-delay-1', 'animate-delay-2', 'animate-delay-3');
+        
+        card.classList.add('animate-hidden');
+        
+        if (index === 0) {
+            card.classList.add('animate-from-left', 'animate-delay-1');
+        } else if (index === 1) {
+            card.classList.add('animate-from-bottom', 'animate-delay-2');
+        } else if (index === 2) {
+            card.classList.add('animate-from-right', 'animate-delay-3');
+        } else {
+            // Для дополнительных карточек — случайное направление
+            const directions = ['animate-from-left', 'animate-from-bottom', 'animate-from-right'];
+            card.classList.add(directions[index % 3], `animate-delay-${(index % 3) + 1}`);
+        }
+    });
+    
+    function isElementInViewport(el, offset = 50) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top <= (window.innerHeight - offset) && rect.bottom >= 0;
+    }
+    
+   function checkCards() {
+    productCards.forEach(card => {
+        if (isElementInViewport(card, 80)) {
+            card.classList.add('animate-visible');
+            // ✅ Сбрасываем transition через 900мс (после окончания анимации)
+            setTimeout(() => {
+                card.style.transition = 'transform 0.2s ease, box-shadow 0.3s';
+            }, 900);
+        }
+    });
+}
+    
+    // Проверяем сразу (если карточки уже видны)
+    setTimeout(checkCards, 100);
+    
+    // И при скролле
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => {
+            scrollTimeout = null;
+            checkCards();
+        }, 20);
+    }, { passive: true });
+}
+// ========================
+// АНИМАЦИИ ДЛЯ СТРАНИЦЫ "О НАС"
+// ========================
+(function() {
+    if (!document.querySelector('.about-main')) return;
+
+    const pageTitle = document.querySelector('.about-page-title');
+    const pageSubtitle = document.querySelector('.about-page-subtitle');
+    const historyBook = document.querySelector('.about-history-book');
+    const dividers = document.querySelectorAll('.about-main .divider-line');
+    const sectionTitles = document.querySelectorAll('.about-section-title, .about-section-title-desc');
+    const sectionDesc = document.querySelector('.about-section-desc');
+    const valueCards = document.querySelectorAll('.about-value-card');
+    const journeySteps = document.querySelectorAll('.journey-step');
+    const ctaBlock = document.querySelector('.about-cta');
+
+    // Начальные классы
+    if (pageTitle) pageTitle.classList.add('animate-hidden');
+    if (pageSubtitle) pageSubtitle.classList.add('animate-hidden');
+    if (historyBook) historyBook.classList.add('animate-hidden');
+    if (sectionDesc) sectionDesc.classList.add('animate-hidden');
+    if (ctaBlock) ctaBlock.classList.add('animate-hidden');
+
+    dividers.forEach(d => d.classList.add('animate-hidden'));
+    sectionTitles.forEach(t => t.classList.add('animate-hidden'));
+
+    // ✅ Ценности — слева направо с задержкой
+    valueCards.forEach((card, i) => {
+        card.classList.add('animate-hidden');
+        if (i === 0) card.classList.add('animate-delay-1');
+        if (i === 1) card.classList.add('animate-delay-2');
+        if (i === 2) card.classList.add('animate-delay-3');
+    });
+
+    // ✅ Шаги пути — левые слева, правые справа, номера на месте
+    journeySteps.forEach(step => {
+        step.classList.add('animate-hidden');
+        const card = step.querySelector('.journey-card-left, .journey-card-right');
+        const marker = step.querySelector('.journey-marker');
+        if (card) {
+            card.classList.add(card.classList.contains('journey-card-left') ? 'animate-from-left' : 'animate-from-right');
+        }
+        if (marker) marker.classList.add('animate-hidden');
+    });
+
+    function isInView(el, offset = 100) {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.top <= (window.innerHeight - offset) && r.bottom >= 0;
+    }
+
+    function check() {
+        if (isInView(pageTitle)) { pageTitle?.classList.add('animate-visible'); pageSubtitle?.classList.add('animate-visible'); }
+        if (isInView(historyBook, 150)) historyBook?.classList.add('animate-visible');
+        dividers.forEach(d => { if (isInView(d, 50)) d.classList.add('animate-visible'); });
+        sectionTitles.forEach(t => { if (isInView(t, 80)) t.classList.add('animate-visible'); });
+        if (isInView(sectionDesc, 80)) sectionDesc?.classList.add('animate-visible');
+
+        // ✅ Ценности — проявляются слева направо
+        valueCards.forEach(card => {
+            if (isInView(card, 80)) {
+                card.classList.add('animate-visible');
+                setTimeout(() => { card.style.transition = 'transform 0.2s ease'; }, 750);
+            }
+        });
+
+        // ✅ Шаги — карточки вылетают, номера на линии
+        journeySteps.forEach((step, i) => {
+            if (isInView(step, 100)) {
+                step.classList.add('animate-visible');
+                const marker = step.querySelector('.journey-marker');
+                const card = step.querySelector('.journey-card-left, .journey-card-right');
+                // Номер проявляется сразу
+                setTimeout(() => marker?.classList.add('animate-visible'), 100);
+                // Карточка вылетает
+                setTimeout(() => {
+                    card?.classList.add('animate-visible');
+                    if (card) setTimeout(() => { card.style.transition = 'transform 0.2s ease'; }, 850);
+                }, 250);
+            }
+        });
+
+        if (isInView(ctaBlock, 100)) ctaBlock?.classList.add('animate-visible');
+    }
+
+    let t;
+    window.addEventListener('scroll', () => {
+        if (t) return;
+        t = setTimeout(() => { t = null; check(); }, 20);
+    }, { passive: true });
+
+    setTimeout(check, 300);
+})();
