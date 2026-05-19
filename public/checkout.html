@@ -15,7 +15,10 @@
 
   <!-- ХЕДЕР -->
   <header>
-    <div class="header-logo"></div>
+    <div class="header-logo-wrapper">
+  <div class="header-logo"></div>
+  <span class="header-site-name">Forest Tea</span>
+</div>
     <div class="header-center">
       <nav class="header-nav">
         <a href="glavnaya.html">Главная</a>
@@ -153,15 +156,21 @@
           <span class="payment-radio"></span>
           <span class="payment-name">Наличными при получении</span>
         </label>
-        <label class="payment-option">
-          <input type="radio" name="payment" value="erip">
-          <span class="payment-radio"></span>
-          <span class="payment-name">Через ЕРИП</span>
-        </label>
       </div>
     <button class="step-next-btn" onclick="nextStep('cardPayment', 'cardComment')">Продолжить</button>
     </div>
   </div>
+  <!-- Информация о предоплате (показывается при выборе наличных) -->
+<div id="prepaymentInfo" style="display:none; margin-top:16px; padding:16px; background:rgba(51,123,87,0.1); border:1px solid rgba(51,123,87,0.2); border-radius:12px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <span style="font-size:20px;">💡</span>
+    <span style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;color:#337B57;">Требуется предоплата доставки</span>
+  </div>
+  <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);margin:0;line-height:1.5;">
+    При выборе оплаты наличными необходимо внести предоплату за доставку: <strong id="prepaymentAmount">10 Br</strong>.<br>
+    Остальная сумма оплачивается при получении заказа.
+  </p>
+</div>
 
   <!-- Комментарий -->
   <div class="checkout-card" id="cardComment">
@@ -196,10 +205,10 @@
           <div class="checkout-item"><img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Выдержанный пуэр</span><span class="checkout-item-qty">× 3</span></div><span class="checkout-item-price">174 Br</span></div>
         </div>
         <div class="checkout-summary-divider"></div>
-        <div class="checkout-summary-row"><span>Товары (6)</span><span id="checkoutSubtotal">286 Br</span></div>
+        <div class="checkout-summary-row"><span>Товары</span><span id="checkoutSubtotal">Br</span></div>
         <div class="checkout-summary-row"><span>Доставка</span><span id="checkoutDelivery">Бесплатно</span></div>
         <div class="checkout-summary-divider"></div>
-        <div class="checkout-summary-row checkout-summary-total"><span>Итого</span><span id="checkoutTotal">286 Br</span></div>
+        <div class="checkout-summary-row checkout-summary-total"><span>Итого</span><span id="checkoutTotal">Br</span></div>
     </div>
 
   </div><!-- /checkout-layout -->
@@ -298,5 +307,45 @@
   </div>
 
   <script src="checkout.js"></script>
+  <!-- Модальное окно оплаты картой -->
+<div class="modal-overlay" id="cardPaymentModal" style="display:none;">
+  <div class="modal-window" style="max-width:450px;text-align:center;">
+    <button class="modal-close-btn" onclick="closeCardPayment()">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+    <h3 style="font-family:'Montserrat Alternates',sans-serif;font-weight:600;font-size:22px;color:#fff;margin-bottom:8px;">
+      Данные карты
+    </h3>
+    <p style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:20px;">
+      Сумма к оплате: <strong style="color:#337B57;" id="cardPaymentAmount">0</strong> Br
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label" style="text-align:left;">Номер карты</label>
+        <input type="text" class="form-input" placeholder="0000 0000 0000 0000" maxlength="19" id="cardNumber">
+      </div>
+      <div style="display:flex;gap:12px;">
+        <div class="form-group" style="flex:1;text-align:left;">
+          <label class="form-label" style="text-align:left;">Срок действия</label>
+          <input type="text" class="form-input" placeholder="ММ/ГГ" maxlength="5" id="cardExpiry">
+        </div>
+        <div class="form-group" style="flex:1;text-align:left;">
+          <label class="form-label" style="text-align:left;">CVV</label>
+          <input type="text" class="form-input" placeholder="123" maxlength="3" id="cardCVV" style="text-align:left;width:100%;box-sizing:border-box;">
+        </div>
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label" style="text-align:left;">Имя держателя</label>
+        <input type="text" class="form-input" placeholder="IVAN IVANOV" id="cardHolder">
+      </div>
+      <button class="checkout-submit-btn" onclick="saveCardData()" style="width:100%;margin-top:8px;">
+        Сохранить
+      </button>
+    </div>
+    <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:16px;">
+      🔒 Демо-режим. Оплата спишется при подтверждении заказа.
+    </p>
+  </div>
+</div>
 </body>
 </html>

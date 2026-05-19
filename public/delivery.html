@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Корзина — Forest Tea</title>
+  <title>Оплата и доставка — Forest Tea</title>
 
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
 
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -48,61 +50,147 @@
   <nav class="breadcrumbs">
     <ol class="breadcrumbs-list">
       <li class="breadcrumbs-item"><a href="/" class="breadcrumbs-link breadcrumbs-home">Главная</a></li>
-      <li class="breadcrumbs-item"><span class="breadcrumbs-separator">/</span><a href="cart.html" class="breadcrumbs-link">Корзина</a></li>
+      <li class="breadcrumbs-item"><span class="breadcrumbs-separator">/</span><a href="delivery.html" class="breadcrumbs-link">Оплата и доставка</a></li>
   </nav>
 
   <!-- ОСНОВНОЙ КОНТЕНТ -->
-  <main class="cart-main">
+  <main class="delivery-main">
     
-    <h1 class="cart-page-title">Корзина</h1>
+    <!-- Заголовок -->
+    <h1 class="delivery-page-title">Оплата и доставка</h1>
+    <p class="delivery-subtitle">
+      Удобные способы оплаты и быстрая доставка по всей Беларуси
+    </p>
 
-    <!-- Товары в корзине -->
-    <div class="cart-layout" id="cartLayout">
-      
-      <!-- Список товаров -->
-      <div class="cart-items" id="cartItems">
-        
+    <!-- Разделительная линия -->
+    <div class="divider-line"></div>
 
-      </div><!-- /cart-items -->
-
-      <!-- Сводка -->
-      <div class="cart-summary">
-        <div class="cart-summary-card">
-          <h3 class="cart-summary-title">Ваш заказ</h3>
-          
-          <div class="cart-summary-row">
-            <span>Товары</span>
-            <span id="cartTotalItems">8 товаров</span>
-          </div>
-          <div class="cart-summary-row">
-            <span>Доставка</span>
-            <span class="cart-summary-free">Бесплатно</span>
-          </div>
-          <div class="cart-summary-divider"></div>
-          <div class="cart-summary-row cart-summary-total">
-            <span>Итого</span>
-            <span id="cartTotalPrice">305 Br</span>
-          </div>
-
-          <a href="checkout.html" class="cart-checkout-btn">Оформить заказ</a>
-          
-          
-        </div>
-      </div><!-- /cart-summary -->
-
-    </div><!-- /cart-layout -->
-
-    <!-- Пустая корзина -->
-    <div class="cart-empty" id="cartEmpty" style="display: none;">
-      <img src="pictures/cart.png" alt="Пустая корзина" class="cart-empty-icon">
-      <h2 class="cart-empty-title">В корзине пока пусто</h2>
-      <p class="cart-empty-text">Добавляйте товары из каталога</p>
-      <a href="catalog.html" class="cart-empty-btn">Перейти в каталог</a>
+    <!-- Секция: Доставка -->
+    <section class="delivery-section">
+      <h2 class="delivery-section-title">Способы доставки</h2>
+     <!-- Карточки доставки в стиле why-us -->
+<div class="delivery-grid">
+  
+  <!-- Карточка доставки 1 — Минск -->
+  <div class="delivery-card-item">
+    <div class="delivery-card-icon">
+      <img src="pictures/pickup.png" alt="Доставка по Минску" class="delivery-card-icon-img">
     </div>
+    <h3 class="delivery-card-title">Доставка по Минску</h3>
+    <div class="delivery-card-box">
+      <p class="delivery-card-box-text">
+        Курьерская доставка до двери в течение 1–2 дней. Стоимость — 10 Br. 
+        Заказы, оформленные до 15:00, доставляются на следующий день.
+      </p>
+    </div>
+  </div>
+
+  <!-- Карточка доставки 2 — Беларусь -->
+  <div class="delivery-card-item">
+    <div class="delivery-card-icon">
+      <img src="pictures/delivery-car.png" alt="Доставка по Беларуси" class="delivery-card-icon-img">
+    </div>
+    <h3 class="delivery-card-title">Доставка по Беларуси</h3>
+    <div class="delivery-card-box">
+      <p class="delivery-card-box-text">
+        Отправляем почтой или курьерской службой по всей стране за 2–5 дней. 
+        Стоимость — 15 Br. Трек-номер приходит на email сразу после отправки.
+      </p>
+    </div>
+  </div>
+
+  <!-- Карточка доставки 3 — Самовывоз -->
+  <div class="delivery-card-item">
+    <div class="delivery-card-icon">
+      <img src="pictures/delivery-box.png" alt="Самовывоз" class="delivery-card-icon-img">
+    </div>
+    <h3 class="delivery-card-title">Самовывоз</h3>
+    <div class="delivery-card-box">
+      <p class="delivery-card-box-text">
+        Заберите заказ самостоятельно в день оформления из нашего магазина 
+        в агрогородке Лесной. Бесплатно. Мы сообщим, когда заказ будет готов.
+      </p>
+    </div>
+  </div>
+
+</div>
+    </section>
+
+    <!-- Разделительная линия -->
+    <div class="divider-line"></div>
+
+    <!-- Секция: Оплата -->
+    <section class="payment-section">
+      <h2 class="delivery-section-title">Способы оплаты</h2>
+      
+      <div class="payment-methods">
+        
+        <!-- Способ оплаты 1 -->
+        <div class="payment-method">
+          <div class="payment-method-icon">
+            <img src="pictures/payment-card.png" alt="Банковская карта" class="payment-method-icon-img">
+          </div>
+          <div class="payment-method-content">
+            <h3 class="payment-method-title">Банковская карта</h3>
+            <p class="payment-method-text">
+              Принимаем Visa, Mastercard и МИР. Оплата проходит через защищённое соединение. 
+              Деньги списываются только после подтверждения заказа
+            </p>
+          </div>
+        </div>
+
+        <!-- Способ оплаты 2 -->
+        <div class="payment-method">
+          <div class="payment-method-icon">
+            <img src="pictures/payment-erip.png" alt="ЕРИП" class="payment-method-icon-img">
+          </div>
+          <div class="payment-method-content">
+            <h3 class="payment-method-title">ЕРИП</h3>
+            <p class="payment-method-text">
+              Оплата через систему «Расчёт» (ЕРИП) в любом банке или интернет-банкинге. 
+              После оформления заказа мы вышлем инструкцию с кодом для оплаты
+            </p>
+          </div>
+        </div>
+
+        <!-- Способ оплаты 3 -->
+        <div class="payment-method">
+          <div class="payment-method-icon">
+            <img src="pictures/payment-cash.png" alt="Наличные" class="payment-method-icon-img">
+          </div>
+          <div class="payment-method-content">
+            <h3 class="payment-method-title">Наличные</h3>
+            <p class="payment-method-text">
+              Оплата наличными доступна при самовывозе из магазина или курьеру при доставке 
+              по Минску. Для доставки в другие города — только онлайн-оплата
+            </p>
+          </div>
+        </div>
+
+
+      </div>
+    </section>
+
+    <!-- Разделительная линия -->
+    <div class="divider-line"></div>
+
+<!-- Блок с вопросом -->
+<div class="delivery-faq-cta">
+  <div class="delivery-faq-inner">
+    <h2 class="delivery-faq-title">Остались вопросы?</h2>
+    <p class="delivery-faq-text">
+      Напишите нам или позвоните — мы подробно расскажем о доставке в ваш город
+    </p>
+    <div class="delivery-faq-buttons">
+      <a href="contacts.html" class="delivery-faq-btn delivery-faq-btn-primary">Связаться с нами</a>
+      <a href="faq.html" class="delivery-faq-btn delivery-faq-btn-secondary">Частые вопросы</a>
+    </div>
+  </div>
+</div>
 
   </main>
 
-  <!-- ФУТЕР -->
+    <!-- ФУТЕР -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-subscribe">
@@ -179,6 +267,6 @@
     </div>
   </div>
 
-  <script src="cart.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

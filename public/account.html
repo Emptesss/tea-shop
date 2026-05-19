@@ -15,7 +15,10 @@
 
   <!-- ХЕДЕР -->
   <header>
-    <div class="header-logo"></div>
+    <div class="header-logo-wrapper">
+  <div class="header-logo"></div>
+  <span class="header-site-name">Forest Tea</span>
+</div>
     <div class="header-center">
       <nav class="header-nav">
         <a href="glavnaya.html">Главная</a>
@@ -304,6 +307,25 @@
         <button id="confirmDeleteBtn" style="padding:12px 28px;background:#ff4444;border:none;border-radius:100px;color:white;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;">
           Да, удалить
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Модальное окно редактирования заказа -->
+<div class="modal-overlay" id="editOrderModal" style="display:none;">
+  <div class="modal-window" style="max-width:650px;max-height:85vh;overflow-y:auto;">
+    <button class="modal-close-btn" onclick="closeEditOrderModal()">
+      <img src="pictures/close.png" alt="Закрыть" class="modal-close-icon">
+    </button>
+    <h3 style="font-family:'Montserrat Alternates',sans-serif;font-weight:600;font-size:22px;color:#fff;margin-bottom:20px;">
+      Редактирование заказа <span id="editOrderNumber"></span>
+    </h3>
+    <div id="editOrderItems"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);">
+      <span style="font-family:'Montserrat',sans-serif;font-weight:600;font-size:18px;color:#fff;">Итого: <span id="editOrderTotal">0</span> Br</span>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeEditOrderModal()" style="padding:10px 24px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:100px;color:white;cursor:pointer;">Отмена</button>
+        <button onclick="saveEditedOrder()" style="padding:10px 24px;background:#337B57;border:none;border-radius:100px;color:white;cursor:pointer;">Сохранить изменения</button>
       </div>
     </div>
   </div>

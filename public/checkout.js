@@ -136,6 +136,37 @@ function nextStep(currentId, nextId) {
     }
   }
 
+  // ✅ При переходе с оплаты — открываем модалку, меняем кнопку
+  if (currentId === 'cardPayment') {
+    const paymentEl = document.querySelector('input[name="payment"]:checked');
+    const deliveryEl = document.querySelector('input[name="delivery"]:checked');
+    const payment_method = paymentEl ? paymentEl.value : 'card';
+    const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
+    
+    let amountToPay = 0;
+    
+    if (payment_method === 'card' || payment_method === 'erip') {
+        const totalText = document.getElementById('checkoutTotal').textContent;
+        amountToPay = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
+    } else if (payment_method === 'cash' && delivery_method !== 'pickup') {
+        const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+        amountToPay = deliveryPrice;
+    }
+    
+    if (amountToPay > 0) {
+        showCardPayment(amountToPay);
+    }
+    
+    // Меняем кнопку "Продолжить" на "Изменить способ оплаты"
+    const nextBtn = current.querySelector('.step-next-btn');
+    if (nextBtn) {
+        nextBtn.textContent = 'Изменить способ оплаты';
+        nextBtn.onclick = function() {
+            showCardPayment(amountToPay);
+        };
+    }
+  }
+
   current.classList.remove('active');
   current.classList.add('done');
   current.classList.remove('locked');
@@ -182,11 +213,66 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         if (deliveryAddress) deliveryAddress.style.display = 'none';
       }
-      updateTotal();
+      resetCardData();
+        updateTotal();
+        updatePrepaymentInfo();
     });
   });
 
-  function updateTotal() {
+const paymentRadios = document.querySelectorAll('input[name="payment"]');
+  const prepaymentInfo = document.getElementById('prepaymentInfo');
+
+  paymentRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+          if (this.value === 'cash') {
+              if (prepaymentInfo) prepaymentInfo.style.display = 'block';
+          } else {
+              if (prepaymentInfo) prepaymentInfo.style.display = 'none';
+          }
+          resetCardData();
+        updatePrepaymentInfo();
+      });
+  });
+  // ✅ Функция обновления информации о предоплате
+  function updatePrepaymentInfo() {
+      const paymentEl = document.querySelector('input[name="payment"]:checked');
+      const deliveryEl = document.querySelector('input[name="delivery"]:checked');
+      const prepaymentInfo = document.getElementById('prepaymentInfo');
+      
+      if (!paymentEl || !deliveryEl || !prepaymentInfo) return;
+      
+      const payment_method = paymentEl.value;
+      const delivery_method = deliveryEl.value;
+      
+      // Показываем предоплату ТОЛЬКО при наличных + доставка (не самовывоз)
+      if (payment_method === 'cash' && delivery_method !== 'pickup') {
+          prepaymentInfo.style.display = 'block';
+          const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+          document.getElementById('prepaymentAmount').textContent = deliveryPrice + ' Br';
+      } else {
+          prepaymentInfo.style.display = 'none';
+      }
+  }
+  // ✅ Добавьте эту функцию:
+function resetCardData() {
+    savedCardData = null;
+    cardDataConfirmed = false;
+    
+    // Очищаем поля в модалке
+    const cardNumber = document.getElementById('cardNumber');
+    const cardExpiry = document.getElementById('cardExpiry');
+    const cardCVV = document.getElementById('cardCVV');
+    const cardHolder = document.getElementById('cardHolder');
+    
+    if (cardNumber) cardNumber.value = '';
+    if (cardExpiry) cardExpiry.value = '';
+    if (cardCVV) cardCVV.value = '';
+    if (cardHolder) cardHolder.value = '';
+}
+
+  // ✅ ЗАМЕНИТЕ существующую функцию updateTotal (она внутри DOMContentLoaded)
+// на эту:
+function updateTotal() {
     const subtotalEl = document.getElementById('checkoutSubtotal');
     const subtotalText = subtotalEl ? subtotalEl.textContent : '0 Br';
     const subtotal = parseFloat(subtotalText.replace(/[^0-9.]/g, '')) || 0;
@@ -194,12 +280,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const selected = document.querySelector('input[name="delivery"]:checked');
     let deliveryPrice = 0;
     if (selected) {
-      if (selected.value === 'courier') deliveryPrice = 10;
-      if (selected.value === 'post') deliveryPrice = 5;
+        if (selected.value === 'courier') deliveryPrice = 10;
+        if (selected.value === 'post') deliveryPrice = 5;
     }
     
     const totalEl = document.getElementById('checkoutTotal');
     const deliveryEl = document.getElementById('checkoutDelivery');
+    const prepaymentAmount = document.getElementById('prepaymentAmount');
     
     if (deliveryEl) {
         deliveryEl.textContent = deliveryPrice === 0 ? 'Бесплатно' : deliveryPrice + ' Br';
@@ -207,13 +294,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (totalEl) {
         totalEl.textContent = (subtotal + deliveryPrice) + ' Br';
     }
-  }
+    if (prepaymentAmount) {
+        prepaymentAmount.textContent = deliveryPrice + ' Br';
+    }
+}
 
   if (localStorage.getItem('isLoggedIn') === 'true') {
     loadProfileData();
   }
 
   updateTotal();
+updatePrepaymentInfo();
 });
 
 async function loadProfileData() {
@@ -245,6 +336,28 @@ async function loadProfileData() {
 async function placeOrder() {
     const btn = document.getElementById('confirmOrderBtn');
     if (!btn) return;
+
+    // ✅ ДОБАВЬТЕ ЭТО В НАЧАЛО ФУНКЦИИ (перед btn.disabled = true)
+    const paymentEl = document.querySelector('input[name="payment"]:checked');
+const payment_method = paymentEl ? paymentEl.value : 'card';
+    const deliveryEl = document.querySelector('input[name="delivery"]:checked');
+    const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
+
+     const needsCardPayment = (payment_method === 'card') || 
+                         (payment_method === 'cash' && delivery_method !== 'pickup');
+                         
+    if (needsCardPayment && !cardDataConfirmed) {
+        alert('Сначала введите данные карты. Нажмите "Изменить способ оплаты".');
+        return;
+    }
+    // Предупреждение о предоплате при наличных
+    if (payment_method === 'cash' && delivery_method !== 'pickup') {
+        const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+        if (!confirm(`При оплате наличными требуется предоплата доставки ${deliveryPrice} Br. Продолжить?`)) {
+            return;
+        }
+    }
+    // ✅ КОНЕЦ ВСТАВКИ
     
     btn.disabled = true;
     btn.textContent = 'Оформление...';
@@ -255,12 +368,8 @@ async function placeOrder() {
         const phone = document.getElementById('checkoutPhone').value.trim();
         const email = document.getElementById('checkoutEmail').value.trim();
         
-        const deliveryEl = document.querySelector('input[name="delivery"]:checked');
-        const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
         const delivery_address = document.getElementById('deliveryAddressInput')?.value || '';
-        
-        const paymentEl = document.querySelector('input[name="payment"]:checked');
-        const payment_method = paymentEl ? paymentEl.value : 'card';
+    
         
         const comment = document.querySelector('#cardComment textarea')?.value || '';
         
@@ -561,3 +670,62 @@ function updateHeaderAvatar() {
         iconImg.style.objectFit = 'contain';
     }
 }
+// ========================
+// МОДАЛКА ОПЛАТЫ КАРТОЙ
+// ========================
+
+let savedCardData = null;
+let cardDataConfirmed = false; // флаг, что карта введена
+
+function showCardPayment(amount) {
+    document.getElementById('cardPaymentAmount').textContent = amount.toFixed(2);
+    
+    // Если есть сохранённые данные — заполняем (кроме CVV)
+    if (savedCardData) {
+        document.getElementById('cardNumber').value = savedCardData.number || '';
+        document.getElementById('cardExpiry').value = savedCardData.expiry || '';
+        document.getElementById('cardCVV').value = '';
+        document.getElementById('cardHolder').value = savedCardData.holder || '';
+    }
+    
+    document.getElementById('cardPaymentModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCardPayment() {
+    document.getElementById('cardPaymentModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function saveCardData() {
+    const number = document.getElementById('cardNumber').value.trim();
+    const expiry = document.getElementById('cardExpiry').value.trim();
+    const cvv = document.getElementById('cardCVV').value.trim();
+    const holder = document.getElementById('cardHolder').value.trim();
+    
+    // Базовая проверка
+    if (!number || number.replace(/\s/g, '').length < 13) {
+        alert('Введите корректный номер карты');
+        return;
+    }
+    if (!expiry || !expiry.includes('/')) {
+        alert('Введите срок действия (ММ/ГГ)');
+        return;
+    }
+    if (!cvv || cvv.length < 3) {
+        alert('Введите CVV-код (3 цифры)');
+        return;
+    }
+    
+    // Сохраняем данные (демо)
+    savedCardData = { number, expiry, holder };
+    cardDataConfirmed = true;
+    
+    closeCardPayment();
+    alert('✅ Данные карты сохранены. Оплата произойдёт при подтверждении заказа.');
+}
+
+// Закрытие по клику на оверлей
+document.getElementById('cardPaymentModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCardPayment();
+});

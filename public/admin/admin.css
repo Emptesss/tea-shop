@@ -305,3 +305,132 @@ select.form-select option { background: #1a2a1a; color: #fff; }
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
+
+/* ======================== */
+/* ПЛАШКА "ТРЕБУЕТСЯ ВОЗВРАТ" */
+/* ======================== */
+.refund-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(255, 60, 60, 0.15);
+  border: 1px solid rgba(255, 60, 60, 0.4);
+  border-radius: 100px;
+  color: #ff4444;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  animation: pulse-refund 2s infinite;
+  margin-left: 8px;
+}
+
+@keyframes pulse-refund {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Строка с REFUND_PENDING — красный фон */
+tr.refund-pending {
+  background: rgba(255, 0, 0, 0.05) !important;
+  border-left: 3px solid #ff4444;
+}
+
+tr.refund-pending:hover {
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* Иконка возврата */
+.refund-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+/* ======================== */
+/* МОДАЛКА ОТМЕНЫ ЗАКАЗА */
+/* ======================== */
+.cancel-reason-option:hover {
+    background: rgba(255,255,255,0.05) !important;
+    border-color: rgba(255,255,255,0.2) !important;
+}
+
+.cancel-reason-option.selected {
+    background: rgba(255, 60, 60, 0.15) !important;
+    border-color: rgba(255, 60, 60, 0.5) !important;
+    color: #ff6b6b !important;
+}
+/* ======================== */
+/* СОРТИРОВКА ТАБЛИЦ */
+/* ======================== */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 20px;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.sortable-header:hover {
+    color: var(--accent);
+}
+
+.sort-indicator {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+}
+
+.sortable-header.asc .sort-indicator,
+.sortable-header.desc .sort-indicator {
+    opacity: 1;
+    color: var(--accent);
+}
+
+/* ======================== */
+/* ФИЛЬТРЫ ЗАКАЗОВ */
+/* ======================== */
+.orders-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.filter-chip {
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-chip:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+.filter-chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}
+
+.filter-chip .count {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-left: 6px;
+    font-size: 11px;
+}

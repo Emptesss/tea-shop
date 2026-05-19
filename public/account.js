@@ -88,7 +88,7 @@ const observer = new MutationObserver(function() {
 
 observer.observe(document.body, { childList: true, subtree: true });
 // Запускаем при загрузке
-document.addEventListener('DOMContentLoaded', setupPasswordToggles);
+setupPasswordToggles();
   
   // ========================
   // ЗАГРУЗКА АВАТАРА
@@ -126,14 +126,12 @@ document.addEventListener('DOMContentLoaded', setupPasswordToggles);
           headers: {
             'Authorization': `Bearer ${token}`
           },
-          body: formData  // ← без 'Content-Type', браузер сам поставит multipart/form-data
+          body: formData
         });
         
         if (response.ok) {
           const data = await response.json();
-          // Сохраняем путь к файлу в localStorage
           localStorage.setItem('userAvatar', data.avatar);
-          // Обновляем аватар в хедере из серверного пути
           avatarImg.src = data.avatar;
           updateHeaderAvatar(data.avatar);
         }
@@ -172,9 +170,7 @@ document.addEventListener('DOMContentLoaded', setupPasswordToggles);
     });
   }
 
-    // ========================
-  // СОХРАНЕНИЕ ПРОФИЛЯ
-  // ========================
+
 // ========================
 // СОХРАНЕНИЕ ПРОФИЛЯ
 // ========================
@@ -191,7 +187,6 @@ if (profileForm) {
       const phone = this.querySelector('input[type="tel"]')?.value;
       const birthDate = this.querySelector('input[type="date"]')?.value;
       
-      // ✅ Валидация телефона ТОЛЬКО если он не пустой
       let formattedPhone = '';
       if (phone && phone.trim() !== '') {
           if (!validateBelarusPhone(phone)) {
@@ -214,13 +209,12 @@ if (profileForm) {
             name, 
             lastName, 
             middleName, 
-            phone: formattedPhone || null,  // ✅ Отправляем null если пусто
+            phone: formattedPhone || null,
             birthDate: birthDate || null
           })
         });
         
         if (response.ok) {
-          // Обновляем поле телефона на отформатированное
           const phoneInput = document.querySelector('#panel-profile input[type="tel"]');
           if (phoneInput) phoneInput.value = formattedPhone;
           
@@ -250,20 +244,17 @@ if (profileForm) {
       document.getElementById('panel-' + this.dataset.tab).classList.add('active');
     });
   });
+  
 // ========================
 // ВАЛИДАЦИЯ БЕЛОРУССКОГО ТЕЛЕФОНА
 // ========================
 function validateBelarusPhone(phone) {
-    // Убираем все пробелы, скобки, тире
     const cleaned = phone.replace(/[\s\(\)\-]/g, '');
-    
-    // Форматы: +375291234567, +375 29 1234567, 80291234567, +375(29)123-45-67
     const regex = /^(\+375|80)(29|33|44|25|17)\d{7}$/;
     return regex.test(cleaned);
 }
 
 function formatBelarusPhone(phone) {
-    // Приводим к единому формату +375 XX XXX-XX-XX
     const cleaned = phone.replace(/[\s\(\)\-]/g, '');
     let digits = cleaned;
     
@@ -287,22 +278,19 @@ if (settingsForm) {
         e.preventDefault();
         
         const currentPassword = this.querySelector('input[name="currentPassword"]')?.value;
-const newPassword = this.querySelector('input[name="newPassword"]')?.value;
-const confirmPassword = this.querySelector('input[name="confirmPassword"]')?.value;
+        const newPassword = this.querySelector('input[name="newPassword"]')?.value;
+        const confirmPassword = this.querySelector('input[name="confirmPassword"]')?.value;
         
-        // Проверка заполнения
         if (!currentPassword || !newPassword || !confirmPassword) {
             alert('Заполните все поля');
             return;
         }
         
-        // Проверка совпадения нового пароля
         if (newPassword !== confirmPassword) {
             alert('Новые пароли не совпадают');
             return;
         }
         
-        // Проверка длины
         if (newPassword.length < 6) {
             alert('Новый пароль должен быть не менее 6 символов');
             return;
@@ -324,10 +312,9 @@ const confirmPassword = this.querySelector('input[name="confirmPassword"]')?.val
             
             if (response.ok) {
                 alert('Пароль успешно изменён!');
-                // Очищаем поля
                 this.querySelector('input[name="currentPassword"]').value = '';
-this.querySelector('input[name="newPassword"]').value = '';
-this.querySelector('input[name="confirmPassword"]').value = '';
+                this.querySelector('input[name="newPassword"]').value = '';
+                this.querySelector('input[name="confirmPassword"]').value = '';
             } else {
                 alert(data.error || 'Ошибка смены пароля');
             }
@@ -337,33 +324,31 @@ this.querySelector('input[name="confirmPassword"]').value = '';
         }
     });
 }
+
   // ========================
   // ВЫХОД
   // ========================
   const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
-        if (confirm('Вы уверены, что хотите выйти?')) {
-            // Очищаем ВСЁ
-            localStorage.clear();
-            
-            // Возвращаем иконку на дефолт
-            const headerIcon = document.querySelector('#accountIcon img');
-            if (headerIcon) {
-                headerIcon.src = 'pictures/profile.png';
-                headerIcon.style.width = '35px';
-                headerIcon.style.height = '35px';
-                headerIcon.style.borderRadius = '0';
-                headerIcon.style.objectFit = 'contain';
-            }
-            
-            window.location.href = 'glavnaya.html';
-        }
-    });
-}
+  if (logoutBtn) {
+      logoutBtn.addEventListener('click', function() {
+          if (confirm('Вы уверены, что хотите выйти?')) {
+              localStorage.clear();
+              
+              const headerIcon = document.querySelector('#accountIcon img');
+              if (headerIcon) {
+                  headerIcon.src = 'pictures/profile.png';
+                  headerIcon.style.width = '35px';
+                  headerIcon.style.height = '35px';
+                  headerIcon.style.borderRadius = '0';
+                  headerIcon.style.objectFit = 'contain';
+              }
+              
+              window.location.href = 'glavnaya.html';
+          }
+      });
+  }
 
-  // Загружаем профиль при открытии
-    // ========================
+  // ========================
   // УДАЛЕНИЕ АККАУНТА
   // ========================
   const deleteBtn = document.querySelector('.account-delete-btn');
@@ -372,7 +357,6 @@ if (logoutBtn) {
   const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-  // Открыть модальное окно
   if (deleteBtn) {
       deleteBtn.addEventListener('click', function() {
           if (deleteModal) {
@@ -383,7 +367,6 @@ if (logoutBtn) {
       });
   }
 
-  // Закрыть модальное окно
   function closeDeleteModalWindow() {
       if (deleteModal) {
           deleteModal.classList.remove('open');
@@ -400,7 +383,6 @@ if (logoutBtn) {
       cancelDeleteBtn.addEventListener('click', closeDeleteModalWindow);
   }
 
-  // Клик по оверлею
   if (deleteModal) {
       deleteModal.addEventListener('click', function(e) {
           if (e.target === deleteModal) {
@@ -409,13 +391,11 @@ if (logoutBtn) {
       });
   }
 
-  // Подтверждение удаления
   if (confirmDeleteBtn) {
       confirmDeleteBtn.addEventListener('click', async function() {
           const token = localStorage.getItem('token');
           if (!token) return;
           
-          // Блокируем кнопки
           confirmDeleteBtn.disabled = true;
           confirmDeleteBtn.textContent = 'Удаление...';
           cancelDeleteBtn.disabled = true;
@@ -427,10 +407,8 @@ if (logoutBtn) {
               });
               
               if (response.ok) {
-                  // Очищаем всё
                   localStorage.clear();
                   
-                  // Обновляем иконку в хедере
                   const headerIcon = document.querySelector('#accountIcon img');
                   if (headerIcon) {
                       headerIcon.src = 'pictures/profile.png';
@@ -459,21 +437,23 @@ if (logoutBtn) {
       });
   }
 
-  // Закрытие по ESC
   document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && deleteModal && deleteModal.classList.contains('open')) {
           closeDeleteModalWindow();
       }
   });
 
-  // Загружаем профиль при открытии
-  loadProfile();
-
+  // ========================
+  // ЗАГРУЗКА ЗАКАЗОВ
+  // ========================
   loadOrders();
-});
+  
+}); // КОНЕЦ DOMContentLoaded
+
 // ========================
-// ЗАГРУЗКА ЗАКАЗОВ
+// ВСЕ ФУНКЦИИ ЗАКАЗОВ (ГЛОБАЛЬНЫЕ)
 // ========================
+
 async function loadOrders() {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -489,6 +469,7 @@ async function loadOrders() {
         }
         
         const data = await response.json();
+        window._allOrders = data.orders;
         renderOrders(data.orders);
         
     } catch (error) {
@@ -500,7 +481,6 @@ function renderOrders(orders) {
     const container = document.getElementById('panel-orders');
     if (!container) return;
     
-    // Если нет заказов
     if (!orders || orders.length === 0) {
         container.innerHTML = `
             <div class="account-card" style="text-align:center;padding:40px;">
@@ -511,23 +491,30 @@ function renderOrders(orders) {
         return;
     }
     
-    // Статусы и их стили
     const statusMap = {
-        'processing': { text: 'В обработке', class: 'processing' },
-        'in-transit': { text: 'В пути', class: 'in-transit' },
-        'delivered': { text: 'Доставлен', class: 'delivered' },
-        'cancelled': { text: 'Отменён', class: 'cancelled' }
+        'NEW': { text: 'Новый', class: 'new' },
+        'PROCESSING': { text: 'Собирается', class: 'processing' },
+        'READY_FOR_PICKUP': { text: 'Готов к выдаче', class: 'ready-pickup' },
+        'SHIPPED': { text: 'В пути', class: 'shipped' },
+        'DELIVERED': { text: 'Доставлен', class: 'delivered' },
+        'CANCELLED': { text: 'Отменён', class: 'cancelled' },
+        'REFUNDED': { text: 'Возврат', class: 'cancelled' }
     };
     
-    // Методы доставки
+    const paymentMap = {
+        'UNPAID': 'Не оплачен',
+        'PAID': 'Оплачен',
+        'REFUND_PENDING': 'Ожидает возврата',
+        'REFUNDED': 'Возвращён'
+    };
+    
     const deliveryMap = {
         'pickup': 'Самовывоз',
         'courier': 'Курьером',
         'post': 'Почтой'
     };
     
-    // Методы оплаты
-    const paymentMap = {
+    const paymentMethodMap = {
         'card': 'Картой онлайн',
         'cash': 'Наличными',
         'erip': 'ЕРИП'
@@ -539,7 +526,44 @@ function renderOrders(orders) {
         const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
         const dateStr = `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
         
-        // Товары в заказе
+        let actionsHtml = '';
+        let hintHtml = '';
+        
+        const canEdit = order.status === 'NEW' && order.payment_status === 'UNPAID';
+        const canCancel = order.status === 'NEW';
+        
+        if (canEdit) {
+            actionsHtml = `
+                <button class="order-edit-btn" onclick="openEditOrderModal(${order.id})" 
+                        style="background:#337B57;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                    Изменить заказ
+                </button>
+                <button class="order-cancel-btn" onclick="cancelOrder(${order.id})" 
+                        style="background:#6B3A3A;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                    Отменить заказ
+                </button>`;
+            hintHtml = '<p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Вы можете изменить или отменить заказ</p>';
+        } else if (canCancel) {
+            actionsHtml = `
+                <button class="order-cancel-btn" onclick="cancelOrder(${order.id})" 
+                        style="background:#6B3A3A;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                    Отменить заказ
+                </button>`;
+            hintHtml = '<p style="font-size:12px;color:#f4a742;margin-top:6px;">Заказ оплачен. Для изменения свяжитесь с поддержкой. Отменить можно.</p>';
+        } else if (order.status === 'PROCESSING') {
+            hintHtml = '<p style="font-size:12px;color:#f4a742;margin-top:6px;">Заказ собирается. Для изменений свяжитесь с поддержкой</p>';
+        } else if (order.status === 'READY_FOR_PICKUP') {
+            hintHtml = '<p style="font-size:12px;color:#2ecc71;margin-top:6px;">Заказ ждёт вас в магазине!</p>';
+        } else if (order.status === 'SHIPPED') {
+            hintHtml = '<p style="font-size:12px;color:#9b59b6;margin-top:6px;">Заказ в пути</p>';
+        } else if (order.status === 'DELIVERED') {
+            hintHtml = '<p style="font-size:12px;color:#27ae60;margin-top:6px;">Заказ доставлен</p>';
+} else if (order.status === 'CANCELLED') {
+    hintHtml = '<p style="font-size:12px;color:#e74c3c;margin-top:6px;">Заказ отменён</p>';
+} else if (order.status === 'REFUNDED') {
+    hintHtml = '<p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Деньги возвращены</p>';
+}
+        
         const itemsHtml = order.items.map(item => {
             const imgSrc = item.product_image || 'pictures/placeholder.jpg';
             return `
@@ -550,8 +574,7 @@ function renderOrders(orders) {
                     <span class="order-item-qty">× ${item.quantity}</span>
                 </div>
                 <span class="order-item-price">${item.total} Br</span>
-            </div>
-            `;
+            </div>`;
         }).join('');
         
         return `
@@ -561,25 +584,198 @@ function renderOrders(orders) {
                 <span class="order-date">${dateStr}</span>
                 <span class="order-status ${status.class}">${status.text}</span>
             </div>
-            <div style="display:flex;gap:20px;margin-bottom:12px;font-size:13px;color:rgba(255,255,255,0.5);">
+            <div style="display:flex;gap:20px;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.5);">
                 <span>🚚 ${deliveryMap[order.delivery_method] || order.delivery_method}</span>
-                <span>💳 ${paymentMap[order.payment_method] || order.payment_method}</span>
+                <span>💳 ${paymentMethodMap[order.payment_method] || order.payment_method}</span>
+                <span>💰 ${paymentMap[order.payment_status] || order.payment_status}</span>
             </div>
-            <div class="order-items">
-                ${itemsHtml}
-            </div>
+            <div class="order-items">${itemsHtml}</div>
             <div class="order-footer">
                 <span class="order-total">Итого: ${order.total} Br</span>
-                <button class="order-repeat-btn" onclick="repeatOrder('${order.order_number}')">Повторить заказ</button>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    ${actionsHtml}
+                </div>
             </div>
-        </div>
-        `;
+            ${hintHtml}
+        </div>`;
     }).join('');
 }
+
+// ========================
+// РЕДАКТИРОВАНИЕ ЗАКАЗА
+// ========================
+let currentEditOrderId = null;
+let currentEditOrderItems = [];
+
+window.openEditOrderModal = function(orderId) {
+    const order = (window._allOrders || []).find(o => o.id === orderId);
+    if (!order) return;
+    
+    currentEditOrderId = orderId;
+    currentEditOrderItems = JSON.parse(JSON.stringify(order.items));
+    
+    document.getElementById('editOrderNumber').textContent = '№' + order.order_number;
+    
+    const itemsContainer = document.getElementById('editOrderItems');
+    itemsContainer.innerHTML = order.items.map((item, index) => {
+        const imgSrc = item.product_image || 'pictures/placeholder.jpg';
+        return `
+        <div class="order-item" style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);" data-index="${index}">
+            <img src="${imgSrc}" alt="${item.product_name}" class="order-item-img" style="width:60px;height:60px;">
+            <div class="order-item-info" style="flex:1;">
+                <span class="order-item-name">${item.product_name}</span>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                    <div class="cart-item-qty" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border-radius:100px;padding:2px 4px;">
+                        <button class="cart-qty-btn" onclick="changeEditQty(${index}, -1)">−</button>
+                        <span class="cart-qty-value">${item.quantity}</span>
+                        <button class="cart-qty-btn" onclick="changeEditQty(${index}, 1)">+</button>
+                    </div>
+                    <span style="color:rgba(255,255,255,0.5);font-size:13px;">× ${item.price} Br</span>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                <span class="order-item-price" style="font-weight:600;">${item.total} Br</span>
+                <button onclick="removeEditItem(${index})" 
+                        style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;">Удалить</button>
+            </div>
+        </div>`;
+    }).join('');
+    
+    updateEditTotal();
+    document.getElementById('editOrderModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeEditOrderModal = function() {
+    document.getElementById('editOrderModal').style.display = 'none';
+    document.body.style.overflow = '';
+    currentEditOrderId = null;
+    currentEditOrderItems = [];
+};
+
+window.changeEditQty = function(index, delta) {
+    let newQty = currentEditOrderItems[index].quantity + delta;
+    if (newQty < 1) newQty = 1;
+    
+    currentEditOrderItems[index].quantity = newQty;
+    currentEditOrderItems[index].total = (currentEditOrderItems[index].price * newQty).toFixed(2);
+    
+    const itemEl = document.querySelector(`#editOrderItems .order-item[data-index="${index}"]`);
+    if (itemEl) {
+        itemEl.querySelector('.cart-qty-value').textContent = newQty;
+        itemEl.querySelector('.order-item-price').textContent = currentEditOrderItems[index].total + ' Br';
+    }
+    
+    updateEditTotal();
+};
+
+window.removeEditItem = function(index) {
+    if (!confirm('Удалить товар из заказа?')) return;
+    
+    currentEditOrderItems.splice(index, 1);
+    
+    if (currentEditOrderItems.length === 0) {
+        alert('Нельзя удалить все товары. Отмените заказ полностью.');
+        closeEditOrderModal();
+        return;
+    }
+    
+    const itemsContainer = document.getElementById('editOrderItems');
+    itemsContainer.innerHTML = currentEditOrderItems.map((item, i) => {
+        const imgSrc = item.product_image || 'pictures/placeholder.jpg';
+        return `
+        <div class="order-item" style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);" data-index="${i}">
+            <img src="${imgSrc}" alt="${item.product_name}" class="order-item-img" style="width:60px;height:60px;">
+            <div class="order-item-info" style="flex:1;">
+                <span class="order-item-name">${item.product_name}</span>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                    <div class="cart-item-qty" style="display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border-radius:100px;padding:2px 4px;">
+                        <button class="cart-qty-btn" onclick="changeEditQty(${i}, -1)">−</button>
+                        <span class="cart-qty-value">${item.quantity}</span>
+                        <button class="cart-qty-btn" onclick="changeEditQty(${i}, 1)">+</button>
+                    </div>
+                    <span style="color:rgba(255,255,255,0.5);font-size:13px;">× ${item.price} Br</span>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                <span class="order-item-price" style="font-weight:600;">${item.total} Br</span>
+                <button onclick="removeEditItem(${i})" 
+                        style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;">Удалить</button>
+            </div>
+        </div>`;
+    }).join('');
+    
+    updateEditTotal();
+};
+
+function updateEditTotal() {
+    const total = currentEditOrderItems.reduce((sum, item) => sum + parseFloat(item.total), 0);
+    document.getElementById('editOrderTotal').textContent = total.toFixed(2);
+}
+
+window.saveEditedOrder = async function() {
+    const token = localStorage.getItem('token');
+    
+    for (const item of currentEditOrderItems) {
+        const res = await fetch(`/api/orders/${currentEditOrderId}/items/${item.product_id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ quantity: item.quantity })
+        });
+        
+        if (!res.ok) {
+            const err = await res.json();
+            alert('Ошибка: ' + (err.error || 'Не удалось сохранить'));
+            return;
+        }
+    }
+    
+    closeEditOrderModal();
+    alert('Заказ обновлён!');
+    loadOrders();
+};
+
+// Закрытие по клику на оверлей
+document.getElementById('editOrderModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeEditOrderModal();
+});
+
+// Закрытие по ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('editOrderModal')?.style.display === 'flex') {
+        closeEditOrderModal();
+    }
+});
+
+// ========================
+// ОТМЕНА ЗАКАЗА
+// ========================
+window.cancelOrder = async function(orderId) {
+    if (!confirm('Вы уверены, что хотите отменить заказ?')) return;
+    
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch(`/api/orders/${orderId}/cancel`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            alert('Заказ отменён. ' + (data.refund ? 'Ожидайте возврат денег.' : ''));
+            loadOrders();
+        } else {
+            alert(data.error || 'Ошибка отмены');
+        }
+    } catch(e) {
+        alert('Ошибка соединения');
+    }
+};
 
 // Повторить заказ
 window.repeatOrder = async function(orderNumber) {
     alert('Функция повтора заказа будет добавлена позже');
 };
-
-loadOrders();

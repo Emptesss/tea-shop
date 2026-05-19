@@ -1413,18 +1413,18 @@ if (retries === 0) {
     throw new Error('Не удалось сгенерировать уникальный номер заказа');
 }
         
-        // Создаём заказ
-        const orderResult = await client.query(
-            `INSERT INTO orders (order_number, user_id, session_id, name, surname, phone, email,
-             delivery_method, delivery_address, payment_method, comment,
-             subtotal, delivery_price, total, status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'processing')
-             RETURNING id, order_number`,
-            [orderNumber, userId, sessionId || null, name, surname, phone, email || null,
-             delivery_method, delivery_address || null, payment_method, comment || null,
-             subtotal, deliveryPrice, total]
-        );
-        
+const initialPaymentStatus = (payment_method === 'card') ? 'PAID' : 'UNPAID';
+
+const orderResult = await client.query(
+    `INSERT INTO orders (order_number, user_id, session_id, name, surname, phone, email,
+     delivery_method, delivery_address, payment_method, comment,
+     subtotal, delivery_price, total, status, payment_status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'NEW', $15)
+     RETURNING id, order_number`,
+    [orderNumber, userId, sessionId || null, name, surname, phone, email || null,
+     delivery_method, delivery_address || null, payment_method, comment || null,
+     subtotal, deliveryPrice, total, initialPaymentStatus]
+);
         const orderId = orderResult.rows[0].id;
         
         // Добавляем товары в заказ
@@ -1470,39 +1470,37 @@ if (retries === 0) {
 });
 
 // Получить заказы пользователя
+// Получить заказы пользователя
 app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
         
         const ordersResult = await pool.query(
-            `SELECT id, order_number, status, total, delivery_method, payment_method, created_at
+            `SELECT id, order_number, status, payment_status, total, 
+                    delivery_method, payment_method, created_at
              FROM orders
              WHERE user_id = $1
              ORDER BY created_at DESC`,
             [userId]
         );
         
-        // Получаем товары для каждого заказа
         const orders = [];
         for (const order of ordersResult.rows) {
             const itemsResult = await pool.query(
-                `SELECT product_id, product_name, product_image, price, quantity, total
-                 FROM order_items
-                 WHERE order_id = $1`,
-                [order.id]
-            );
+    `SELECT id, product_id, product_name, product_image, price, quantity, total
+     FROM order_items WHERE order_id = $1`,
+    [order.id]
+);
             order.items = itemsResult.rows;
             orders.push(order);
         }
         
         res.json({ orders });
-        
     } catch (error) {
         console.error('Ошибка получения заказов:', error);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
-
 // ========================
 // API — УДАЛЕНИЕ АККАУНТА
 // ========================
@@ -1842,14 +1840,18 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
             pool.query('SELECT COUNT(*) as count FROM reviews WHERE is_approved = true'),
             
             // Заказы по статусам
-            pool.query(`
-                SELECT 
-                    COUNT(*) FILTER (WHERE status = 'processing') as processing,
-                    COUNT(*) FILTER (WHERE status = 'delivered') as delivered,
-                    COUNT(*) FILTER (WHERE status = 'cancelled') as cancelled,
-                    COUNT(*) FILTER (WHERE status = 'in-transit') as in_transit
-                FROM orders
-            `),
+            // Заказы по статусам
+pool.query(`
+    SELECT 
+        COUNT(*) FILTER (WHERE status = 'NEW') as new,
+        COUNT(*) FILTER (WHERE status = 'PROCESSING') as processing,
+        COUNT(*) FILTER (WHERE status = 'READY_FOR_PICKUP') as ready_pickup,
+        COUNT(*) FILTER (WHERE status = 'SHIPPED') as shipped,
+        COUNT(*) FILTER (WHERE status = 'DELIVERED') as delivered,
+        COUNT(*) FILTER (WHERE status = 'CANCELLED') as cancelled,
+        COUNT(*) FILTER (WHERE status = 'REFUNDED') as refunded
+    FROM orders
+`),
             
             // Топ-3 продаваемых товара
             pool.query(`
@@ -1877,11 +1879,14 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
             reviews: parseInt(reviews.rows[0].count),
             
             ordersByStatus: {
-                processing: parseInt(ordersByStatus.rows[0].processing),
-                delivered: parseInt(ordersByStatus.rows[0].delivered),
-                cancelled: parseInt(ordersByStatus.rows[0].cancelled),
-                inTransit: parseInt(ordersByStatus.rows[0].in_transit)
-            },
+    new: parseInt(ordersByStatus.rows[0].new),
+    processing: parseInt(ordersByStatus.rows[0].processing),
+    readyPickup: parseInt(ordersByStatus.rows[0].ready_pickup),
+    shipped: parseInt(ordersByStatus.rows[0].shipped),
+    delivered: parseInt(ordersByStatus.rows[0].delivered),
+    cancelled: parseInt(ordersByStatus.rows[0].cancelled),
+    refunded: parseInt(ordersByStatus.rows[0].refunded)
+},
             
             topProducts: topProducts.rows,
             bottomProducts: bottomProducts.rows
@@ -1928,13 +1933,85 @@ app.get('/api/admin/orders', authenticateToken, requireAdmin, async (req, res) =
     }
 });
 
-// Обновить статус заказа
+// Обновить статус заказа (админ)
 app.put('/api/admin/orders/:id', authenticateToken, requireAdmin, async (req, res) => {
     try {
         const { status } = req.body;
-        await pool.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', [status, req.params.id]);
-        res.json({ message: 'Статус обновлён' });
-    } catch(e) { res.status(500).json({ error: e.message }); }
+        const orderId = parseInt(req.params.id, 10);
+        
+        if (!status) {
+            return res.status(400).json({ error: 'Укажите статус' });
+        }
+        
+        // Получаем текущий заказ
+        const order = await pool.query(
+            'SELECT payment_method, payment_status, delivery_method, status FROM orders WHERE id = $1',
+            [orderId]
+        );
+        
+        if (order.rows.length === 0) {
+            return res.status(404).json({ error: 'Заказ не найден' });
+        }
+        
+        const currentOrder = order.rows[0];
+        let newPaymentStatus = currentOrder.payment_status;
+        
+        // ✅ Логика: когда меняем payment_status
+        if (status === 'REFUNDED') {
+            // Возврат оформлен
+            newPaymentStatus = 'REFUNDED';
+            
+        } else if (status === 'CANCELLED') {
+            // Отмена заказа
+            if (currentOrder.payment_status === 'PAID') {
+                // Был оплачен → нужен возврат
+                newPaymentStatus = 'REFUND_PENDING';
+            } else {
+                // Не был оплачен → просто отмена
+                newPaymentStatus = 'UNPAID';
+            }
+            
+       } else if (status === 'DELIVERED') {
+    // Заказ доставлен/выдан
+    if (currentOrder.payment_method === 'cash') {
+        // Наличные → оплачен при получении
+        newPaymentStatus = 'PAID';
+    } else {
+        // Карта → уже PAID, не трогаем
+        newPaymentStatus = 'PAID';
+    }
+} else if (status === 'READY_FOR_PICKUP') {
+            // Готов к выдаче — оплату не трогаем
+            // (наличные оплатят при получении, карта уже оплачена)
+            
+        } else if (status === 'SHIPPED') {
+            // Отправлен — оплату не трогаем
+            // (наличные оплатят при получении, карта уже оплачена)
+            
+        } else {
+            // NEW, PROCESSING — оплату не трогаем
+        }
+        
+        // Обновляем заказ
+        await pool.query(
+            `UPDATE orders 
+             SET status = $1, 
+                 payment_status = $2, 
+                 updated_at = NOW() 
+             WHERE id = $3`,
+            [status, newPaymentStatus, orderId]
+        );
+        
+        res.json({ 
+            message: 'Статус обновлён',
+            status: status,
+            payment_status: newPaymentStatus
+        });
+        
+    } catch(e) { 
+        console.error('Ошибка обновления статуса заказа:', e);
+        res.status(500).json({ error: e.message }); 
+    }
 });
 
 // Все пользователи
@@ -2164,6 +2241,248 @@ app.put('/api/products/:id/tastes', authenticateToken, requireAdmin, async (req,
     }
 });
 
+// ✅ 1. Сначала конкретный маршрут — отмена заказа
+// В маршруте PUT /api/orders/:id/cancel
+app.put('/api/orders/:id/cancel', authenticateToken, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const orderId = parseInt(req.params.id);
+        const userId = req.user.id;
+        
+        const orderCheck = await client.query(
+            'SELECT id, status, payment_status FROM orders WHERE id = $1 AND user_id = $2',
+            [orderId, userId]
+        );
+        
+        if (orderCheck.rows.length === 0) return res.status(404).json({ error: 'Заказ не найден' });
+        if (orderCheck.rows[0].status !== 'NEW') {
+            return res.status(400).json({ error: 'Можно отменить только новый заказ. Для отмены свяжитесь с поддержкой.' });
+        }
+        
+        const wasPaid = orderCheck.rows[0].payment_status === 'PAID';
+        
+        await client.query('BEGIN');
+        await client.query(
+            `UPDATE orders 
+             SET status = $1, 
+                 payment_status = CASE WHEN $2 THEN $3 ELSE payment_status END, 
+                 cancel_reason = 'Отменён пользователем',
+                 updated_at = NOW() 
+             WHERE id = $4`,
+            ['CANCELLED', wasPaid, 'REFUND_PENDING', orderId]
+        );
+        await client.query('COMMIT');
+        
+        res.json({ 
+            message: 'Заказ отменён', 
+            status: 'CANCELLED',
+            refund: wasPaid
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// ✅ Изменение товара в заказе
+app.put('/api/orders/:orderId/items/:itemId', authenticateToken, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const orderId = parseInt(req.params.orderId);
+        const productId = parseInt(req.params.itemId);
+        const { quantity } = req.body;
+        const userId = req.user.id;
+        
+        const orderCheck = await client.query(
+            'SELECT id, status FROM orders WHERE id = $1 AND user_id = $2',
+            [orderId, userId]
+        );
+        
+        if (orderCheck.rows.length === 0) return res.status(404).json({ error: 'Заказ не найден' });
+        if (orderCheck.rows[0].status !== 'NEW') return res.status(400).json({ error: 'Можно менять только новый заказ' });
+        
+        if (quantity < 1) {
+            await client.query('DELETE FROM order_items WHERE product_id = $1 AND order_id = $2', [productId, orderId]);
+        } else {
+            await client.query(
+                'UPDATE order_items SET quantity = $1::integer, total = price * $1::integer WHERE product_id = $2 AND order_id = $3',
+                [quantity, productId, orderId]
+            );
+        }
+        
+        // ✅ Получаем обновлённый товар
+        const updatedItem = await client.query(
+            'SELECT product_id, price, quantity, total FROM order_items WHERE product_id = $1 AND order_id = $2',
+            [productId, orderId]
+        );
+        
+        // Пересчитываем сумму заказа
+        const totalResult = await client.query('SELECT COALESCE(SUM(total), 0) as subtotal FROM order_items WHERE order_id = $1', [orderId]);
+        const newSubtotal = parseFloat(totalResult.rows[0].subtotal);
+        const deliveryRow = await client.query('SELECT delivery_price FROM orders WHERE id = $1', [orderId]);
+        const newTotal = newSubtotal + parseFloat(deliveryRow.rows[0].delivery_price);
+        
+        await client.query('UPDATE orders SET subtotal = $1, total = $2, updated_at = NOW() WHERE id = $3', [newSubtotal, newTotal, orderId]);
+        await client.query('COMMIT');
+        
+        // ✅ Возвращаем обновлённый товар и общую сумму
+        res.json({ 
+            message: 'Заказ обновлён', 
+            subtotal: newSubtotal, 
+            total: newTotal,
+            item: updatedItem.rows[0] || null
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// ✅ 3. Удаление товара
+// ✅ Удаление товара из заказа
+app.delete('/api/orders/:orderId/items/:itemId', authenticateToken, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const orderId = parseInt(req.params.orderId);
+        const productId = parseInt(req.params.itemId);  // это product_id!
+        const userId = req.user.id;
+        
+        const orderCheck = await client.query(
+            'SELECT id, status FROM orders WHERE id = $1 AND user_id = $2',
+            [orderId, userId]
+        );
+        
+        if (orderCheck.rows.length === 0) return res.status(404).json({ error: 'Заказ не найден' });
+        if (orderCheck.rows[0].status !== 'NEW') return res.status(400).json({ error: 'Можно менять только новый заказ' });
+        
+        // ✅ Ищем по product_id
+        await client.query('DELETE FROM order_items WHERE product_id = $1 AND order_id = $2', [productId, orderId]);
+        
+        const itemsCheck = await client.query('SELECT COUNT(*) FROM order_items WHERE order_id = $1', [orderId]);
+        if (parseInt(itemsCheck.rows[0].count) === 0) {
+            await client.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', ['CANCELLED', orderId]);
+            return res.json({ message: 'Все товары удалены, заказ отменён', cancelled: true });
+        }
+        
+        const totalResult = await client.query('SELECT COALESCE(SUM(total), 0) as subtotal FROM order_items WHERE order_id = $1', [orderId]);
+        const newSubtotal = parseFloat(totalResult.rows[0].subtotal);
+        const deliveryRow = await client.query('SELECT delivery_price FROM orders WHERE id = $1', [orderId]);
+        const newTotal = newSubtotal + parseFloat(deliveryRow.rows[0].delivery_price);
+        
+        await client.query('UPDATE orders SET subtotal = $1, total = $2, updated_at = NOW() WHERE id = $3', [newSubtotal, newTotal, orderId]);
+        await client.query('COMMIT');
+        res.json({ message: 'Товар удалён', subtotal: newSubtotal, total: newTotal });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// ========================
+// ОТМЕНА ЗАКАЗА АДМИНОМ (с причиной и расчётом возврата)
+// ========================
+app.put('/api/admin/orders/:id/cancel', authenticateToken, requireAdmin, async (req, res) => {
+    const client = await pool.connect();
+    try {
+        const orderId = parseInt(req.params.id);
+        const { reason } = req.body;
+        
+        if (!reason || !reason.trim()) {
+            return res.status(400).json({ error: 'Укажите причину отмены' });
+        }
+        
+        // Получаем полную информацию о заказе
+        const orderCheck = await client.query(
+            `SELECT id, status, payment_status, payment_method, delivery_method, 
+                    subtotal, delivery_price, total 
+             FROM orders WHERE id = $1`,
+            [orderId]
+        );
+        
+        if (orderCheck.rows.length === 0) {
+            return res.status(404).json({ error: 'Заказ не найден' });
+        }
+        
+        const order = orderCheck.rows[0];
+        
+        // Нельзя отменить уже доставленный
+        if (order.status === 'DELIVERED') {
+            return res.status(400).json({ error: 'Нельзя отменить доставленный заказ' });
+        }
+        
+        // ✅ Рассчитываем сумму возврата
+        let refundAmount = 0;
+        let newPaymentStatus = 'UNPAID';
+        
+        if (order.payment_method === 'card') {
+            // Карта — всегда был оплачен полностью
+            if (order.status === 'SHIPPED') {
+                // В пути — возвращаем только товар, доставка не возвращается
+                refundAmount = parseFloat(order.subtotal);
+            } else {
+                // NEW или PROCESSING — возвращаем всё
+                refundAmount = parseFloat(order.total);
+            }
+            newPaymentStatus = 'REFUND_PENDING';
+            
+        } else if (order.payment_method === 'cash') {
+            // Наличные
+            if (order.delivery_method === 'pickup') {
+                // Самовывоз — ничего не платил
+                refundAmount = 0;
+                newPaymentStatus = 'UNPAID';
+            } else {
+                // Курьер или почта — была предоплата доставки
+                if (order.status === 'SHIPPED') {
+                    // В пути — предоплата не возвращается
+                    refundAmount = 0;
+                    newPaymentStatus = 'UNPAID';
+                } else {
+                    // NEW или PROCESSING — возвращаем предоплату
+                    refundAmount = parseFloat(order.delivery_price);
+                    newPaymentStatus = 'REFUND_PENDING';
+                }
+            }
+        }
+        
+        await client.query('BEGIN');
+        
+        await client.query(
+            `UPDATE orders 
+             SET status = 'CANCELLED', 
+                 payment_status = $1, 
+                 cancel_reason = $2,
+                 updated_at = NOW() 
+             WHERE id = $3`,
+            [newPaymentStatus, reason.trim(), orderId]
+        );
+        
+        await client.query('COMMIT');
+        
+        res.json({ 
+            message: 'Заказ отменён администратором',
+            status: 'CANCELLED',
+            payment_status: newPaymentStatus,
+            refund_amount: refundAmount,
+            refund_description: refundAmount > 0 
+                ? `К возврату: ${refundAmount.toFixed(2)} Br` 
+                : 'Возврат не требуется'
+        });
+        
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Ошибка отмены заказа админом:', error);
+        res.status(500).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
 // ========================
 // ЗАПУСК СЕРВЕРА
 // ========================

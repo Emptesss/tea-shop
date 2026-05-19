@@ -121,25 +121,33 @@ async function loadDashboard() {
         `;
         
         // Статистика по статусам заказов
-        const os = stats.ordersByStatus || {};
-        document.getElementById('ordersStatusStats').innerHTML = `
-            <div class="stat-card" style="border-left: 4px solid #f4a742;">
-                <div class="stat-value" style="color: #f4a742;">${os.processing || 0}</div>
-                <div class="stat-label">В обработке</div>
-            </div>
-            <div class="stat-card" style="border-left: 4px solid #3498db;">
-                <div class="stat-value" style="color: #3498db;">${os.inTransit || 0}</div>
-                <div class="stat-label">В пути</div>
-            </div>
-            <div class="stat-card" style="border-left: 4px solid #27ae60;">
-                <div class="stat-value" style="color: #27ae60;">${os.delivered || 0}</div>
-                <div class="stat-label">Доставлено</div>
-            </div>
-            <div class="stat-card" style="border-left: 4px solid #e74c3c;">
-                <div class="stat-value" style="color: #e74c3c;">${os.cancelled || 0}</div>
-                <div class="stat-label">Отменено</div>
-            </div>
-        `;
+const os = stats.ordersByStatus || {};
+document.getElementById('ordersStatusStats').innerHTML = `
+    <div class="stat-card" style="border-left: 4px solid #3498db;">
+        <div class="stat-value" style="color: #3498db;">${os.new || 0}</div>
+        <div class="stat-label">Новые</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #f4a742;">
+        <div class="stat-value" style="color: #f4a742;">${os.processing || 0}</div>
+        <div class="stat-label">Собираются</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #2ecc71;">
+        <div class="stat-value" style="color: #2ecc71;">${os.readyPickup || 0}</div>
+        <div class="stat-label">Готовы к выдаче</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #9b59b6;">
+        <div class="stat-value" style="color: #9b59b6;">${os.shipped || 0}</div>
+        <div class="stat-label">В пути</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #27ae60;">
+        <div class="stat-value" style="color: #27ae60;">${os.delivered || 0}</div>
+        <div class="stat-label">Доставлены</div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+        <div class="stat-value" style="color: #e74c3c;">${os.cancelled || 0}</div>
+        <div class="stat-label">Отменены</div>
+    </div>
+`;
         
         // Топ продаваемых товаров
         const topProducts = stats.topProducts || [];
@@ -194,7 +202,15 @@ async function loadDashboard() {
         `;
         
         // Последние заказы
-        const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
+        const statusMap = { 
+    'NEW': 'Новый', 
+    'PROCESSING': 'Собирается', 
+    'READY_FOR_PICKUP': 'Готов к выдаче',
+    'SHIPPED': 'В пути', 
+    'DELIVERED': 'Доставлен', 
+    'CANCELLED': 'Отменён',
+    'REFUNDED': 'Возврат'
+};
         const orders = ordersRes.orders || [];
         document.getElementById('recentOrdersTable').innerHTML = `
             <div class="section-title" style="margin-top:24px;">Последние заказы</div>
@@ -215,7 +231,14 @@ async function loadProducts() {
     const products = data.products || [];
     
     document.getElementById('productsTable').innerHTML = `
-        <table><thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена</th><th>В наличии</th><th></th></tr></thead><tbody>
+        <table id="productsTable"><thead><tr>
+    <th class="sortable-header" onclick="sortTable('productsTable', 0, 'number')">ID <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('productsTable', 1, 'string')">Название <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('productsTable', 2, 'string')">Категория <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('productsTable', 3, 'number')">Цена <span class="sort-indicator">↕</span></th>
+    <th>В наличии</th>
+    <th></th>
+</tr></thead><tbody>
         ${products.map(p => `
             <tr>
                 <td>${p.id}</td><td>${p.name}</td><td>${p.category_name || ''}</td><td>${p.price} Br</td>
@@ -468,25 +491,151 @@ async function deleteProduct(id) {
 }
 
 
+
 // ======================== ЗАКАЗЫ ========================
-// ======================== ЗАКАЗЫ ========================
+// Текущий фильтр заказов
+let currentOrderFilter = 'all';
+
 async function loadOrders() {
     const data = await api('/api/admin/orders?limit=50');
     const orders = data.orders || [];
-    const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
+    const statusMap = { 
+        'NEW': 'Новый', 
+        'PROCESSING': 'Собирается', 
+        'READY_FOR_PICKUP': 'Готов к выдаче',
+        'SHIPPED': 'В пути', 
+        'DELIVERED': 'Доставлен', 
+        'CANCELLED': 'Отменён',
+        'REFUNDED': 'Возврат'
+    };
     const deliveryMap = { pickup: 'Самовывоз', courier: 'Курьером', post: 'Почтой' };
-    const paymentMap = { card: 'Картой', cash: 'Наличными', erip: 'ЕРИП' };
+    const paymentMap = { card: 'Картой', cash: 'Наличными' };
+    const paymentStatusMap = {
+        'UNPAID': 'Не оплачен',
+        'PAID': 'Оплачен',
+        'REFUND_PENDING': '⚠️ Ожидает возврат',
+        'REFUNDED': '✅ Возвращён'
+    };
     
-    // Сохраняем заказы для использования в модальном окне
+    // Сохраняем все заказы
     window.allOrders = orders;
     
+    // Подсчёты для фильтров
+    const counts = {
+        all: orders.length,
+        new: orders.filter(o => o.status === 'NEW').length,
+        processing: orders.filter(o => o.status === 'PROCESSING').length,
+        ready: orders.filter(o => o.status === 'READY_FOR_PICKUP').length,
+        shipped: orders.filter(o => o.status === 'SHIPPED').length,
+        delivered: orders.filter(o => o.status === 'DELIVERED').length,
+        cancelled: orders.filter(o => o.status === 'CANCELLED').length,
+        refunded: orders.filter(o => o.status === 'REFUNDED').length,
+        paid: orders.filter(o => o.payment_status === 'PAID').length,
+        unpaid: orders.filter(o => o.payment_status === 'UNPAID').length,
+        refundPending: orders.filter(o => o.payment_status === 'REFUND_PENDING').length,
+    };
+    
+    // Фильтруем заказы
+    let filteredOrders = orders;
+    switch (currentOrderFilter) {
+        case 'new': filteredOrders = orders.filter(o => o.status === 'NEW'); break;
+        case 'processing': filteredOrders = orders.filter(o => o.status === 'PROCESSING'); break;
+        case 'ready': filteredOrders = orders.filter(o => o.status === 'READY_FOR_PICKUP'); break;
+        case 'shipped': filteredOrders = orders.filter(o => o.status === 'SHIPPED'); break;
+        case 'delivered': filteredOrders = orders.filter(o => o.status === 'DELIVERED'); break;
+        case 'cancelled': filteredOrders = orders.filter(o => o.status === 'CANCELLED'); break;
+        case 'refunded': filteredOrders = orders.filter(o => o.status === 'REFUNDED'); break;
+        case 'paid': filteredOrders = orders.filter(o => o.payment_status === 'PAID'); break;
+        case 'unpaid': filteredOrders = orders.filter(o => o.payment_status === 'UNPAID'); break;
+        case 'refund_pending': filteredOrders = orders.filter(o => o.payment_status === 'REFUND_PENDING'); break;
+    }
+    
+    // Считаем количество требующих возврата (для предупреждения)
+    const refundPendingCount = orders.filter(o => o.payment_status === 'REFUND_PENDING').length;
+    
     document.getElementById('ordersTable').innerHTML = `
-        <table><thead><tr>
-            <th>Номер</th><th>Клиент</th><th>Телефон</th><th>Доставка</th><th>Сумма</th><th>Статус</th><th>Дата</th><th></th>
+        ${refundPendingCount > 0 ? `
+        <div style="
+            background: rgba(255, 60, 60, 0.1);
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        ">
+            <span style="font-size:20px;">⚠️</span>
+            <div>
+                <strong style="color:#ff4444;">Требуется возврат денег:</strong>
+                <span style="color:rgba(255,255,255,0.8);">${refundPendingCount} заказ(ов) ожидают возврата</span>
+            </div>
+        </div>
+        ` : ''}
+        
+        <!-- ФИЛЬТРЫ -->
+        <div class="orders-filters">
+            <button class="filter-chip ${currentOrderFilter === 'all' ? 'active' : ''}" onclick="setOrderFilter('all')">
+                Все<span class="count">${counts.all}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'new' ? 'active' : ''}" onclick="setOrderFilter('new')">
+                Новые<span class="count">${counts.new}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'processing' ? 'active' : ''}" onclick="setOrderFilter('processing')">
+                Собираются<span class="count">${counts.processing}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'ready' ? 'active' : ''}" onclick="setOrderFilter('ready')">
+                Готовы<span class="count">${counts.ready}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'shipped' ? 'active' : ''}" onclick="setOrderFilter('shipped')">
+                В пути<span class="count">${counts.shipped}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'delivered' ? 'active' : ''}" onclick="setOrderFilter('delivered')">
+                Доставлены<span class="count">${counts.delivered}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'cancelled' ? 'active' : ''}" onclick="setOrderFilter('cancelled')">
+                Отменены<span class="count">${counts.cancelled}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'refunded' ? 'active' : ''}" onclick="setOrderFilter('refunded')">
+                Возвраты<span class="count">${counts.refunded}</span>
+            </button>
+            <span style="color:var(--border);margin:0 4px;">|</span>
+            <button class="filter-chip ${currentOrderFilter === 'paid' ? 'active' : ''}" onclick="setOrderFilter('paid')" style="border-color:rgba(51,123,87,0.3);">
+                Оплачены<span class="count">${counts.paid}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'unpaid' ? 'active' : ''}" onclick="setOrderFilter('unpaid')" style="border-color:rgba(255,255,255,0.15);">
+                Не оплачены<span class="count">${counts.unpaid}</span>
+            </button>
+            <button class="filter-chip ${currentOrderFilter === 'refund_pending' ? 'active' : ''}" onclick="setOrderFilter('refund_pending')" style="border-color:rgba(255,60,60,0.3);">
+                Требуют возврата<span class="count" style="background:rgba(255,60,60,0.3);">${counts.refundPending}</span>
+            </button>
+        </div>
+        
+        ${filteredOrders.length === 0 ? `
+        <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);">
+            Нет заказов по выбранному фильтру
+        </div>
+        ` : `
+        <table id="ordersTableInner"><thead><tr>
+            <th class="sortable-header" onclick="sortTable('ordersTableInner', 0, 'string')">Номер <span class="sort-indicator">↕</span></th>
+            <th class="sortable-header" onclick="sortTable('ordersTableInner', 1, 'string')">Клиент <span class="sort-indicator">↕</span></th>
+            <th>Телефон</th>
+            <th>Доставка</th>
+            <th class="sortable-header" onclick="sortTable('ordersTableInner', 4, 'number')">Сумма <span class="sort-indicator">↕</span></th>
+            <th class="sortable-header" onclick="sortTable('ordersTableInner', 5, 'status')">Статус <span class="sort-indicator">↕</span></th>
+            <th>Оплата</th>
+            <th class="sortable-header" onclick="sortTable('ordersTableInner', 7, 'date')">Дата <span class="sort-indicator">↕</span></th>
+            <th></th>
         </tr></thead><tbody>
-        ${orders.map(o => `
-            <tr>
-                <td><strong>${o.order_number}</strong></td>
+        ${filteredOrders.map(o => {
+            const needsRefund = o.payment_status === 'REFUND_PENDING';
+            
+            return `
+            <tr class="${needsRefund ? 'refund-pending' : ''}">
+                <td>
+                    <strong>${o.order_number}</strong>
+                    ${needsRefund ? `<span class="refund-alert">💸 Требуется возврат</span>` : ''}
+                </td>
                 <td>${o.name} ${o.surname}</td>
                 <td>${o.phone}</td>
                 <td>${deliveryMap[o.delivery_method] || o.delivery_method}</td>
@@ -496,27 +645,111 @@ async function loadOrders() {
                         ${Object.entries(statusMap).map(([k,v]) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${v}</option>`).join('')}
                     </select>
                 </td>
+                <td>
+                    <span style="
+                        font-size:12px;
+                        font-weight:600;
+                        color: ${o.payment_status === 'REFUND_PENDING' ? '#ff4444' : 
+                                o.payment_status === 'REFUNDED' ? '#27ae60' : 
+                                o.payment_status === 'PAID' ? '#337B57' : 
+                                'rgba(255,255,255,0.5)'};
+                    ">
+                        ${paymentStatusMap[o.payment_status] || o.payment_status}
+                    </span>
+                </td>
                 <td>${new Date(o.created_at).toLocaleDateString('ru-RU')}</td>
                 <td>
                     <button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})">
                         Подробнее
                     </button>
+                    ${o.status === 'NEW' || o.status === 'PROCESSING' ? `
+                    <button class="btn btn-sm btn-danger" onclick="openCancelOrderModal(${o.id})" style="margin-left:4px;">
+                        Отменить
+                    </button>
+                    ` : ''}
                 </td>
             </tr>
-        `).join('')}
-        </tbody></table>`;
+            `;
+        }).join('')}
+        </tbody></table>
+        `}
+    `;
 }
 
+// Функция установки фильтра
+function setOrderFilter(filter) {
+    currentOrderFilter = filter;
+    loadOrders();
+}
 // Показать детали заказа
 function showOrderDetail(orderId) {
     const order = (window.allOrders || []).find(o => o.id === orderId);
     if (!order) return;
     
-    const statusMap = { processing: 'В обработке', delivered: 'Доставлен', cancelled: 'Отменён', 'in-transit': 'В пути' };
+    const statusMap = { 
+        'NEW': 'Новый', 
+        'PROCESSING': 'Собирается', 
+        'READY_FOR_PICKUP': 'Готов к выдаче',
+        'SHIPPED': 'В пути', 
+        'DELIVERED': 'Доставлен', 
+        'CANCELLED': 'Отменён',
+        'REFUNDED': 'Возврат'  
+    };
     const deliveryMap = { pickup: 'Самовывоз', courier: 'Курьером', post: 'Почтой' };
-    const paymentMap = { card: 'Банковской картой', cash: 'Наличными', erip: 'Через ЕРИП' };
+   const paymentMap = { card: 'Банковской картой', cash: 'Наличными' };
+    const paymentStatusMap = {
+        'UNPAID': 'Не оплачен',
+        'PAID': 'Оплачен',
+        'REFUND_PENDING': '⚠️ Ожидает возврат',
+        'REFUNDED': '✅ Возвращён'
+    };
+    
+    const needsRefund = order.payment_status === 'REFUND_PENDING';
     
     document.getElementById('orderDetailContent').innerHTML = `
+        ${needsRefund ? `
+        <div style="
+            background: rgba(255, 60, 60, 0.1);
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        ">
+            <span style="font-size:24px;">⚠️</span>
+            <div>
+                <strong style="color:#ff4444;font-size:16px;">Требуется возврат денег!</strong>
+                <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:14px;">
+                    Заказ отменён, оплата ${paymentMap[order.payment_method] || order.payment_method}.<br>
+                    Сумма к возврату: <strong style="color:#ff4444;">${order.total} Br</strong>
+                </p>
+            </div>
+        </div>
+        ` : ''}
+        
+        ${order.payment_status === 'REFUNDED' ? `
+        <div style="
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        ">
+            <span style="font-size:24px;">✅</span>
+            <div>
+                <strong style="color:#27ae60;font-size:16px;">Возврат оформлен</strong>
+                <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:14px;">
+                    Сумма ${order.total} Br возвращена клиенту
+                </p>
+            </div>
+        </div>
+        ` : ''}
+        
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
             <div>
                 <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Номер заказа</div>
@@ -524,7 +757,21 @@ function showOrderDetail(orderId) {
             </div>
             <div>
                 <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Статус</div>
-                <span class="badge badge-${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}">${statusMap[order.status] || order.status}</span>
+                <span class="badge badge-${order.status === 'DELIVERED' ? 'success' : order.status === 'CANCELLED' ? 'danger' : order.status === 'REFUNDED' ? 'danger' : 'warning'}">${statusMap[order.status] || order.status}</span>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Оплата</div>
+                <span style="
+                    font-weight:600;
+                    color: ${order.payment_status === 'REFUND_PENDING' ? '#ff4444' : 
+                            order.payment_status === 'REFUNDED' ? '#27ae60' : 
+                            order.payment_status === 'PAID' ? '#337B57' : 
+                            'rgba(255,255,255,0.7)'};
+                ">${paymentStatusMap[order.payment_status] || order.payment_status}</span>
+            </div>
+            <div>
+                <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Способ оплаты</div>
+                <div>${paymentMap[order.payment_method] || order.payment_method}</div>
             </div>
             <div>
                 <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Дата</div>
@@ -535,7 +782,43 @@ function showOrderDetail(orderId) {
                 <div style="font-weight:600;color:var(--accent);">${order.total} Br</div>
             </div>
         </div>
-        
+
+${order.cancel_reason ? `
+<div style="
+    background: rgba(255, 60, 60, 0.08);
+    border: 1px solid rgba(255, 60, 60, 0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+">
+    <div style="color:#ff6b6b;font-size:12px;margin-bottom:4px;">Причина отмены:</div>
+    <div style="color:rgba(255,255,255,0.85);font-size:14px;">${order.cancel_reason}</div>
+    
+    ${order.payment_status === 'REFUND_PENDING' ? `
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,60,60,0.2);">
+        <div style="color:#ff6b6b;font-size:12px;margin-bottom:4px;">Сумма к возврату:</div>
+        <div style="color:#ff6b6b;font-weight:600;font-size:16px;">
+            ${order.payment_method === 'card' 
+                ? (order.status === 'SHIPPED' ? order.subtotal : order.total)
+                : (order.delivery_method !== 'pickup' ? order.delivery_price : 0)
+            } Br
+        </div>
+        <div style="color:rgba(255,255,255,0.5);font-size:11px;margin-top:4px;">
+            ${order.payment_method === 'card' 
+                ? (order.status === 'SHIPPED' ? 'Только стоимость товара (доставка не возвращается)' : 'Полная стоимость заказа')
+                : (order.delivery_method !== 'pickup' ? 'Предоплата за доставку' : 'Оплата не вносилась')
+            }
+        </div>
+    </div>
+    ` : ''}
+    
+    ${order.payment_status === 'REFUNDED' ? `
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(39,174,96,0.2);">
+        <div style="color:#27ae60;font-size:12px;">✅ Деньги возвращены</div>
+    </div>
+    ` : ''}
+</div>
+` : ''}
         <h3 style="font-size:16px;margin-bottom:12px;">Клиент</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
             <div><span style="color:var(--text-secondary);">Имя:</span> ${order.name} ${order.surname}</div>
@@ -614,7 +897,15 @@ async function loadUsers() {
     const users = data.users || [];
     
     document.getElementById('usersTable').innerHTML = `
-        <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Телефон</th><th>Админ</th><th>Заблокирован</th><th></th></tr></thead><tbody>
+<table id="usersTable"><thead><tr>
+    <th class="sortable-header" onclick="sortTable('usersTable', 0, 'number')">ID <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('usersTable', 1, 'string')">Имя <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('usersTable', 2, 'string')">Email <span class="sort-indicator">↕</span></th>
+    <th>Телефон</th>
+    <th>Админ</th>
+    <th>Заблокирован</th>
+    <th></th>
+</tr></thead><tbody>
         ${users.map(u => `
             <tr>
                 <td>${u.id}</td><td>${u.name || ''}</td><td>${u.email}</td><td>${u.phone || ''}</td>
@@ -645,7 +936,15 @@ async function loadReviews() {
     window.allReviews = reviews;
     
     document.getElementById('reviewsTable').innerHTML = `
-        <table><thead><tr><th>ID</th><th>Автор</th><th>Товар</th><th>Оценка</th><th>Текст</th><th>Одобрен</th><th></th></tr></thead><tbody>
+       <table id="reviewsTable"><thead><tr>
+    <th class="sortable-header" onclick="sortTable('reviewsTable', 0, 'number')">ID <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('reviewsTable', 1, 'string')">Автор <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('reviewsTable', 2, 'string')">Товар <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('reviewsTable', 3, 'number')">Оценка <span class="sort-indicator">↕</span></th>
+    <th>Текст</th>
+    <th>Одобрен</th>
+    <th></th>
+</tr></thead><tbody>
         ${reviews.map(r => `
             <tr>
                 <td>${r.id}</td><td>${r.author_name}</td><td>${r.product_name || ''}</td>
@@ -759,7 +1058,13 @@ async function loadCategories() {
                 table.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">Категорий пока нет. <a href="#" onclick="openCategoryForm()" style="color:var(--accent);">Добавить</a></div>';
             } else {
                 table.innerHTML = `
-                    <table><thead><tr><th>ID</th><th>Название</th><th>Slug</th><th>Порядок</th><th></th></tr></thead><tbody>
+                   <table id="categoriesTable"><thead><tr>
+    <th class="sortable-header" onclick="sortTable('categoriesTable', 0, 'number')">ID <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('categoriesTable', 1, 'string')">Название <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('categoriesTable', 2, 'string')">Slug <span class="sort-indicator">↕</span></th>
+    <th class="sortable-header" onclick="sortTable('categoriesTable', 3, 'number')">Порядок <span class="sort-indicator">↕</span></th>
+    <th></th>
+</tr></thead><tbody>
                     ${categories.map(c => `
                         <tr>
                             <td>${c.id}</td><td>${c.name}</td><td>${c.slug}</td><td>${c.display_order || 0}</td>
@@ -893,4 +1198,218 @@ async function loadTastesForProduct(productId) {
 function getSelectedTasteIds() {
     const checkboxes = document.querySelectorAll('.taste-checkbox:checked');
     return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+// ========================
+// МОДАЛКА ОТМЕНЫ ЗАКАЗА АДМИНОМ
+// ========================
+let cancelOrderId = null;
+
+function openCancelOrderModal(orderId) {
+    cancelOrderId = orderId;
+    const order = (window.allOrders || []).find(o => o.id === orderId);
+    
+    if (order) {
+        document.getElementById('cancelOrderNumber').textContent = '№' + order.order_number;
+        document.getElementById('cancelOrderAmount').textContent = order.total + ' Br';
+    }
+    
+    // Сбрасываем выбор причины
+    document.querySelectorAll('#cancelReasonOptions .cancel-reason-option').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    document.getElementById('cancelReasonCustom').value = '';
+    document.getElementById('cancelReasonCustom').style.display = 'none';
+    
+    document.getElementById('cancelOrderModal').classList.remove('hidden');
+}
+
+function closeCancelOrderModal() {
+    document.getElementById('cancelOrderModal').classList.add('hidden');
+    cancelOrderId = null;
+}
+
+// Выбор причины
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.cancel-reason-option')) {
+        const btn = e.target.closest('.cancel-reason-option');
+        const reason = btn.dataset.reason;
+        
+        // Подсветка выбранной
+        document.querySelectorAll('.cancel-reason-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        
+        // Если "Другое" — показываем поле ввода
+        const customInput = document.getElementById('cancelReasonCustom');
+        if (reason === 'other') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    }
+});
+
+// Подтверждение отмены
+async function confirmCancelOrder() {
+    if (!cancelOrderId) return;
+    
+    // Определяем причину
+    const selectedBtn = document.querySelector('.cancel-reason-option.selected');
+    let reason = '';
+    
+    if (selectedBtn) {
+        if (selectedBtn.dataset.reason === 'other') {
+            reason = document.getElementById('cancelReasonCustom').value.trim();
+            if (!reason) {
+                alert('Укажите причину отмены');
+                return;
+            }
+        } else {
+            reason = selectedBtn.textContent.trim();
+        }
+    } else {
+        reason = document.getElementById('cancelReasonCustom').value.trim();
+        if (!reason) {
+            alert('Выберите причину или укажите свою');
+            return;
+        }
+    }
+    
+    const btn = document.getElementById('confirmCancelBtn');
+    btn.disabled = true;
+    btn.textContent = 'Отмена...';
+    
+    try {
+        const res = await fetch(`/api/admin/orders/${cancelOrderId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ reason })
+        });
+        
+        const data = await res.json();
+        
+        // В confirmCancelOrder(), замени блок if (res.ok):
+if (res.ok) {
+    closeCancelOrderModal();
+    loadOrders();
+    
+    let message = 'Заказ отменён.';
+    if (data.refund_amount > 0) {
+        message += `\n${data.refund_description}`;
+    }
+    alert(message);
+} else {
+    alert(data.error || 'Ошибка отмены');
+}
+    } catch(e) {
+        alert('Ошибка соединения');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Подтвердить отмену';
+    }
+}
+// ========================
+// УНИВЕРСАЛЬНАЯ СОРТИРОВКА ТАБЛИЦ
+// ========================
+
+// Хранилище состояний сортировки для каждой таблицы
+const sortState = {};
+
+/**
+ * Сортирует таблицу по колонке
+ * @param {string} tableId - ID таблицы (без #)
+ * @param {number} colIndex - Индекс колонки (0-based)
+ * @param {string} type - Тип данных: 'string', 'number', 'date', 'status'
+ */
+function sortTable(tableId, colIndex, type = 'string') {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    if (rows.length === 0) return;
+    
+    // Определяем направление
+    const key = `${tableId}_${colIndex}`;
+    if (!sortState[key]) sortState[key] = 'none';
+    
+    if (sortState[key] === 'asc') {
+        sortState[key] = 'desc';
+    } else {
+        sortState[key] = 'asc';
+    }
+    
+    const direction = sortState[key] === 'asc' ? 1 : -1;
+    
+    // Обновляем индикаторы в шапке
+    updateSortIndicators(table, colIndex, sortState[key]);
+    
+    // Сортируем
+    rows.sort((a, b) => {
+        const cellA = a.querySelectorAll('td')[colIndex];
+        const cellB = b.querySelectorAll('td')[colIndex];
+        
+        if (!cellA || !cellB) return 0;
+        
+        let valA = cellA.textContent.trim();
+        let valB = cellB.textContent.trim();
+        
+        if (type === 'number') {
+            valA = parseFloat(valA.replace(/[^0-9.]/g, '')) || 0;
+            valB = parseFloat(valB.replace(/[^0-9.]/g, '')) || 0;
+        } else if (type === 'date') {
+            valA = new Date(valA.split('.').reverse().join('-'));
+            valB = new Date(valB.split('.').reverse().join('-'));
+        } else if (type === 'status') {
+            // Сортировка по значению select
+            const selectA = cellA.querySelector('select');
+            const selectB = cellB.querySelector('select');
+            valA = selectA ? selectA.value : valA;
+            valB = selectB ? selectB.value : valB;
+        }
+        
+        if (valA < valB) return -1 * direction;
+        if (valA > valB) return 1 * direction;
+        return 0;
+    });
+    
+    // Переставляем строки
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+/**
+ * Обновляет стрелки сортировки в шапке таблицы
+ */
+function updateSortIndicators(table, activeCol, direction) {
+    const headers = table.querySelectorAll('th');
+    headers.forEach((th, i) => {
+        th.classList.remove('asc', 'desc');
+        const indicator = th.querySelector('.sort-indicator');
+        if (indicator) {
+            indicator.textContent = '↕';
+        }
+    });
+    
+    const activeHeader = headers[activeCol];
+    if (activeHeader && activeHeader.classList.contains('sortable-header')) {
+        activeHeader.classList.add(direction);
+        const indicator = activeHeader.querySelector('.sort-indicator');
+        if (indicator) {
+            indicator.textContent = direction === 'asc' ? '▲' : '▼';
+        }
+    }
+}
+
+/**
+ * Делает заголовок сортируемым
+ */
+function makeSortable(th, text) {
+    th.classList.add('sortable-header');
+    th.innerHTML = `${text} <span class="sort-indicator">↕</span>`;
 }

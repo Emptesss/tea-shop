@@ -63,6 +63,22 @@ header {
   flex-shrink: 0;
 }
 
+.header-logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+/* Название сайта рядом с логотипом */
+.header-site-name {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--color-accent-green);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
 /* Центральная зона: навигация + соцсети вместе, по центру хедера */
 .header-center {
   flex: 1;
@@ -3824,15 +3840,6 @@ header {
   border-radius: 50%;
 }
 
-/* Иконка чашки (декор) */
-.about-cta-icon {
-  font-size: 40px;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 1;
-  display: block;
-  animation: float 3s ease-in-out infinite;
-}
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
@@ -7661,4 +7668,426 @@ input[type="text"].was-password {
 .journey-marker.animate-visible {
     opacity: 1;
     transform: translateX(-50%) scale(1) !important;
+}
+
+/* Новые статусы */
+.order-status.new { background: #3498db; }
+.order-status.processing { background: #f4a742; }
+.order-status.ready-pickup { background: #2ecc71; }
+.order-status.shipped { background: #9b59b6; }
+.order-status.delivered { background: #27ae60; }
+.order-status.cancelled { background: #e74c3c; }
+
+/* ========================
+   СТРАНИЦА ОПЛАТА И ДОСТАВКА
+   ======================== */
+.delivery-main {
+  width: 100%;
+  padding: 0 var(--page-margin);
+  margin-top: 10px;
+  margin-bottom: 80px;
+}
+
+/* Заголовок */
+.delivery-page-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  color: var(--color-white);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.delivery-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: rgba(255, 255, 255);
+  text-align: center;
+  margin: 0 auto 30px auto;
+  max-width: 800px;
+  line-height: 1.6;
+}
+
+/* ========================
+   СЕКЦИИ
+   ======================== */
+.delivery-section,
+.payment-section {
+  margin-bottom: 40px;
+}
+
+.delivery-section-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  color: var(--color-white);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+
+/* ========================
+   КАРТОЧКИ ДОСТАВКИ (В СТИЛЕ WHY-US)
+   ======================== */
+.delivery-grid {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Карточка */
+.delivery-card-item {
+  width: 320px;
+  text-align: center;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.delivery-card-item:hover {
+  transform: translateY(-8px);
+}
+
+/* Иконка */
+.delivery-card-icon {
+  width: 64px;
+  height: 64px;
+  background: transparent;
+  border-radius: 0%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.delivery-card-icon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* Заголовок */
+.delivery-card-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--color-white);
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Блок с текстом (прямоугольник с обводкой) */
+.delivery-card-box {
+  width: 100%;
+  flex: 1;
+  border-radius: 20px;
+  padding: 3px;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-green) 0%,
+    #5B3E3E 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  transition: box-shadow 0.3s;
+  min-height: 140px;
+}
+
+.delivery-card-item:hover .delivery-card-box {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(51, 123, 87, 0.1);
+}
+
+/* Текст внутри прямоугольника */
+.delivery-card-box-text {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.8) 0%,
+    rgba(9, 21, 15, 0.9) 100%
+  );
+  border-radius: 17px;
+  padding: 24px 20px;
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255);
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  min-height: 134px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Декоративные круги */
+.delivery-card-box-text::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.delivery-card-box-text::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+/* ========================
+   СПОСОБЫ ОПЛАТЫ
+   ======================== */
+.payment-methods {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-method {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background-color: #5b3e3e30;
+  border-radius: 20px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.payment-method:hover {
+  border-color: rgba(51, 123, 87, 0.2);
+}
+
+.payment-method-icon {
+  width:40px;
+  height: 40px;
+  background-color: rgba(51, 123, 87, 0);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.payment-method-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.payment-method-content {
+  flex: 1;
+}
+
+.payment-method-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-accent-green);
+  margin: 0 0 8px 0;
+}
+
+.payment-method-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255, 255, 255);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ========================
+   БЛОК С ВОПРОСОМ (В СТИЛЕ О НАС)
+   ======================== */
+.delivery-faq-cta {
+  text-align: center;
+  max-width: 700px;
+  margin: 30px auto 0 auto;
+}
+
+.delivery-faq-inner {
+  background: linear-gradient(
+    160deg,
+    rgba(31, 77, 46, 0.5) 0%,
+    rgba(9, 21, 15, 0.7) 100%
+  );
+  border-radius: 30px;
+  padding: 50px 45px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Декоративные элементы */
+.delivery-faq-inner::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(
+    circle,
+    rgba(51, 123, 87, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.delivery-faq-inner::after {
+  content: '';
+  position: absolute;
+  bottom: -35px;
+  left: -35px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(91, 62, 62, 0.12) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.delivery-faq-title {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--color-white);
+  margin: 0 0 16px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.delivery-faq-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 auto 30px auto;
+  max-width: 500px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.delivery-faq-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.delivery-faq-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.delivery-faq-btn-primary {
+  background: linear-gradient(to right, #0D2719 0%, #337B57 100%);
+}
+
+.delivery-faq-btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.delivery-faq-btn-secondary {
+  background: #5B3E3E;
+}
+
+.delivery-faq-btn-secondary:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .delivery-faq-inner {
+    padding: 40px 25px;
+  }
+
+  .delivery-faq-title {
+    font-size: 24px;
+  }
+
+  .delivery-faq-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ========================
+   АДАПТИВНОСТЬ
+   ======================== */
+@media (max-width: 900px) {
+  .delivery-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .delivery-card {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .payment-method {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .delivery-page-title {
+    font-size: 32px;
+  }
+
+  .delivery-section-title {
+    font-size: 28px;
+  }
+
+  .delivery-faq-cta {
+    padding: 30px 20px;
+  }
 }
