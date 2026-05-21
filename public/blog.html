@@ -14,17 +14,12 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
- <!-- ========================
-       ХЕДЕР
-       Высота 100px, фон #09150F, фиксированный
-       [Лого] [Навигация + Соцсети по центру] [Действия справа]
-       ======================== -->
   <header>
 
-    <!-- Логотип — круг 64×64. Замените на <img src="logo.png" width="64" height="64" /> -->
-    <div class="header-logo"></div>
-
+    <div class="header-logo-wrapper">
+  <div class="header-logo"></div>
+  <span class="header-site-name">Forest Tea</span>
+</div>
     <!-- Центральная зона: навигация + иконки соцсетей сразу после «Контакты» -->
     <div class="header-center">
 
@@ -37,22 +32,24 @@
         <a href="blog.html">Блог</a>
       </nav>
 
-     <div class="header-socials">
+      <!-- Соцсети 40×40 — вплотную правее пункта «Контакты»
+           Замените SVG на <img src="telegram.png" width="40" height="40" alt="Telegram" /> -->
+      <div class="header-socials">
 
         <!-- Телеграм -->
-       <a href="https://t.me/forestteabel" target="_blank" class="header-icon" title="Telegram" style="cursor:pointer;">
-  <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
-</a>
+        <div class="header-icon" title="Telegram">
+          <img src="pictures/telegram.png" width="35" height="35" alt="Наш Телеграм" />
+        </div>
 
-     <!-- YouTube -->
-<a href="https://www.youtube.com/@ForestTea2026" target="_blank" class="header-icon" title="YouTube" style="cursor:pointer;">
-  <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
-</a>
+        <!-- YouTube -->
+        <div class="header-icon" title="YouTube">
+          <img src="pictures/youtube.png" width="35" height="35" alt="Наш ютуб-канал" />
+        </div>
 
-<!-- Instagram -->
-<a href="https://www.instagram.com/forestteabel/" target="_blank" class="header-icon" title="Instagram" style="cursor:pointer;">
-  <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
-</a>
+        <!-- inst -->
+        <div class="header-icon" title="Instagram">
+          <img src="pictures/instagram.png" width="35" height="35" alt="Наш инстаграм" />
+        </div>
 
       </div>
     </div>
@@ -430,10 +427,10 @@
         <div class="footer-column">
           <h4 class="footer-column-title">Наши соцсети</h4>
           <div class="footer-socials">
-  <a href="https://t.me/forestteabel" target="_blank" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
-  <a href="https://www.youtube.com/@ForestTea2026" target="_blank" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
-  <a href="https://www.instagram.com/forestteabel/" target="_blank" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
-</div>
+            <a href="#" class="footer-social-link"><img src="pictures/telegram.png" alt="Telegram" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/youtube.png" alt="YouTube" class="footer-social-icon"></a>
+            <a href="#" class="footer-social-link"><img src="pictures/instagram.png" alt="Instagram" class="footer-social-icon"></a>
+          </div>
           <h4 class="footer-column-title payment-title">Способы оплаты</h4>
           <div class="footer-payments">
             <img src="pictures/Visa.jpg" alt="Visa" class="payment-icon">

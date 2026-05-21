@@ -138,12 +138,63 @@
           <span class="delivery-price">15 Br</span>
         </label>
       </div>
-      <div class="delivery-address" id="deliveryAddress" style="display: none;">
-        <div class="form-group full-width" style="margin-top: 14px;">
-          <label class="form-label">Адрес доставки*</label>
-          <input type="text" class="form-input" id="deliveryAddressInput" placeholder="Город, улица, дом, квартира">
-        </div>
+     <div class="delivery-address" id="deliveryAddress" style="display: none;">
+  
+  <!-- Для курьера -->
+  <div id="courierAddressFields">
+    <div class="form-group full-width" style="margin-top: 14px;">
+      <label class="form-label">Город*</label>
+      <input type="text" class="form-input" id="courierCity" placeholder="Например: Минск">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Улица*</label>
+        <input type="text" class="form-input" id="courierStreet" placeholder="Например: Ленина">
       </div>
+      <div class="form-group">
+        <label class="form-label">Дом*</label>
+        <input type="text" class="form-input" id="courierHouse" placeholder="15">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Квартира</label>
+        <input type="text" class="form-input" id="courierApartment" placeholder="42">
+      </div>
+      <div class="form-group">
+        <!-- пусто для ровной сетки -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Для почты -->
+  <div id="postAddressFields" style="display:none;">
+    <div class="form-group full-width" style="margin-top: 14px;">
+      <label class="form-label">Город / населённый пункт*</label>
+      <input type="text" class="form-input" id="postCity" placeholder="Например: Минск">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Улица*</label>
+        <input type="text" class="form-input" id="postStreet" placeholder="Например: Ленина">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Дом</label>
+        <input type="text" class="form-input" id="postHouse" placeholder="15">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Квартира</label>
+        <input type="text" class="form-input" id="postApartment" placeholder="42">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Почтовый индекс*</label>
+        <input type="text" class="form-input" id="postalIndex" placeholder="220001">
+      </div>
+    </div>
+  </div>
+</div>
       <button class="step-next-btn" onclick="nextStep('cardDelivery', 'cardPayment')">Продолжить</button>
     </div>
   </div>

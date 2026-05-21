@@ -497,6 +497,20 @@ async function deleteProduct(id) {
 // Текущий фильтр заказов
 let currentOrderFilter = 'all';
 
+// ✅ Карта логичных переходов статусов
+const allowedStatusTransitions = {
+    'NEW': ['PROCESSING', 'CANCELLED'],
+    'PROCESSING': ['READY_FOR_PICKUP', 'SHIPPED', 'CANCELLED'],
+    'READY_FOR_PICKUP': ['DELIVERED', 'CANCELLED'],
+    'SHIPPED': ['DELIVERED', 'CANCELLED'],
+    'DELIVERED': [],
+    'CANCELLED': ['REFUNDED'],
+    'REFUNDED': []
+};
+
+// ✅ Статусы, которые доступны только через кнопки
+const cancelOnlyStatuses = ['CANCELLED', 'REFUNDED'];
+
 async function loadOrders() {
     const data = await api('/api/admin/orders?limit=50');
     const orders = data.orders || [];
@@ -551,7 +565,7 @@ async function loadOrders() {
         case 'refund_pending': filteredOrders = orders.filter(o => o.payment_status === 'REFUND_PENDING'); break;
     }
     
-    // Считаем количество требующих возврата (для предупреждения)
+    // Считаем количество требующих возврата
     const refundPendingCount = orders.filter(o => o.payment_status === 'REFUND_PENDING').length;
     
     document.getElementById('ordersTable').innerHTML = `
@@ -628,6 +642,17 @@ async function loadOrders() {
         ${filteredOrders.map(o => {
             const needsRefund = o.payment_status === 'REFUND_PENDING';
             
+            // ✅ Получаем разрешённые статусы
+            const allowedStatuses = allowedStatusTransitions[o.status] || [];
+            // ✅ Убираем CANCELLED и REFUNDED (только через кнопки)
+            const selectableStatuses = allowedStatuses.filter(s => !cancelOnlyStatuses.includes(s));
+            // ✅ Конечный статус — показываем текст
+            const isFinalStatus = selectableStatuses.length === 0 && !['CANCELLED', 'REFUNDED'].includes(o.status);
+            // ✅ Можно отменить
+            const canCancel = ['NEW', 'PROCESSING', 'READY_FOR_PICKUP', 'SHIPPED'].includes(o.status);
+            // ✅ Можно сделать возврат
+            const canRefund = o.status === 'CANCELLED' && o.payment_status === 'REFUND_PENDING';
+            
             return `
             <tr class="${needsRefund ? 'refund-pending' : ''}">
                 <td>
@@ -638,9 +663,24 @@ async function loadOrders() {
                 <td>${deliveryMap[o.delivery_method] || o.delivery_method}</td>
                 <td>${o.total} Br</td>
                 <td>
-                    <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-select" style="width:150px;padding:8px 28px 8px 8px;">
-                        ${Object.entries(statusMap).map(([k,v]) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${v}</option>`).join('')}
-                    </select>
+                    ${isFinalStatus ? `
+                        <span style="
+                            font-size:14px;
+                            font-weight:500;
+                            color: ${o.status === 'DELIVERED' ? '#27ae60' : '#fff'};
+                        ">${statusMap[o.status]}</span>
+                    ` : o.status === 'CANCELLED' || o.status === 'REFUNDED' ? `
+                        <span style="
+                            font-size:14px;
+                            font-weight:500;
+                            color: ${o.status === 'REFUNDED' ? '#337B57' : '#e74c3c'};
+                        ">${statusMap[o.status]}</span>
+                    ` : `
+                        <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-select" style="width:150px;padding:8px 28px 8px 8px;">
+                            <option value="${o.status}" selected>${statusMap[o.status]}</option>
+                            ${selectableStatuses.map(s => `<option value="${s}">${statusMap[s]}</option>`).join('')}
+                        </select>
+                    `}
                 </td>
                 <td>
                     <span style="
@@ -657,14 +697,19 @@ async function loadOrders() {
                 </td>
                 <td>${new Date(o.created_at).toLocaleDateString('ru-RU')}</td>
                 <td>
-<button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})" style="justify-content:center;margin-bottom:12px;">
-    Подробнее
-</button>
-${o.status === 'NEW' || o.status === 'PROCESSING' ? `
-<button class="btn btn-sm btn-danger" onclick="openCancelOrderModal(${o.id})" style="min-width:90px;justify-content:center;margin-left:8px;margin-bottom:4px;">
-    Отменить
-</button>
-` : ''}
+                    <button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})" style="justify-content:center;margin-bottom:4px;">
+                        Подробнее
+                    </button>
+                    ${canCancel ? `
+                    <button class="btn btn-sm btn-danger" onclick="openCancelOrderModal(${o.id})" style="min-width:90px;justify-content:center;margin-top:4px;">
+                        Отменить
+                    </button>
+                    ` : ''}
+                    ${canRefund ? `
+                    <button class="btn btn-sm btn-primary" onclick="markAsRefunded(${o.id})" style="min-width:90px;justify-content:center;margin-top:4px;">
+                        Возврат
+                    </button>
+                    ` : ''}
                 </td>
             </tr>
             `;
@@ -672,6 +717,33 @@ ${o.status === 'NEW' || o.status === 'PROCESSING' ? `
         </tbody></table>
         `}
     `;
+}
+
+// ✅ Функция "Возврат" для отменённых заказов
+async function markAsRefunded(orderId) {
+    if (!confirm('Подтвердить возврат денег? Статус изменится на "Возврат".')) return;
+    
+    try {
+        const res = await fetch(`/api/admin/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: 'REFUNDED' })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            loadOrders();
+            alert('Возврат оформлен.');
+        } else {
+            alert(data.error || 'Ошибка');
+        }
+    } catch(e) {
+        alert('Ошибка соединения');
+    }
 }
 
 // Функция установки фильтра
@@ -799,17 +871,28 @@ ${order.cancel_reason ? `
 ` : ''}
         <h3 style="font-size:16px;margin-bottom:12px;">Клиент</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
-            <div><span style="color:var(--text-secondary);">Имя:</span> ${order.name} ${order.surname}</div>
+            <div><span styыle="color:var(--text-secondary);">Имя:</span> ${order.name} ${order.surname}</div>
             <div><span style="color:var(--text-secondary);">Телефон:</span> ${order.phone}</div>
             <div><span style="color:var(--text-secondary);">Email:</span> ${order.email || '—'}</div>
         </div>
         
         <h3 style="font-size:16px;margin-bottom:12px;">Доставка и оплата</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
-            <div><span style="color:var(--text-secondary);">Способ:</span> ${deliveryMap[order.delivery_method] || order.delivery_method}</div>
-            <div><span style="color:var(--text-secondary);">Оплата:</span> ${paymentMap[order.payment_method] || order.payment_method}</div>
-            <div style="grid-column:1/-1;"><span style="color:var(--text-secondary);">Адрес:</span> ${order.delivery_address || '—'}</div>
-        </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;">
+    <div><span style="color:var(--text-secondary);">Способ:</span> ${deliveryMap[order.delivery_method] || order.delivery_method}</div>
+    <div><span style="color:var(--text-secondary);">Оплата:</span> ${paymentMap[order.payment_method] || order.payment_method}</div>
+    <div style="grid-column:1/-1;"><span style="color:var(--text-secondary);">Адрес:</span> ${order.delivery_address || '—'}</div>
+    ${order.delivery_method === 'post' && order.postal_index ? `
+<div style="grid-column:1/-1;">
+    <span style="color:var(--text-secondary);">Почтовый индекс:</span> 
+    <strong style="color:#fff;">${order.postal_index}</strong>
+    <a href="https://belpost.by/Uznatpochtovyykod28indek?search=${order.postal_index}" 
+       target="_blank" 
+       style="display:inline-block;margin-left:12px;padding:4px 12px;background:#337B57;border-radius:100px;color:#fff;text-decoration:none;font-size:12px;">
+        Найти отделение
+    </a>
+</div>
+` : ''}
+</div>
         
         ${order.comment ? `
         <h3 style="font-size:16px;margin-bottom:12px;">Комментарий</h3>

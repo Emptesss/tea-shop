@@ -637,17 +637,49 @@ window.changeEditQty = function(index, delta) {
     updateEditTotal();
 };
 
-window.removeEditItem = function(index) {
+window.removeEditItem = async function(index) {
     if (!confirm('Удалить товар из заказа?')) return;
     
-    currentEditOrderItems.splice(index, 1);
+    const item = currentEditOrderItems[index];
+    const token = localStorage.getItem('token');
     
-    if (currentEditOrderItems.length === 0) {
-        alert('Нельзя удалить все товары. Отмените заказ полностью.');
-        closeEditOrderModal();
+    // ✅ Отправляем удаление на сервер
+    try {
+        const res = await fetch(`/api/orders/${currentEditOrderId}/items/${item.product_id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+            const err = await res.json();
+            alert('Ошибка: ' + (err.error || 'Не удалось удалить'));
+            return;
+        }
+        
+        const data = await res.json();
+        
+        // Если сервер вернул что заказ отменён (все товары удалены)
+        if (data.cancelled) {
+            alert('Все товары удалены, заказ отменён');
+            closeEditOrderModal();
+            loadOrders();
+            return;
+        }
+    } catch(e) {
+        alert('Ошибка соединения');
         return;
     }
     
+    // Удаляем из локального массива
+    currentEditOrderItems.splice(index, 1);
+    
+    if (currentEditOrderItems.length === 0) {
+        closeEditOrderModal();
+        loadOrders();
+        return;
+    }
+    
+    // Перерисовываем список
     const itemsContainer = document.getElementById('editOrderItems');
     itemsContainer.innerHTML = currentEditOrderItems.map((item, i) => {
         const imgSrc = item.product_image || 'pictures/placeholder.jpg';

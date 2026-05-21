@@ -6,6 +6,7 @@ async function loadFavorites() {
     
     if (!token) {
         const favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
+        console.log('Гость, избранное из localStorage:', favs); // ← для отладки
         if (favs.length === 0) {
             showEmpty();
             return;
@@ -37,7 +38,14 @@ async function loadProductsByIds(ids) {
     try {
         const response = await fetch(`/api/products?limit=50`);
         const data = await response.json();
-        const favProducts = data.products.filter(p => ids.includes(p.id));
+        // ✅ Приводим оба к числу для сравнения
+        const favProducts = data.products.filter(p => ids.map(Number).includes(p.id));
+        
+        if (favProducts.length === 0) {
+            showEmpty();
+            return;
+        }
+        
         renderFavorites(favProducts);
     } catch (error) {
         console.error('Ошибка:', error);
@@ -329,6 +337,23 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
             localStorage.setItem('userName', data.user.name || '');
             localStorage.setItem('userAvatar', data.user.avatar || 'pictures/cat.png');
             
+            // ✅ Перенос локального избранного на сервер
+            const localFavs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
+            if (localFavs.length > 0) {
+                for (const pid of localFavs) {
+                    await fetch('/api/favorites', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Authorization': `Bearer ${data.token}` 
+                        },
+                        body: JSON.stringify({ productId: pid })
+                    }).catch(() => {});
+                }
+                localStorage.removeItem('localFavorites');
+            }
+            
+            // Слияние корзины
             const guestSessionId = localStorage.getItem('cartSessionId');
             if (guestSessionId) {
                 fetch('/api/cart/merge', {
@@ -373,6 +398,23 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
             localStorage.setItem('userName', data.user.name || '');
             localStorage.setItem('userAvatar', 'pictures/cat.png');
             
+            // ✅ Перенос локального избранного на сервер
+            const localFavs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
+            if (localFavs.length > 0) {
+                for (const pid of localFavs) {
+                    await fetch('/api/favorites', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Authorization': `Bearer ${data.token}` 
+                        },
+                        body: JSON.stringify({ productId: pid })
+                    }).catch(() => {});
+                }
+                localStorage.removeItem('localFavorites');
+            }
+            
+            // Слияние корзины
             const guestSessionId = localStorage.getItem('cartSessionId');
             if (guestSessionId) {
                 fetch('/api/cart/merge', {
@@ -442,9 +484,13 @@ async function addToCartApi(productId, quantity, button) {
                 button.textContent = 'В корзину';
                 button.style.opacity = '1';
             }, 1000);
+        } else {
+            const data = await response.json();
+            alert(data.error || 'Не удалось добавить товар');
         }
     } catch (error) {
         console.error('Ошибка добавления в корзину:', error);
+        alert('Ошибка соединения с сервером');
     }
 }
 

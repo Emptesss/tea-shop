@@ -125,16 +125,28 @@ function nextStep(currentId, nextId) {
     }
   }
 
-  if (currentId === 'cardDelivery') {
+ if (currentId === 'cardDelivery') {
     const delivery = document.querySelector('input[name="delivery"]:checked');
-    if (delivery && (delivery.value === 'courier' || delivery.value === 'post')) {
-      const addr = document.getElementById('deliveryAddressInput').value.trim();
-      if (!addr) {
-        alert('Введите адрес доставки');
-        return;
-      }
+    if (delivery) {
+        if (delivery.value === 'courier') {
+            const city = document.getElementById('courierCity').value.trim();
+            const street = document.getElementById('courierStreet').value.trim();
+            const house = document.getElementById('courierHouse').value.trim();
+            if (!city || !street || !house) {
+                alert('Заполните город, улицу и дом');
+                return;
+            }
+        } else if (delivery.value === 'post') {
+            const city = document.getElementById('postCity').value.trim();
+            const street = document.getElementById('postStreet').value.trim();
+            const index = document.getElementById('postalIndex').value.trim();
+            if (!city || !street || !index) {
+                alert('Заполните город, улицу и почтовый индекс');
+                return;
+            }
+        }
     }
-  }
+}
 
   // ✅ При переходе с оплаты — открываем модалку, меняем кнопку
   if (currentId === 'cardPayment') {
@@ -204,20 +216,30 @@ function checkAllDone() {
 document.addEventListener('DOMContentLoaded', function() {
   
   const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
-  const deliveryAddress = document.getElementById('deliveryAddress');
+const deliveryAddress = document.getElementById('deliveryAddress');
+const courierFields = document.getElementById('courierAddressFields');
+const postFields = document.getElementById('postAddressFields');
 
-  deliveryRadios.forEach(radio => {
+deliveryRadios.forEach(radio => {
     radio.addEventListener('change', function() {
-      if (this.value === 'courier' || this.value === 'post') {
-        if (deliveryAddress) deliveryAddress.style.display = 'block';
-      } else {
-        if (deliveryAddress) deliveryAddress.style.display = 'none';
-      }
-      resetCardData();
+        if (this.value === 'courier') {
+            if (deliveryAddress) deliveryAddress.style.display = 'block';
+            if (courierFields) courierFields.style.display = 'block';
+            if (postFields) postFields.style.display = 'none';
+        } else if (this.value === 'post') {
+            if (deliveryAddress) deliveryAddress.style.display = 'block';
+            if (courierFields) courierFields.style.display = 'none';
+            if (postFields) postFields.style.display = 'block';
+        } else {
+            if (deliveryAddress) deliveryAddress.style.display = 'none';
+            if (courierFields) courierFields.style.display = 'none';
+            if (postFields) postFields.style.display = 'none';
+        }
+        resetCardData();
         updateTotal();
         updatePrepaymentInfo();
     });
-  });
+});
 
 const paymentRadios = document.querySelectorAll('input[name="payment"]');
   const prepaymentInfo = document.getElementById('prepaymentInfo');
@@ -337,27 +359,25 @@ async function placeOrder() {
     const btn = document.getElementById('confirmOrderBtn');
     if (!btn) return;
 
-    // ✅ ДОБАВЬТЕ ЭТО В НАЧАЛО ФУНКЦИИ (перед btn.disabled = true)
     const paymentEl = document.querySelector('input[name="payment"]:checked');
-const payment_method = paymentEl ? paymentEl.value : 'card';
+    const payment_method = paymentEl ? paymentEl.value : 'card';
     const deliveryEl = document.querySelector('input[name="delivery"]:checked');
     const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
 
-     const needsCardPayment = (payment_method === 'card') || 
-                         (payment_method === 'cash' && delivery_method !== 'pickup');
+    const needsCardPayment = (payment_method === 'card') || 
+                             (payment_method === 'cash' && delivery_method !== 'pickup');
                          
     if (needsCardPayment && !cardDataConfirmed) {
         alert('Сначала введите данные карты. Нажмите "Изменить способ оплаты".');
         return;
     }
-    // Предупреждение о предоплате при наличных
+    
     if (payment_method === 'cash' && delivery_method !== 'pickup') {
         const deliveryPrice = delivery_method === 'courier' ? 10 : 15;
         if (!confirm(`При оплате наличными требуется предоплата доставки ${deliveryPrice} Br. Продолжить?`)) {
             return;
         }
     }
-    // ✅ КОНЕЦ ВСТАВКИ
     
     btn.disabled = true;
     btn.textContent = 'Оформление...';
@@ -367,12 +387,27 @@ const payment_method = paymentEl ? paymentEl.value : 'card';
         const surname = document.getElementById('checkoutSurname').value.trim();
         const phone = document.getElementById('checkoutPhone').value.trim();
         const email = document.getElementById('checkoutEmail').value.trim();
-        
-        const delivery_address = document.getElementById('deliveryAddressInput')?.value || '';
-    
-        
         const comment = document.querySelector('#cardComment textarea')?.value || '';
         
+        // ✅ ТОЛЬКО ОДНО объявление delivery_address
+        let delivery_address = '';
+        let postal_index = null;
+
+        if (delivery_method === 'courier') {
+    const city = document.getElementById('courierCity')?.value.trim() || '';
+    const street = document.getElementById('courierStreet')?.value.trim() || '';
+    const house = document.getElementById('courierHouse')?.value.trim() || '';
+    const apartment = document.getElementById('courierApartment')?.value.trim() || '';
+    delivery_address = [city, street, house, apartment].filter(Boolean).join(', ');
+    
+} else if (delivery_method === 'post') {
+    const city = document.getElementById('postCity')?.value.trim() || '';
+    const street = document.getElementById('postStreet')?.value.trim() || '';
+    const house = document.getElementById('postHouse')?.value.trim() || '';
+    const apartment = document.getElementById('postApartment')?.value.trim() || '';
+    postal_index = document.getElementById('postalIndex')?.value.trim() || '';
+    delivery_address = [city, street, house, apartment].filter(Boolean).join(', ');
+}
         const token = localStorage.getItem('token');
         const sessionId = localStorage.getItem('cartSessionId');
         
@@ -391,6 +426,7 @@ const payment_method = paymentEl ? paymentEl.value : 'card';
         const body = {
             name, surname, phone, email,
             delivery_method, delivery_address,
+            postal_index,
             payment_method, comment
         };
         
@@ -726,6 +762,9 @@ function saveCardData() {
 }
 
 // Закрытие по клику на оверлей
-document.getElementById('cardPaymentModal').addEventListener('click', function(e) {
-    if (e.target === this) closeCardPayment();
-});
+const cardPaymentModal = document.getElementById('cardPaymentModal');
+if (cardPaymentModal) {
+    cardPaymentModal.addEventListener('click', function(e) {
+        if (e.target === this) closeCardPayment();
+    });
+}

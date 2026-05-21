@@ -549,13 +549,16 @@ window.toggleFavoriteBottom = async function(btn) {
 // Локальное избранное для гостей
 function saveLocalFavorite(productId) {
     let favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-    if (!favs.includes(productId)) favs.push(productId);
+    const numId = Number(productId); // ✅ Явно в число
+    if (!favs.includes(numId)) favs.push(numId);
     localStorage.setItem('localFavorites', JSON.stringify(favs));
 }
 
+
 function removeLocalFavorite(productId) {
     let favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-    favs = favs.filter(id => id != productId);
+    const numId = Number(productId); // ✅ Явно в число
+    favs = favs.filter(id => id !== numId);
     localStorage.setItem('localFavorites', JSON.stringify(favs));
 }
 
@@ -1313,10 +1316,8 @@ async function addToCartApi(productId, quantity, button) {
     try {
         const token = localStorage.getItem('token');
         
-        // Базовое тело запроса
         const body = { productId, quantity };
         
-        // Всегда добавляем sessionId для гостей
         let sessionId = localStorage.getItem('cartSessionId');
         if (!sessionId) {
             sessionId = 'cart_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -1343,10 +1344,13 @@ async function addToCartApi(productId, quantity, button) {
                 button.style.opacity = '1';
             }, 1000);
         } else {
-            console.error('Ошибка ответа сервера:', response.status);
+            // ✅ Показываем ошибку пользователю
+            const data = await response.json();
+            alert(data.error || 'Не удалось добавить товар');
         }
     } catch (error) {
         console.error('Ошибка добавления в корзину:', error);
+        alert('Ошибка соединения с сервером');
     }
 }
 
@@ -1619,7 +1623,6 @@ function createMainPageCard(product) {
                 <a href="product.html?slug=${product.slug}" class="card-name-link">
                     <div class="card-name">${product.name}</div>
                 </a>
-                <!-- ✅ ДОБАВЛЕНА ССЫЛКА НА ОПИСАНИЕ -->
                 <a href="product.html?slug=${product.slug}" class="card-desc-link">
                     <div class="card-desc">${product.short_desc || ''}</div>
                 </a>
@@ -1630,7 +1633,8 @@ function createMainPageCard(product) {
                 </div>
                 <div class="card-bottom-row">
                     <button class="card-btn add-to-cart-btn">В корзину</button>
-                    <button class="card-favorite-bottom">
+                    <!-- ✅ ДОБАВЬ onclick -->
+                    <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
                         <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
                     </button>
                 </div>

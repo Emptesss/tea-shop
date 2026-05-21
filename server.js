@@ -721,6 +721,19 @@ app.post('/api/cart', async (req, res) => {
         if (!productId) {
             return res.status(400).json({ error: 'ID товара обязателен' });
         }
+        // ✅ ДОБАВЬ ЭТУ ПРОВЕРКУ:
+        const productCheck = await pool.query(
+            'SELECT id, in_stock, is_active FROM products WHERE id = $1',
+            [productId]
+        );
+        
+        if (productCheck.rows.length === 0) {
+            return res.status(404).json({ error: 'Товар не найден' });
+        }
+        
+        if (!productCheck.rows[0].in_stock || !productCheck.rows[0].is_active) {
+            return res.status(400).json({ error: 'Товара нет в наличии' });
+        }
 
         if (!userId && !sessionId) {
             return res.status(400).json({ error: 'Требуется sessionId или авторизация' });
@@ -1311,10 +1324,10 @@ app.post('/api/orders', async (req, res) => {
     
     try {
         const {
-            name, surname, phone, email,
-            delivery_method, delivery_address,
-            payment_method, comment
-        } = req.body;
+    name, surname, phone, email,
+    delivery_method, delivery_address,
+    payment_method, comment, postal_index
+} = req.body;
         
         // Проверяем авторизацию
         let userId = null;
@@ -1378,7 +1391,7 @@ app.post('/api/orders', async (req, res) => {
         // Стоимость доставки
         let deliveryPrice = 0;
         if (delivery_method === 'courier') deliveryPrice = 10;
-        if (delivery_method === 'post') deliveryPrice = 5;
+        if (delivery_method === 'post') deliveryPrice = 15;
         
         const total = subtotal + deliveryPrice;
         
@@ -1418,12 +1431,12 @@ const initialPaymentStatus = (payment_method === 'card') ? 'PAID' : 'UNPAID';
 const orderResult = await client.query(
     `INSERT INTO orders (order_number, user_id, session_id, name, surname, phone, email,
      delivery_method, delivery_address, payment_method, comment,
-     subtotal, delivery_price, total, status, payment_status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'NEW', $15)
+     subtotal, delivery_price, total, status, payment_status, postal_index)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'NEW', $15, $16)
      RETURNING id, order_number`,
     [orderNumber, userId, sessionId || null, name, surname, phone, email || null,
      delivery_method, delivery_address || null, payment_method, comment || null,
-     subtotal, deliveryPrice, total, initialPaymentStatus]
+     subtotal, deliveryPrice, total, initialPaymentStatus, postal_index || null]
 );
         const orderId = orderResult.rows[0].id;
         
