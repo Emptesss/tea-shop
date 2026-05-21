@@ -96,14 +96,14 @@ if (badgesEl) {
     
     // Новинка — если год сбора 2026
     if (product.year === 2026) {
-        badgesHtml += '<span class="gallery-badge" style="background:rgba(39, 174, 96, 0.8);">Новинка</span>';
+        badgesHtml += '<span class="gallery-badge" style="background: #337B57;">Новинка</span>';
     }
     
     // В наличии
     if (product.in_stock) {
         badgesHtml += '<span class="gallery-badge in-stock">В наличии</span>';
     } else {
-        badgesHtml += '<span class="gallery-badge" style="background:rgba(200,0,0,0.7);">Нет в наличии</span>';
+        badgesHtml += '<span class="gallery-badge" style="background: #0D2719;">Нет в наличии</span>';
     }
     
     badgesEl.innerHTML = badgesHtml;

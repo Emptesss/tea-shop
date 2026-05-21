@@ -149,7 +149,7 @@ function nextStep(currentId, nextId) {
         const totalText = document.getElementById('checkoutTotal').textContent;
         amountToPay = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
     } else if (payment_method === 'cash' && delivery_method !== 'pickup') {
-        const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+        const deliveryPrice = delivery_method === 'courier' ? 10 : 15;
         amountToPay = deliveryPrice;
     }
     
@@ -247,7 +247,7 @@ const paymentRadios = document.querySelectorAll('input[name="payment"]');
       // Показываем предоплату ТОЛЬКО при наличных + доставка (не самовывоз)
       if (payment_method === 'cash' && delivery_method !== 'pickup') {
           prepaymentInfo.style.display = 'block';
-          const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+          const deliveryPrice = delivery_method === 'courier' ? 10 : 15;
           document.getElementById('prepaymentAmount').textContent = deliveryPrice + ' Br';
       } else {
           prepaymentInfo.style.display = 'none';
@@ -281,7 +281,7 @@ function updateTotal() {
     let deliveryPrice = 0;
     if (selected) {
         if (selected.value === 'courier') deliveryPrice = 10;
-        if (selected.value === 'post') deliveryPrice = 5;
+        if (selected.value === 'post') deliveryPrice = 15;
     }
     
     const totalEl = document.getElementById('checkoutTotal');
@@ -352,7 +352,7 @@ const payment_method = paymentEl ? paymentEl.value : 'card';
     }
     // Предупреждение о предоплате при наличных
     if (payment_method === 'cash' && delivery_method !== 'pickup') {
-        const deliveryPrice = delivery_method === 'courier' ? 10 : 5;
+        const deliveryPrice = delivery_method === 'courier' ? 10 : 15;
         if (!confirm(`При оплате наличными требуется предоплата доставки ${deliveryPrice} Br. Продолжить?`)) {
             return;
         }

@@ -34,7 +34,32 @@ body {
   padding: 24px 16px;
   flex-shrink: 0;
 }
+/* Стилизация скроллбаров */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
 
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
 .sidebar-logo {
   font-family: 'Montserrat Alternates', sans-serif;
   font-size: 24px;
@@ -61,12 +86,25 @@ body {
 .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
 .nav-item.active { background: rgba(51, 123, 87, 0.2); color: var(--accent); }
 
+
+.nav-item.logout-btn {
+  border: none;
+  background: transparent;
+}
+
+.nav-item.logout-btn:hover {
+  background: rgba(255,255,255,0.0);
+  color: inherit;
+}
 .main-content { flex: 1; overflow-y: auto; padding: 32px; }
 
 .page-title { font-family: 'Montserrat Alternates', sans-serif; font-size: 28px; margin-bottom: 24px; }
 
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
 
+#ordersStatusStats.dashboard-grid { 
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+}
 .stat-card {
   background: var(--surface);
   backdrop-filter: blur(10px);
@@ -165,9 +203,9 @@ select.form-select option { background: #1a2a1a; color: #fff; }
   display: inline-block;
 }
 
-.badge-success { background: rgba(51, 123, 87, 0.2); color: var(--accent); }
-.badge-warning { background: rgba(244, 167, 66, 0.2); color: var(--warning); }
-.badge-danger { background: rgba(255, 80, 80, 0.2); color: var(--danger); }
+.badge-success { background: rgba(51, 123, 87, 0.2); color: var #fff; }
+.badge-warning { background: rgba(244, 167, 66, 0.2); color: var #fff; }
+.badge-danger { background: rgba(255, 80, 80, 0.2); color: var #fff; }
 .badge-info { background: rgba(52, 152, 219, 0.2); color: #3498db; }
 
 .login-screen {
@@ -187,6 +225,57 @@ select.form-select option { background: #1a2a1a; color: #fff; }
   width: 400px;
   text-align: center;
 }
+
+/* Чекбоксы вкусов в админке */
+.checkbox-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #337B57;
+  border-color: #337B57;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 12px;
+}
+
+.checkbox-text {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: #fff;
+}
+
 
 .login-title { font-family: 'Montserrat Alternates', sans-serif; font-size: 24px; margin-bottom: 24px; }
 
@@ -276,25 +365,7 @@ select.form-select option { background: #1a2a1a; color: #fff; }
         grid-template-columns: 1fr !important;
     }
 }
-/* Цветные полоски для статусов */
-#ordersStatusStats .stat-card {
-    position: relative;
-    overflow: hidden;
-}
 
-#ordersStatusStats .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-}
-
-#ordersStatusStats .stat-card:nth-child(1)::before { background: #f4a742; }
-#ordersStatusStats .stat-card:nth-child(2)::before { background: #3498db; }
-#ordersStatusStats .stat-card:nth-child(3)::before { background: #27ae60; }
-#ordersStatusStats .stat-card:nth-child(4)::before { background: #e74c3c; }
 
 /* Анимация для карточек */
 .stat-card {
@@ -332,12 +403,12 @@ select.form-select option { background: #1a2a1a; color: #fff; }
 
 /* Строка с REFUND_PENDING — красный фон */
 tr.refund-pending {
-  background: rgba(255, 0, 0, 0.05) !important;
-  border-left: 3px solid #ff4444;
+  background:rgba(94, 62, 62, 0.3) !important;
+  border-left: 3px solid #5e3e3e;
 }
 
 tr.refund-pending:hover {
-  background: rgba(255, 0, 0, 0.1) !important;
+  background:rgba(94, 62, 62, 0.4) !important;
 }
 
 /* Иконка возврата */

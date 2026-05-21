@@ -1446,6 +1446,33 @@ header {
   color: rgba(0, 0, 0, 0.4);
 }
 
+/* Стилизация скроллбаров */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
 /* ========================
    ГОРИЗОНТАЛЬНЫЙ СКРОЛЛ КАТЕГОРИЙ
    ======================== */
@@ -4521,8 +4548,8 @@ header {
 
 .product-meta-tag {
   padding: 6px 14px;
-  background-color: rgba(51, 123, 87, 0.15);
-  border: 1px solid rgba(51, 123, 87, 0.25);
+  background-color: rgba(51, 123, 87, 0.3);
+  border-color: #337B57;
   border-radius: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
@@ -4535,7 +4562,7 @@ header {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.7;
   margin: 0;
 }
@@ -4824,7 +4851,7 @@ header {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.7;
   margin-bottom: 14px;
 }
@@ -5541,6 +5568,10 @@ header {
   -webkit-backdrop-filter: blur(30px);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
+.modal-window.wide {
+  width: 700px;
+  padding-top: 40px;
+}
 
 /* Кнопка закрытия */
 .modal-close-btn {
@@ -5564,8 +5595,8 @@ header {
 }
 
 .modal-close-icon {
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
 }
 
@@ -7671,12 +7702,12 @@ input[type="text"].was-password {
 }
 
 /* Новые статусы */
-.order-status.new { background: #3498db; }
-.order-status.processing { background: #f4a742; }
-.order-status.ready-pickup { background: #2ecc71; }
-.order-status.shipped { background: #9b59b6; }
-.order-status.delivered { background: #27ae60; }
-.order-status.cancelled { background: #e74c3c; }
+.order-status.new { background: #5B3E3E; }
+.order-status.processing { background: #5B3E3E; }
+.order-status.ready-pickup { background: #337B57; }
+.order-status.shipped { background: #5B3E3E; }
+.order-status.delivered { background: #337B57; }
+.order-status.cancelled { background: #5B3E3E; }
 
 /* ========================
    СТРАНИЦА ОПЛАТА И ДОСТАВКА

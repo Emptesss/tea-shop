@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ========================
   // ЗАГРУЗКА ПРОФИЛЯ С СЕРВЕРА
   // ========================
- async function loadProfile() {
+  async function loadProfile() {
     const token = localStorage.getItem('token');
     if (!token) return;
     
@@ -24,9 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Заполняем поля формы
         const nameInputs = document.querySelectorAll('#panel-profile .form-input[type="text"]');
-        if (nameInputs[0]) nameInputs[0].value = user.name || '';        // Имя
-        if (nameInputs[1]) nameInputs[1].value = user.last_name || '';   // Фамилия
-        if (nameInputs[2]) nameInputs[2].value = user.middle_name || ''; // Отчество
+        if (nameInputs[0]) nameInputs[0].value = user.name || '';
+        if (nameInputs[1]) nameInputs[1].value = user.last_name || '';
+        if (nameInputs[2]) nameInputs[2].value = user.middle_name || '';
         
         const emailInput = document.querySelector('#panel-profile input[type="email"]');
         if (emailInput) emailInput.value = user.email || '';
@@ -35,13 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (phoneInput) phoneInput.value = user.phone || '';
         
         const birthInput = document.querySelector('#panel-profile input[type="date"]');
-        if (birthInput && user.birth_date) {
-        const dbDate = user.birth_date; 
-        birthInput.value = dbDate.split('T')[0];
+if (birthInput && user.birth_date) {
+    // Берём только дату (первые 10 символов: YYYY-MM-DD)
+    const dateStr = String(user.birth_date).substring(0, 10);
+    birthInput.value = dateStr;
 }
         
-        // Загружаем аватар
+        // Загружаем аватар 
         if (user.avatar) {
+          const avatarImg = document.getElementById('accountAvatar');
           if (avatarImg) avatarImg.src = user.avatar;
           updateHeaderAvatar(user.avatar);
           localStorage.setItem('userAvatar', user.avatar);
@@ -50,45 +52,38 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (error) {
       console.error('Ошибка загрузки профиля:', error);
     }
-}
+  }
 
-// ========================
-// ГЛАЗИК ДЛЯ ПАРОЛЕЙ
-// ========================
-function setupPasswordToggles() {
+  // ========================
+  // ГЛАЗИК ДЛЯ ПАРОЛЕЙ
+  // ========================
+  function setupPasswordToggles() {
     document.querySelectorAll('input[type="password"]').forEach(input => {
-        // Проверяем, не добавлен ли уже глазик
-        if (input.parentNode.querySelector('.password-toggle')) return;
-        
-        // Создаём кнопку-глазик
-        const toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'password-toggle';
-        toggleBtn.innerHTML = '<img src="pictures/nevidimo.png" alt="Показать пароль" class="password-toggle-img">';
-        
-        // Вставляем глазик после поля ввода
-        input.parentNode.style.position = 'relative';
-        input.parentNode.appendChild(toggleBtn);
-        
-        // Обработчик клика
-        toggleBtn.addEventListener('click', function() {
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            
-            const img = this.querySelector('.password-toggle-img');
-            img.src = isPassword ? 'pictures/vidimo.png' : 'pictures/nevidimo.png';
-            img.alt = isPassword ? 'Скрыть пароль' : 'Показать пароль';
-        });
+      if (input.parentNode.querySelector('.password-toggle')) return;
+      
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'password-toggle';
+      toggleBtn.innerHTML = '<img src="pictures/nevidimo.png" alt="Показать пароль" class="password-toggle-img">';
+      
+      input.parentNode.style.position = 'relative';
+      input.parentNode.appendChild(toggleBtn);
+      
+      toggleBtn.addEventListener('click', function() {
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const img = this.querySelector('.password-toggle-img');
+        img.src = isPassword ? 'pictures/vidimo.png' : 'pictures/nevidimo.png';
+        img.alt = isPassword ? 'Скрыть пароль' : 'Показать пароль';
+      });
     });
-}
-// Следим за изменениями в DOM (например, переключение табов модалки)
-const observer = new MutationObserver(function() {
+  }
+  
+  const observer = new MutationObserver(function() {
     setupPasswordToggles();
-});
-
-observer.observe(document.body, { childList: true, subtree: true });
-// Запускаем при загрузке
-setupPasswordToggles();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  setupPasswordToggles();
   
   // ========================
   // ЗАГРУЗКА АВАТАРА
@@ -103,11 +98,10 @@ setupPasswordToggles();
       avatarInput.click();
     });
 
-        avatarInput.addEventListener('change', async function() {
+    avatarInput.addEventListener('change', async function() {
       const file = this.files[0];
       if (!file) return;
       
-      // Показываем локально сразу
       const reader = new FileReader();
       reader.onload = function(e) {
         avatarImg.src = e.target.result;
@@ -115,7 +109,6 @@ setupPasswordToggles();
       };
       reader.readAsDataURL(file);
       
-      // Отправляем файл на сервер
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('avatar', file);
@@ -123,9 +116,7 @@ setupPasswordToggles();
       try {
         const response = await fetch('/api/auth/avatar', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
           body: formData
         });
         
@@ -161,21 +152,11 @@ setupPasswordToggles();
     }
   }
 
-  // Функция перевода файла в base64
-  function toBase64(file) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(file);
-    });
-  }
-
-
-// ========================
-// СОХРАНЕНИЕ ПРОФИЛЯ
-// ========================
-const profileForm = document.querySelector('#panel-profile .account-form');
-if (profileForm) {
+  // ========================
+  // СОХРАНЕНИЕ ПРОФИЛЯ
+  // ========================
+  const profileForm = document.querySelector('#panel-profile .account-form');
+  if (profileForm) {
     profileForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
@@ -189,11 +170,11 @@ if (profileForm) {
       
       let formattedPhone = '';
       if (phone && phone.trim() !== '') {
-          if (!validateBelarusPhone(phone)) {
-              alert('Неверный формат телефона!\n\nПравильные форматы:\n+375 (29) 123-45-67\n+375291234567\n80291234567\n\nКоды операторов: 29, 33, 44, 25\n\nИли оставьте поле пустым');
-              return;
-          }
-          formattedPhone = formatBelarusPhone(phone);
+        if (!validateBelarusPhone(phone)) {
+          alert('Неверный формат телефона!\n\nПравильные форматы:\n+375 (29) 123-45-67\n+375291234567\n80291234567\n\nКоды операторов: 29, 33, 44, 25\n\nИли оставьте поле пустым');
+          return;
+        }
+        formattedPhone = formatBelarusPhone(phone);
       }
       
       const token = localStorage.getItem('token');
@@ -231,7 +212,7 @@ if (profileForm) {
         console.error('Ошибка сохранения:', error);
       }
     });
-}
+  }
 
   // ========================
   // ТАБЫ
@@ -245,107 +226,98 @@ if (profileForm) {
     });
   });
   
-// ========================
-// ВАЛИДАЦИЯ БЕЛОРУССКОГО ТЕЛЕФОНА
-// ========================
-function validateBelarusPhone(phone) {
+  // ========================
+  // ВАЛИДАЦИЯ ТЕЛЕФОНА
+  // ========================
+  function validateBelarusPhone(phone) {
     const cleaned = phone.replace(/[\s\(\)\-]/g, '');
     const regex = /^(\+375|80)(29|33|44|25|17)\d{7}$/;
     return regex.test(cleaned);
-}
+  }
 
-function formatBelarusPhone(phone) {
+  function formatBelarusPhone(phone) {
     const cleaned = phone.replace(/[\s\(\)\-]/g, '');
     let digits = cleaned;
-    
-    if (digits.startsWith('80')) {
-        digits = '+375' + digits.substring(2);
-    }
-    
+    if (digits.startsWith('80')) digits = '+375' + digits.substring(2);
     if (digits.length === 13 && digits.startsWith('+375')) {
-        return `+375 (${digits.substring(4, 6)}) ${digits.substring(6, 9)}-${digits.substring(9, 11)}-${digits.substring(11, 13)}`;
+      return `+375 (${digits.substring(4, 6)}) ${digits.substring(6, 9)}-${digits.substring(9, 11)}-${digits.substring(11, 13)}`;
     }
-    
     return phone;
-}
+  }
 
-// ========================
-// СМЕНА ПАРОЛЯ
-// ========================
-const settingsForm = document.querySelector('#panel-settings .account-form');
-if (settingsForm) {
+  // ========================
+  // СМЕНА ПАРОЛЯ
+  // ========================
+  const settingsForm = document.querySelector('#panel-settings .account-form');
+  if (settingsForm) {
     settingsForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+      e.preventDefault();
+      
+      const currentPassword = this.querySelector('input[name="currentPassword"]')?.value;
+      const newPassword = this.querySelector('input[name="newPassword"]')?.value;
+      const confirmPassword = this.querySelector('input[name="confirmPassword"]')?.value;
+      
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Заполните все поля');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        alert('Новые пароли не совпадают');
+        return;
+      }
+      if (newPassword.length < 6) {
+        alert('Новый пароль должен быть не менее 6 символов');
+        return;
+      }
+      
+      const token = localStorage.getItem('token');
+      
+      try {
+        const response = await fetch('/api/auth/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
         
-        const currentPassword = this.querySelector('input[name="currentPassword"]')?.value;
-        const newPassword = this.querySelector('input[name="newPassword"]')?.value;
-        const confirmPassword = this.querySelector('input[name="confirmPassword"]')?.value;
+        const data = await response.json();
         
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            alert('Заполните все поля');
-            return;
+        if (response.ok) {
+          alert('Пароль успешно изменён!');
+          this.querySelector('input[name="currentPassword"]').value = '';
+          this.querySelector('input[name="newPassword"]').value = '';
+          this.querySelector('input[name="confirmPassword"]').value = '';
+        } else {
+          alert(data.error || 'Ошибка смены пароля');
         }
-        
-        if (newPassword !== confirmPassword) {
-            alert('Новые пароли не совпадают');
-            return;
-        }
-        
-        if (newPassword.length < 6) {
-            alert('Новый пароль должен быть не менее 6 символов');
-            return;
-        }
-        
-        const token = localStorage.getItem('token');
-        
-        try {
-            const response = await fetch('/api/auth/change-password', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ currentPassword, newPassword })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                alert('Пароль успешно изменён!');
-                this.querySelector('input[name="currentPassword"]').value = '';
-                this.querySelector('input[name="newPassword"]').value = '';
-                this.querySelector('input[name="confirmPassword"]').value = '';
-            } else {
-                alert(data.error || 'Ошибка смены пароля');
-            }
-        } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Ошибка соединения с сервером');
-        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка соединения с сервером');
+      }
     });
-}
+  }
 
   // ========================
   // ВЫХОД
   // ========================
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-          if (confirm('Вы уверены, что хотите выйти?')) {
-              localStorage.clear();
-              
-              const headerIcon = document.querySelector('#accountIcon img');
-              if (headerIcon) {
-                  headerIcon.src = 'pictures/profile.png';
-                  headerIcon.style.width = '35px';
-                  headerIcon.style.height = '35px';
-                  headerIcon.style.borderRadius = '0';
-                  headerIcon.style.objectFit = 'contain';
-              }
-              
-              window.location.href = 'glavnaya.html';
-          }
-      });
+    logoutBtn.addEventListener('click', function() {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        localStorage.clear();
+        const headerIcon = document.querySelector('#accountIcon img');
+        if (headerIcon) {
+          headerIcon.src = 'pictures/profile.png';
+          headerIcon.style.width = '35px';
+          headerIcon.style.height = '35px';
+          headerIcon.style.borderRadius = '0';
+          headerIcon.style.objectFit = 'contain';
+        }
+        window.location.href = 'glavnaya.html';
+      }
+    });
   }
 
   // ========================
@@ -358,97 +330,93 @@ if (settingsForm) {
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
   if (deleteBtn) {
-      deleteBtn.addEventListener('click', function() {
-          if (deleteModal) {
-              deleteModal.classList.add('open');
-              deleteModal.style.display = 'flex';
-              document.body.style.overflow = 'hidden';
-          }
-      });
+    deleteBtn.addEventListener('click', function() {
+      if (deleteModal) {
+        deleteModal.classList.add('open');
+        deleteModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    });
   }
 
   function closeDeleteModalWindow() {
-      if (deleteModal) {
-          deleteModal.classList.remove('open');
-          deleteModal.style.display = 'none';
-          document.body.style.overflow = '';
-      }
+    if (deleteModal) {
+      deleteModal.classList.remove('open');
+      deleteModal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
   }
 
-  if (closeDeleteModal) {
-      closeDeleteModal.addEventListener('click', closeDeleteModalWindow);
-  }
-
-  if (cancelDeleteBtn) {
-      cancelDeleteBtn.addEventListener('click', closeDeleteModalWindow);
-  }
+  if (closeDeleteModal) closeDeleteModal.addEventListener('click', closeDeleteModalWindow);
+  if (cancelDeleteBtn) cancelDeleteBtn.addEventListener('click', closeDeleteModalWindow);
 
   if (deleteModal) {
-      deleteModal.addEventListener('click', function(e) {
-          if (e.target === deleteModal) {
-              closeDeleteModalWindow();
-          }
-      });
+    deleteModal.addEventListener('click', function(e) {
+      if (e.target === deleteModal) closeDeleteModalWindow();
+    });
   }
 
   if (confirmDeleteBtn) {
-      confirmDeleteBtn.addEventListener('click', async function() {
-          const token = localStorage.getItem('token');
-          if (!token) return;
-          
-          confirmDeleteBtn.disabled = true;
-          confirmDeleteBtn.textContent = 'Удаление...';
-          cancelDeleteBtn.disabled = true;
-          
-          try {
-              const response = await fetch('/api/auth/account', {
-                  method: 'DELETE',
-                  headers: { 'Authorization': `Bearer ${token}` }
-              });
-              
-              if (response.ok) {
-                  localStorage.clear();
-                  
-                  const headerIcon = document.querySelector('#accountIcon img');
-                  if (headerIcon) {
-                      headerIcon.src = 'pictures/profile.png';
-                      headerIcon.style.width = '35px';
-                      headerIcon.style.height = '35px';
-                      headerIcon.style.borderRadius = '0';
-                      headerIcon.style.objectFit = 'contain';
-                  }
-                  
-                  alert('Аккаунт успешно удалён');
-                  window.location.href = 'glavnaya.html';
-              } else {
-                  const data = await response.json();
-                  alert(data.error || 'Ошибка удаления аккаунта');
-                  confirmDeleteBtn.disabled = false;
-                  confirmDeleteBtn.textContent = 'Да, удалить';
-                  cancelDeleteBtn.disabled = false;
-              }
-          } catch (error) {
-              console.error('Ошибка:', error);
-              alert('Ошибка соединения с сервером');
-              confirmDeleteBtn.disabled = false;
-              confirmDeleteBtn.textContent = 'Да, удалить';
-              cancelDeleteBtn.disabled = false;
+    confirmDeleteBtn.addEventListener('click', async function() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.textContent = 'Удаление...';
+      cancelDeleteBtn.disabled = true;
+      
+      try {
+        const response = await fetch('/api/auth/account', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          localStorage.clear();
+          const headerIcon = document.querySelector('#accountIcon img');
+          if (headerIcon) {
+            headerIcon.src = 'pictures/profile.png';
+            headerIcon.style.width = '35px';
+            headerIcon.style.height = '35px';
+            headerIcon.style.borderRadius = '0';
+            headerIcon.style.objectFit = 'contain';
           }
-      });
+          alert('Аккаунт успешно удалён');
+          window.location.href = 'glavnaya.html';
+        } else {
+          const data = await response.json();
+          alert(data.error || 'Ошибка удаления аккаунта');
+          confirmDeleteBtn.disabled = false;
+          confirmDeleteBtn.textContent = 'Да, удалить';
+          cancelDeleteBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Ошибка соединения с сервером');
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Да, удалить';
+        cancelDeleteBtn.disabled = false;
+      }
+    });
   }
 
   document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && deleteModal && deleteModal.classList.contains('open')) {
-          closeDeleteModalWindow();
-      }
+    if (e.key === 'Escape' && deleteModal && deleteModal.classList.contains('open')) {
+      closeDeleteModalWindow();
+    }
   });
 
   // ========================
-  // ЗАГРУЗКА ЗАКАЗОВ
+  // ЗАГРУЗКА ЗАКАЗОВ И ПРОФИЛЯ
   // ========================
-  loadOrders();
+  loadProfile();  // ✅ Загружаем профиль
+  loadOrders();   // ✅ Загружаем заказы
   
-}); // КОНЕЦ DOMContentLoaded
+  // При загрузке открываем вкладку "Заказы"
+  const ordersTab = document.querySelector('.account-tab[data-tab="orders"]');
+  if (ordersTab) ordersTab.click();
+  
+});
 
 // ========================
 // ВСЕ ФУНКЦИИ ЗАКАЗОВ (ГЛОБАЛЬНЫЕ)
@@ -535,18 +503,18 @@ function renderOrders(orders) {
         if (canEdit) {
             actionsHtml = `
                 <button class="order-edit-btn" onclick="openEditOrderModal(${order.id})" 
-                        style="background:#337B57;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                        style="font-family:'Montserrat',sans-serif;background:#337B57;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
                     Изменить заказ
                 </button>
                 <button class="order-cancel-btn" onclick="cancelOrder(${order.id})" 
-                        style="background:#6B3A3A;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                        style="font-family:'Montserrat',sans-serif;background:#5e3e3e;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
                     Отменить заказ
                 </button>`;
             hintHtml = '<p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Вы можете изменить или отменить заказ</p>';
         } else if (canCancel) {
             actionsHtml = `
                 <button class="order-cancel-btn" onclick="cancelOrder(${order.id})" 
-                        style="background:#6B3A3A;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
+                        style="font-family:'Montserrat',sans-serif;background:#5e3e3e;border:none;border-radius:100px;padding:8px 18px;color:white;cursor:pointer;font-size:13px;">
                     Отменить заказ
                 </button>`;
             hintHtml = '<p style="font-size:12px;color:#f4a742;margin-top:6px;">Заказ оплачен. Для изменения свяжитесь с поддержкой. Отменить можно.</p>';
@@ -585,9 +553,9 @@ function renderOrders(orders) {
                 <span class="order-status ${status.class}">${status.text}</span>
             </div>
             <div style="display:flex;gap:20px;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.5);">
-                <span>🚚 ${deliveryMap[order.delivery_method] || order.delivery_method}</span>
-                <span>💳 ${paymentMethodMap[order.payment_method] || order.payment_method}</span>
-                <span>💰 ${paymentMap[order.payment_status] || order.payment_status}</span>
+                <span><img src="/pictures/delivery-car.png" alt="" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"> ${deliveryMap[order.delivery_method] || order.delivery_method}</span>
+<span><img src="/pictures/payment-card.png" alt="" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"> ${paymentMethodMap[order.payment_method] || order.payment_method}</span>
+<span><img src="/pictures/payment-cash.png" alt="" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"> ${paymentMap[order.payment_status] || order.payment_status}</span>
             </div>
             <div class="order-items">${itemsHtml}</div>
             <div class="order-footer">
@@ -636,7 +604,7 @@ window.openEditOrderModal = function(orderId) {
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
                 <span class="order-item-price" style="font-weight:600;">${item.total} Br</span>
                 <button onclick="removeEditItem(${index})" 
-                        style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;">Удалить</button>
+                        style="font-family:'Montserrat',sans-serif;background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;">Удалить</button>
             </div>
         </div>`;
     }).join('');

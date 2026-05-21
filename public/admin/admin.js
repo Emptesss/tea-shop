@@ -120,31 +120,31 @@ async function loadDashboard() {
             </div>
         `;
         
-        // Статистика по статусам заказов
+// Статистика по статусам заказов
 const os = stats.ordersByStatus || {};
 document.getElementById('ordersStatusStats').innerHTML = `
-    <div class="stat-card" style="border-left: 4px solid #3498db;">
-        <div class="stat-value" style="color: #3498db;">${os.new || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(51,123,87,0.3), rgba(94,62,62,0.3)); border-left: 4px solid rgba(51,123,87,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.new || 0}</div>
         <div class="stat-label">Новые</div>
     </div>
-    <div class="stat-card" style="border-left: 4px solid #f4a742;">
-        <div class="stat-value" style="color: #f4a742;">${os.processing || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(51,123,87,0.3), rgba(94,62,62,0.3)); border-left: 4px solid rgba(51,123,87,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.processing || 0}</div>
         <div class="stat-label">Собираются</div>
     </div>
-    <div class="stat-card" style="border-left: 4px solid #2ecc71;">
-        <div class="stat-value" style="color: #2ecc71;">${os.readyPickup || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(51,123,87,0.3), rgba(94,62,62,0.3)); border-left: 4px solid rgba(51,123,87,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.readyPickup || 0}</div>
         <div class="stat-label">Готовы к выдаче</div>
     </div>
-    <div class="stat-card" style="border-left: 4px solid #9b59b6;">
-        <div class="stat-value" style="color: #9b59b6;">${os.shipped || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(51,123,87,0.3), rgba(94,62,62,0.3)); border-left: 4px solid rgba(51,123,87,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.shipped || 0}</div>
         <div class="stat-label">В пути</div>
     </div>
-    <div class="stat-card" style="border-left: 4px solid #27ae60;">
-        <div class="stat-value" style="color: #27ae60;">${os.delivered || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(51,123,87,0.3), rgba(94,62,62,0.3)); border-left: 4px solid rgba(51,123,87,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.delivered || 0}</div>
         <div class="stat-label">Доставлены</div>
     </div>
-    <div class="stat-card" style="border-left: 4px solid #e74c3c;">
-        <div class="stat-value" style="color: #e74c3c;">${os.cancelled || 0}</div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(94,62,62,0.3), rgba(45,31,26,0.3)); border-left: 4px solid rgba(94,62,62,0.6);">
+        <div class="stat-value" style="color: #fff;">${os.cancelled || 0}</div>
         <div class="stat-label">Отменены</div>
     </div>
 `;
@@ -153,8 +153,8 @@ document.getElementById('ordersStatusStats').innerHTML = `
         const topProducts = stats.topProducts || [];
         document.getElementById('topProductsTable').innerHTML = `
             <div class="section-title" style="margin-top:24px;">Самые продаваемые товары</div>
-            <table>
-                <thead><tr><th>Товар</th><th>Цена</th><th>Продано</th></tr></thead>
+            <table style="table-layout:fixed;width:100%;">
+                <thead><tr><th style="width:60%;">Товар</th><th style="width:20%;">Цена</th><th style="width:20%;">Продано</th></tr></thead>
                 <tbody>
                     ${topProducts.map(p => `
                         <tr>
@@ -163,11 +163,11 @@ document.getElementById('ordersStatusStats').innerHTML = `
                                     <img src="${p.image1 ? (p.image1.startsWith('/') ? p.image1 : '/' + p.image1) : '/pictures/placeholder.jpg'}" 
                                          style="width:40px;height:40px;border-radius:8px;object-fit:cover;"
                                          onerror="this.src='/pictures/placeholder.jpg'">
-                                    <span>${p.name}</span>
+                                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</span>
                                 </div>
                             </td>
                             <td>${p.price} Br</td>
-                            <td><span class="badge badge-success">${p.purchase_count || 0} шт.</span></td>
+                            <td style="color:#fff;font-weight:500;">${p.purchase_count || 0} шт.</td>
                         </tr>
                     `).join('')}
                     ${topProducts.length === 0 ? '<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">Нет данных</td></tr>' : ''}
@@ -179,8 +179,8 @@ document.getElementById('ordersStatusStats').innerHTML = `
         const bottomProducts = stats.bottomProducts || [];
         document.getElementById('bottomProductsTable').innerHTML = `
             <div class="section-title" style="margin-top:24px;">Наименее продаваемые товары</div>
-            <table>
-                <thead><tr><th>Товар</th><th>Цена</th><th>Продано</th></tr></thead>
+            <table style="table-layout:fixed;width:100%;">
+                <thead><tr><th style="width:60%;">Товар</th><th style="width:20%;">Цена</th><th style="width:20%;">Продано</th></tr></thead>
                 <tbody>
                     ${bottomProducts.map(p => `
                         <tr>
@@ -189,11 +189,11 @@ document.getElementById('ordersStatusStats').innerHTML = `
                                     <img src="${p.image1 ? (p.image1.startsWith('/') ? p.image1 : '/' + p.image1) : '/pictures/placeholder.jpg'}" 
                                          style="width:40px;height:40px;border-radius:8px;object-fit:cover;"
                                          onerror="this.src='/pictures/placeholder.jpg'">
-                                    <span>${p.name}</span>
+                                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</span>
                                 </div>
                             </td>
                             <td>${p.price} Br</td>
-                            <td><span class="badge badge-warning">${p.purchase_count || 0} шт.</span></td>
+                            <td style="color:#fff;font-weight:500;">${p.purchase_count || 0} шт.</td>
                         </tr>
                     `).join('')}
                     ${bottomProducts.length === 0 ? '<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);">Нет данных</td></tr>' : ''}
@@ -201,7 +201,7 @@ document.getElementById('ordersStatusStats').innerHTML = `
             </table>
         `;
         
-        // Последние заказы
+// Последние заказы
         const statusMap = { 
     'NEW': 'Новый', 
     'PROCESSING': 'Собирается', 
@@ -214,10 +214,11 @@ document.getElementById('ordersStatusStats').innerHTML = `
         const orders = ordersRes.orders || [];
         document.getElementById('recentOrdersTable').innerHTML = `
             <div class="section-title" style="margin-top:24px;">Последние заказы</div>
-            <table><thead><tr><th>Номер</th><th>Клиент</th><th>Сумма</th><th>Статус</th></tr></thead><tbody>
+            <table style="table-layout:fixed;width:100%;">
+                <thead><tr><th style="width:25%;">Номер</th><th style="width:25%;">Клиент</th><th style="width:25%;">Сумма</th><th style="width:25%;">Статус</th></tr></thead><tbody>
             ${orders.map(o => `
                 <tr><td>${o.order_number}</td><td>${o.name}</td><td>${o.total} Br</td>
-                <td><span class="badge badge-${o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning'}">${statusMap[o.status] || o.status}</span></td></tr>
+                <td style="color:#fff;font-weight:500;">${statusMap[o.status] || o.status}</td></tr>
             `).join('')}
             ${orders.length === 0 ? '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">Нет заказов</td></tr>' : ''}
             </tbody></table>`;
@@ -260,7 +261,7 @@ async function openProductForm(id = null) {
     await loadCategories();
     
     const catSelect = document.getElementById('prodCategory');
-    catSelect.innerHTML = '<option value="">-- Выберите категорию --</option>' + 
+    catSelect.innerHTML = '<option value="">Выберите категорию</option>' + 
         categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     
     editingProductId = id;
@@ -513,8 +514,8 @@ async function loadOrders() {
     const paymentStatusMap = {
         'UNPAID': 'Не оплачен',
         'PAID': 'Оплачен',
-        'REFUND_PENDING': '⚠️ Ожидает возврат',
-        'REFUNDED': '✅ Возвращён'
+        'REFUND_PENDING': 'Ожидает возврат',
+        'REFUNDED': 'Возвращён'
     };
     
     // Сохраняем все заказы
@@ -556,8 +557,7 @@ async function loadOrders() {
     document.getElementById('ordersTable').innerHTML = `
         ${refundPendingCount > 0 ? `
         <div style="
-            background: rgba(255, 60, 60, 0.1);
-            border: 1px solid rgba(255, 60, 60, 0.3);
+            background: rgba(94, 62, 62, 0.3);
             border-radius: 12px;
             padding: 12px 20px;
             margin-bottom: 16px;
@@ -565,9 +565,8 @@ async function loadOrders() {
             align-items: center;
             gap: 12px;
         ">
-            <span style="font-size:20px;">⚠️</span>
             <div>
-                <strong style="color:#ff4444;">Требуется возврат денег:</strong>
+                <span style="font-weight:600;color:rgb(255,255,255);">Требуется возврат денег :</span>
                 <span style="color:rgba(255,255,255,0.8);">${refundPendingCount} заказ(ов) ожидают возврата</span>
             </div>
         </div>
@@ -599,15 +598,14 @@ async function loadOrders() {
             <button class="filter-chip ${currentOrderFilter === 'refunded' ? 'active' : ''}" onclick="setOrderFilter('refunded')">
                 Возвраты<span class="count">${counts.refunded}</span>
             </button>
-            <span style="color:var(--border);margin:0 4px;">|</span>
             <button class="filter-chip ${currentOrderFilter === 'paid' ? 'active' : ''}" onclick="setOrderFilter('paid')" style="border-color:rgba(51,123,87,0.3);">
                 Оплачены<span class="count">${counts.paid}</span>
             </button>
             <button class="filter-chip ${currentOrderFilter === 'unpaid' ? 'active' : ''}" onclick="setOrderFilter('unpaid')" style="border-color:rgba(255,255,255,0.15);">
                 Не оплачены<span class="count">${counts.unpaid}</span>
             </button>
-            <button class="filter-chip ${currentOrderFilter === 'refund_pending' ? 'active' : ''}" onclick="setOrderFilter('refund_pending')" style="border-color:rgba(255,60,60,0.3);">
-                Требуют возврата<span class="count" style="background:rgba(255,60,60,0.3);">${counts.refundPending}</span>
+            <button class="filter-chip ${currentOrderFilter === 'refund_pending' ? 'active' : ''}" onclick="setOrderFilter('refund_pending')" style="border-color:#5E3E3E;">
+                Требуют возврата<span class="count" style="background:#5E3E3E ;">${counts.refundPending}</span>
             </button>
         </div>
         
@@ -634,7 +632,6 @@ async function loadOrders() {
             <tr class="${needsRefund ? 'refund-pending' : ''}">
                 <td>
                     <strong>${o.order_number}</strong>
-                    ${needsRefund ? `<span class="refund-alert">💸 Требуется возврат</span>` : ''}
                 </td>
                 <td>${o.name} ${o.surname}</td>
                 <td>${o.phone}</td>
@@ -647,26 +644,27 @@ async function loadOrders() {
                 </td>
                 <td>
                     <span style="
-                        font-size:12px;
-                        font-weight:600;
-                        color: ${o.payment_status === 'REFUND_PENDING' ? '#ff4444' : 
-                                o.payment_status === 'REFUNDED' ? '#27ae60' : 
-                                o.payment_status === 'PAID' ? '#337B57' : 
-                                'rgba(255,255,255,0.5)'};
-                    ">
-                        ${paymentStatusMap[o.payment_status] || o.payment_status}
-                    </span>
+    font-family:'Montserrat',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color: ${o.payment_status === 'REFUND_PENDING' ? 'rgba(255,255,255,0.8)' : 
+            o.payment_status === 'REFUNDED' ? '#337B57' : 
+            o.payment_status === 'PAID' ? '#337B57' : 
+            'rgba(255,255,255,0.8)'};
+">
+    ${paymentStatusMap[o.payment_status] || o.payment_status}
+</span>
                 </td>
                 <td>${new Date(o.created_at).toLocaleDateString('ru-RU')}</td>
                 <td>
-                    <button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})">
-                        Подробнее
-                    </button>
-                    ${o.status === 'NEW' || o.status === 'PROCESSING' ? `
-                    <button class="btn btn-sm btn-danger" onclick="openCancelOrderModal(${o.id})" style="margin-left:4px;">
-                        Отменить
-                    </button>
-                    ` : ''}
+<button class="btn btn-sm btn-outline" onclick="showOrderDetail(${o.id})" style="justify-content:center;margin-bottom:12px;">
+    Подробнее
+</button>
+${o.status === 'NEW' || o.status === 'PROCESSING' ? `
+<button class="btn btn-sm btn-danger" onclick="openCancelOrderModal(${o.id})" style="min-width:90px;justify-content:center;margin-left:8px;margin-bottom:4px;">
+    Отменить
+</button>
+` : ''}
                 </td>
             </tr>
             `;
@@ -700,34 +698,13 @@ function showOrderDetail(orderId) {
     const paymentStatusMap = {
         'UNPAID': 'Не оплачен',
         'PAID': 'Оплачен',
-        'REFUND_PENDING': '⚠️ Ожидает возврат',
-        'REFUNDED': '✅ Возвращён'
+        'REFUND_PENDING': 'Ожидает возврат',
+        'REFUNDED': 'Возвращён'
     };
     
     const needsRefund = order.payment_status === 'REFUND_PENDING';
     
     document.getElementById('orderDetailContent').innerHTML = `
-        ${needsRefund ? `
-        <div style="
-            background: rgba(255, 60, 60, 0.1);
-            border: 1px solid rgba(255, 60, 60, 0.3);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        ">
-            <span style="font-size:24px;">⚠️</span>
-            <div>
-                <strong style="color:#ff4444;font-size:16px;">Требуется возврат денег!</strong>
-                <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:14px;">
-                    Заказ отменён, оплата ${paymentMap[order.payment_method] || order.payment_method}.<br>
-                    Сумма к возврату: <strong style="color:#ff4444;">${order.total} Br</strong>
-                </p>
-            </div>
-        </div>
-        ` : ''}
         
         ${order.payment_status === 'REFUNDED' ? `
         <div style="
@@ -740,10 +717,10 @@ function showOrderDetail(orderId) {
             align-items: center;
             gap: 12px;
         ">
-            <span style="font-size:24px;">✅</span>
+
             <div>
                 <strong style="color:#27ae60;font-size:16px;">Возврат оформлен</strong>
-                <p style="color:rgba(255,255,255,0.7);margin:4px 0 0;font-size:14px;">
+                <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:14px;">
                     Сумма ${order.total} Br возвращена клиенту
                 </p>
             </div>
@@ -762,8 +739,9 @@ function showOrderDetail(orderId) {
             <div>
                 <div style="color:var(--text-secondary);font-size:13px;margin-bottom:4px;">Оплата</div>
                 <span style="
+
                     font-weight:600;
-                    color: ${order.payment_status === 'REFUND_PENDING' ? '#ff4444' : 
+                    color: ${order.payment_status === 'REFUND_PENDING' ? '#5E3E3E' : 
                             order.payment_status === 'REFUNDED' ? '#27ae60' : 
                             order.payment_status === 'PAID' ? '#337B57' : 
                             'rgba(255,255,255,0.7)'};
@@ -814,7 +792,7 @@ ${order.cancel_reason ? `
     
     ${order.payment_status === 'REFUNDED' ? `
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(39,174,96,0.2);">
-        <div style="color:#27ae60;font-size:12px;">✅ Деньги возвращены</div>
+        <div style="color:#27ae60;font-size:12px;">Деньги возвращены</div>
     </div>
     ` : ''}
 </div>
@@ -882,7 +860,7 @@ async function updateOrderStatus(id, status) {
         if (res.ok) {
             // Перезагружаем список заказов для обновления сумм
             await loadOrders();
-            console.log('✅ Статус заказа обновлён');
+            console.log('Статус заказа обновлён');
         } else {
             alert('Ошибка: ' + (data.error || 'Не удалось обновить статус'));
         }
@@ -950,12 +928,12 @@ async function loadReviews() {
                 <td>${r.id}</td><td>${r.author_name}</td><td>${r.product_name || ''}</td>
                 <td>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</td>
                 <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(r.content || '').substring(0, 60)}...</td>
-                <td><span class="badge ${r.is_approved ? 'badge-success' : 'badge-warning'}">${r.is_approved ? 'Да' : 'Нет'}</span></td>
-                <td style="white-space:nowrap;">
+                <td><span class="badge ${r.is_approved ? 'badge-success' : 'badge-danger'}" style="color:#fff;">${r.is_approved ? 'Да' : 'Нет'}</span></td>
+                <td style="white-space:nowrap;display:flex;align-items:center;gap:4px;">
                     <button class="btn btn-sm btn-outline" onclick="showReviewDetail(${r.id})">Подробнее</button>
                     <button class="btn btn-sm ${r.is_approved ? 'btn-outline' : 'btn-primary'}" onclick="toggleApproveReview(${r.id}, ${!r.is_approved})">${r.is_approved ? 'Скрыть' : 'Одобрить'}</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteReview(${r.id})">
-                        <img src="/pictures/delete.png" alt="Уд." style="width:16px;height:16px;">
+                    <button class="btn btn-sm btn-outline" onclick="deleteReview(${r.id})" style="padding:6px 8px;">
+                        <img src="/pictures/delete.png" alt="Удалить" style="width:16px;height:16px;display:block;">
                     </button>
                 </td>
             </tr>
@@ -1049,7 +1027,7 @@ async function loadCategories() {
         // API возвращает массив напрямую
         categories = Array.isArray(data) ? data : [];
         
-        console.log('📁 Категории загружены:', categories);
+        console.log('Категории загружены:', categories);
         
         // Заполняем таблицу
         const table = document.getElementById('categoriesTable');
@@ -1179,16 +1157,17 @@ async function loadTastesForProduct(productId) {
         }
         
         container.innerHTML = allTastes.map(taste => `
-            <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;">
+            <label class="checkbox-item">
                 <input type="checkbox" 
                        value="${taste.id}" 
-                       class="taste-checkbox"
+                       class="taste-checkbox checkbox-input"
                        ${productTasteIds.includes(taste.id) ? 'checked' : ''}>
-                <span>${taste.name}</span>
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">${taste.name}</span>
             </label>
         `).join('');
         
-        console.log('✅ Вкусы загружены:', allTastes.length, 'шт.');
+        console.log('Вкусы загружены:', allTastes.length, 'шт.');
     } catch (e) {
         console.error('Ошибка загрузки вкусов:', e);
     }
