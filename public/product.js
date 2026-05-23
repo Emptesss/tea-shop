@@ -220,12 +220,10 @@ if (ratingText) {
     
     // Избранное
     const favBtn = document.querySelector('.product-favorite-btn');
-    if (favBtn) {
-        favBtn.dataset.productId = product.id;
-        favBtn.addEventListener('click', function() {
-            toggleFavorite(this);
-        });
-    }
+if (favBtn) {
+    favBtn.dataset.productId = product.id;
+    // ✅ НЕ добавляем addEventListener — HTML уже имеет onclick="toggleFavorite(this)"
+}
     
     // Проверяем статус избранного
     checkFavoriteStatus(product.id);
@@ -393,7 +391,8 @@ async function checkFavoriteStatus(productId) {
     
     if (!token) {
         const favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-        if (favs.includes(productId)) {
+        // ✅ Сравниваем как числа
+        if (favs.map(Number).includes(Number(productId))) {
             favBtn.classList.add('active');
             const img = favBtn.querySelector('img');
             if (img) img.src = 'pictures/love.png';
@@ -419,14 +418,18 @@ async function checkFavoriteStatus(productId) {
 
 function saveLocalFavorite(productId) {
     let favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-    if (!favs.includes(productId)) favs.push(productId);
+    const numId = Number(productId);
+    // ✅ Проверяем по числам
+    if (!favs.map(Number).includes(numId)) favs.push(numId);
     localStorage.setItem('localFavorites', JSON.stringify(favs));
+    console.log('Добавлено в избранное:', numId, 'Все:', favs); // для отладки
 }
-
 function removeLocalFavorite(productId) {
     let favs = JSON.parse(localStorage.getItem('localFavorites') || '[]');
-    favs = favs.filter(id => id != productId);
+    const numId = Number(productId);
+    favs = favs.filter(id => Number(id) !== numId);
     localStorage.setItem('localFavorites', JSON.stringify(favs));
+    console.log('Удалено из избранного:', numId, 'Осталось:', favs); // для отладки
 }
 
 // ========================
