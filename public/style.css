@@ -7736,7 +7736,7 @@ input[type="text"].was-password {
   font-size: 18px;
   color: rgba(255, 255, 255);
   text-align: center;
-  margin: 0 auto 30px auto;
+  margin: 0 auto 60px auto;
   max-width: 800px;
   line-height: 1.6;
 }
@@ -7746,7 +7746,7 @@ input[type="text"].was-password {
    ======================== */
 .delivery-section,
 .payment-section {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 .delivery-section-title {
@@ -7904,7 +7904,7 @@ input[type="text"].was-password {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .payment-method {
@@ -7969,7 +7969,7 @@ input[type="text"].was-password {
 .delivery-faq-cta {
   text-align: center;
   max-width: 700px;
-  margin: 30px auto 0 auto;
+  margin: 60px auto 0 auto;
 }
 
 .delivery-faq-inner {
