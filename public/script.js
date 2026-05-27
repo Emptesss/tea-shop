@@ -1133,8 +1133,15 @@ function createProductCard(product) {
         ? '<div class="stock-badge in-stock">В наличии</div>'
         : '<div class="stock-badge out-of-stock">Нет в наличии</div>';
     
+    // Расчёт скидки в процентах
+    let discountBadge = '';
+    if (product.old_price && product.old_price > product.price) {
+        const discount = Math.round((1 - product.price / product.old_price) * 100);
+        discountBadge = `<div class="discount-badge">-${discount}%</div>`;
+    }
+    
     const oldPriceHtml = product.old_price 
-        ? `<span style="text-decoration: line-through; opacity: 0.5; font-size: 14px; margin-left: 4px;">${product.old_price} Br</span>`
+        ? `<span class="card-old-price">${product.old_price} Br</span>`
         : '';
     
     // Формируем путь к изображению
@@ -1144,6 +1151,7 @@ function createProductCard(product) {
         <div class="product-card catalog-product-card" data-product-id="${product.id}">
             ${stockBadge}
             <div class="card-image-wrapper">
+                ${discountBadge}
                 <img src="${imageUrl}" alt="${product.name}" class="card-image">
             </div>
             <div class="card-badge">Купили <span class="purchase-count">${product.purchase_count || 0}</span> раз</div>
@@ -1612,10 +1620,22 @@ function createMainPageCard(product) {
         ? '<div class="stock-badge in-stock">В наличии</div>'
         : '<div class="stock-badge out-of-stock">Нет в наличии</div>';
     
+    // Расчёт скидки в процентах
+    let discountBadge = '';
+    if (product.old_price && product.old_price > product.price) {
+        const discount = Math.round((1 - product.price / product.old_price) * 100);
+        discountBadge = `<div class="discount-badge">-${discount}%</div>`;
+    }
+    
+    const oldPriceHtml = product.old_price 
+        ? `<span class="card-old-price">${product.old_price} Br</span>`
+        : '';
+    
     return `
         <div class="product-card" data-product-id="${product.id}">
             ${stockBadge}
             <div class="card-image-wrapper">
+                ${discountBadge}
                 <img src="${product.image1 || 'pictures/placeholder.jpg'}" alt="${product.name}" class="card-image">
             </div>
             <div class="card-badge">Купили <span class="purchase-count">${product.purchase_count || 0}</span> раз</div>
@@ -1626,14 +1646,13 @@ function createMainPageCard(product) {
                 <a href="product.html?slug=${product.slug}" class="card-desc-link">
                     <div class="card-desc">${product.short_desc || ''}</div>
                 </a>
-                <div class="card-price">${product.price} br <span class="card-price-unit">/ 50 г</span></div>
+                <div class="card-price">${product.price} Br <span class="card-price-unit">/ 50 г</span>${oldPriceHtml}</div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">
                     <button class="qty-btn minus">−</button><span class="qty-value">1</span><button class="qty-btn plus">+</button>
                 </div>
                 <div class="card-bottom-row">
                     <button class="card-btn add-to-cart-btn">В корзину</button>
-                    <!-- ✅ ДОБАВЬ onclick -->
                     <button class="card-favorite-bottom" onclick="toggleFavoriteBottom(this)">
                         <img src="pictures/heart-empty.png" alt="В избранное" class="card-favorite-bottom-img">
                     </button>
@@ -1641,7 +1660,6 @@ function createMainPageCard(product) {
             </div>
         </div>`;
 }
-
 function setupMainPageCardListeners() {
     const cardsRow = document.querySelector('.products-section .cards-row');
     if (!cardsRow) return;

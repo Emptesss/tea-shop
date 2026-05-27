@@ -8122,3 +8122,40 @@ input[type="text"].was-password {
     padding: 30px 20px;
   }
 }
+/* ========================
+   БЕЙДЖ СКИДКИ НА КАРТОЧКЕ
+   ======================== */
+.discount-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ff4757;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 6px;
+    z-index: 2;
+    pointer-events: none;
+    line-height: 1.2;
+}
+
+/* Старая цена (зачёркнутая) */
+.card-old-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+    font-size: 14px;
+    margin-left: 6px;
+    color: rgba(255,255,255,0.6);
+}
+
+/* Старая цена на странице товара */
+.product-old-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+    font-size: 18px;
+    margin-left: 8px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Montserrat', sans-serif;
+}

@@ -99,6 +99,12 @@ if (badgesEl) {
         badgesHtml += '<span class="gallery-badge" style="background: #337B57;">Новинка</span>';
     }
     
+    // ✅ СКИДКА — добавляем динамически
+    if (product.old_price && product.old_price > product.price) {
+        const discount = Math.round((1 - product.price / product.old_price) * 100);
+        badgesHtml += `<span class="gallery-badge discount-badge-on-image">-${discount}%</span>`;
+    }
+    
     // В наличии
     if (product.in_stock) {
         badgesHtml += '<span class="gallery-badge in-stock">В наличии</span>';
@@ -169,9 +175,35 @@ if (ratingText) {
     const shortDesc = document.querySelector('.product-short-desc');
     if (shortDesc) shortDesc.textContent = product.short_desc || '';
     
-    // Цена
+        // Цена и старая цена
     const priceEl = document.querySelector('.product-price');
-    if (priceEl) priceEl.textContent = product.price + ' Br';
+    const oldPriceEl = document.querySelector('.product-old-price');
+    const discountBadgeEl = document.querySelector('.product-discount-badge');
+    
+    if (priceEl) {
+        priceEl.textContent = product.price + ' Br';
+    }
+    
+    // Старая цена (зачёркнутая)
+    if (oldPriceEl) {
+        if (product.old_price && product.old_price > product.price) {
+            oldPriceEl.textContent = product.old_price + ' Br';
+            oldPriceEl.style.display = 'inline';
+        } else {
+            oldPriceEl.style.display = 'none';
+        }
+    }
+    
+    // Бейдж скидки в процентах
+    if (discountBadgeEl) {
+        if (product.old_price && product.old_price > product.price) {
+            const discount = Math.round((1 - product.price / product.old_price) * 100);
+            discountBadgeEl.textContent = '-' + discount + '%';
+            discountBadgeEl.style.display = 'inline-block';
+        } else {
+            discountBadgeEl.style.display = 'none';
+        }
+    }
     
     // Характеристики
     const charsEl = document.querySelector('.product-characteristics');
@@ -473,15 +505,29 @@ async function addToCartApi(productId, quantity, button) {
 // ПОХОЖИЕ ТОВАРЫ
 // ========================
 function createSimilarCard(p) {
+    // Расчёт скидки
+    let discountBadge = '';
+    if (p.old_price && p.old_price > p.price) {
+        const discount = Math.round((1 - p.price / p.old_price) * 100);
+        discountBadge = `<div class="discount-badge">-${discount}%</div>`;
+    }
+    
+    const oldPriceHtml = p.old_price 
+        ? `<span class="card-old-price">${p.old_price} Br</span>`
+        : '';
+    
     return `
         <div class="product-card" data-product-id="${p.id}">
             <div class="stock-badge in-stock">В наличии</div>
-            <div class="card-image-wrapper"><img src="${p.image1 || 'pictures/placeholder.jpg'}" alt="${p.name}" class="card-image"></div>
+            <div class="card-image-wrapper">
+                ${discountBadge}
+                <img src="${p.image1 || 'pictures/placeholder.jpg'}" alt="${p.name}" class="card-image">
+            </div>
             <div class="card-badge">Купили <span class="purchase-count">${p.purchase_count || 0}</span> раз</div>
             <div class="card-body">
                 <a href="product.html?slug=${p.slug}" class="card-name-link"><div class="card-name">${p.name}</div></a>
                 <div class="card-desc">${p.short_desc || ''}</div>
-                <div class="card-price">${p.price} Br <span class="card-price-unit">/ 50 г</span></div>
+                <div class="card-price">${p.price} Br <span class="card-price-unit">/ 50 г</span>${oldPriceHtml}</div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">
                     <button class="qty-btn minus">−</button><span class="qty-value">1</span><button class="qty-btn plus">+</button>

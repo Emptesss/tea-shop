@@ -558,10 +558,21 @@ function renderOrders(orders) {
 <span><img src="/pictures/payment-cash.png" alt="" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;"> ${paymentMap[order.payment_status] || order.payment_status}</span>
             </div>
             <div class="order-items">${itemsHtml}</div>
-            <div class="order-footer">
-                <span class="order-total">Итого: ${order.total} Br</span>
+                                    <div class="order-footer">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span class="order-total">Итого: ${order.total} Br</span>
+                    <div style="display:flex;gap:16px;font-size:12px;color:rgba(255,255,255,0.5);">
+                        <span>Товары: ${order.subtotal} Br</span>
+                        ${order.delivery_price > 0 ? `<span>Доставка: ${order.delivery_price} Br</span>` : `<span style="color:#337B57;">Доставка: бесплатно</span>`}
+                    </div>
+                </div>
                 <div style="display:flex;align-items:center;gap:10px;">
                     ${actionsHtml}
+                    ${order.status === 'DELIVERED' ? `
+                    <button class="order-repeat-btn" onclick="repeatOrder('${order.order_number}')" 
+                            style="font-family:'Montserrat',sans-serif;background:linear-gradient(to right, #0D2719, #337B57);border:none;border-radius:100px;padding:10px 20px;color:white;cursor:pointer;font-size:14px;">
+                        Повторить заказ
+                    </button>` : ''}
                 </div>
             </div>
             ${hintHtml}
@@ -777,5 +788,35 @@ window.cancelOrder = async function(orderId) {
 
 // Повторить заказ
 window.repeatOrder = async function(orderNumber) {
-    alert('Функция повтора заказа будет добавлена позже');
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+        alert('Войдите в аккаунт, чтобы повторить заказ');
+        return;
+    }
+    
+    const order = (window._allOrders || []).find(o => o.order_number === orderNumber);
+    if (!order) {
+        alert('Заказ не найден');
+        return;
+    }
+    
+    if (!order.items || order.items.length === 0) {
+        alert('В заказе нет товаров');
+        return;
+    }
+    
+    // Сохраняем товары для повтора в sessionStorage
+    const repeatItems = order.items.map(item => ({
+        productId: item.product_id,
+        quantity: item.quantity,
+        name: item.product_name,
+        price: item.price,
+        image: item.product_image
+    }));
+    
+    sessionStorage.setItem('repeatOrderItems', JSON.stringify(repeatItems));
+    
+    // Перенаправляем на оформление
+    window.location.href = 'checkout.html';
 };

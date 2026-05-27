@@ -44,6 +44,47 @@ document.addEventListener('DOMContentLoaded', function() {
       closeAndRedirect();
     }
   });
+    // ========================
+  // ПРОВЕРКА ПОВТОРА ЗАКАЗА
+  // ========================
+  const repeatItems = sessionStorage.getItem('repeatOrderItems');
+  
+  if (repeatItems) {
+      const items = JSON.parse(repeatItems);
+      console.log('🔄 Повтор заказа, товары:', items);
+      
+      // Отображаем товары в сводке БЕЗ добавления в корзину
+      const itemsContainer = document.querySelector('.checkout-items');
+      if (itemsContainer) {
+          itemsContainer.innerHTML = items.map(item => {
+              const imgSrc = item.image || 'pictures/placeholder.jpg';
+              return `
+              <div class="checkout-item">
+                  <img src="${imgSrc}" alt="${item.name}" class="checkout-item-img">
+                  <div class="checkout-item-info">
+                      <span class="checkout-item-name">${item.name}</span>
+                      <span class="checkout-item-qty">× ${item.quantity}</span>
+                  </div>
+                  <span class="checkout-item-price">${(item.price * item.quantity).toFixed(0)} Br</span>
+              </div>`;
+          }).join('');
+      }
+      
+      // Сохраняем товары в глобальную переменную
+      window._repeatOrderItems = items;
+      
+      // Обновляем сумму
+      const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const subtotalEl = document.getElementById('checkoutSubtotal');
+      const totalEl = document.getElementById('checkoutTotal');
+      if (subtotalEl) subtotalEl.textContent = subtotal + ' Br';
+      if (totalEl) totalEl.textContent = subtotal + ' Br';
+  }
+  
+  // Очищаем повтор при уходе
+  window.addEventListener('beforeunload', function() {
+      sessionStorage.removeItem('repeatOrderItems');
+  });
   
   loadCheckoutCart();
   setupPasswordToggles();
@@ -433,7 +474,28 @@ async function placeOrder() {
         if (!token && sessionId) {
             body.sessionId = sessionId;
         }
-        
+                // Если это повтор заказа — добавляем товары в корзину
+        if (window._repeatOrderItems && window._repeatOrderItems.length > 0) {
+            for (const item of window._repeatOrderItems) {
+                const cartBody = { 
+                    productId: item.productId, 
+                    quantity: item.quantity,
+                    sessionId: sessionId
+                };
+                
+                const cartHeaders = { 'Content-Type': 'application/json' };
+                if (token) cartHeaders['Authorization'] = `Bearer ${token}`;
+                
+                await fetch('/api/cart', {
+                    method: 'POST',
+                    headers: cartHeaders,
+                    body: JSON.stringify(cartBody)
+                });
+            }
+            // Очищаем
+            sessionStorage.removeItem('repeatOrderItems');
+            window._repeatOrderItems = null;
+        }
         const response = await fetch('/api/orders', {
             method: 'POST',
             headers: headers,

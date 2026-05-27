@@ -1488,8 +1488,9 @@ app.get('/api/orders', authenticateToken, async (req, res) => {
     try {
         const userId = req.user.id;
         
-        const ordersResult = await pool.query(
+                const ordersResult = await pool.query(
             `SELECT id, order_number, status, payment_status, total, 
+                    subtotal, delivery_price,
                     delivery_method, payment_method, created_at
              FROM orders
              WHERE user_id = $1
