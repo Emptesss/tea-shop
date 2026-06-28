@@ -32,7 +32,12 @@ async function loadProduct() {
         const product = await response.json();
         window._currentProductId = product.id;
         renderProductData(product);
-        
+
+        const infoEl = document.querySelector('.product-info');
+        if (infoEl) { infoEl.style.transition = 'opacity 0.3s ease'; infoEl.style.opacity = '1'; }
+        const footerEl = document.querySelector('.footer');
+        if (footerEl) { footerEl.style.transition = 'opacity 0.3s ease'; footerEl.style.opacity = '1'; }
+
         // Загружаем отзывы после получения ID товара
         loadReviews(product.id);
         
@@ -58,62 +63,85 @@ function renderProductData(product) {
     if (images.length === 0) images.push('pictures/placeholder.jpg');
     
     const mainImg = document.getElementById('mainProductImage');
-    if (mainImg && images.length > 0) mainImg.src = images[0];
+    if (mainImg && images.length > 0) {
+        mainImg.src = images[0];
+        mainImg.alt = product.name;
+        mainImg.style.display = '';
+    }
     
     // Сохраняем изображения для галереи
     window.productImages = images;
     
-    // Миниатюры
-   const thumbsEl = document.querySelector('.gallery-thumbnails');
-if (thumbsEl && images.length > 0) {
-    thumbsEl.innerHTML = images.map((img, i) => {
-        // Убеждаемся, что путь правильный
-        let imgSrc = img;
-        if (!imgSrc.startsWith('pictures/') && !imgSrc.startsWith('/pictures/')) {
-            imgSrc = imgSrc;
+    // Миниатюры и кнопки навигации
+    const thumbsEl = document.querySelector('.gallery-thumbnails');
+    const prevBtn = document.querySelector('.gallery-prev');
+    const nextBtn = document.querySelector('.gallery-next');
+
+    if (images.length > 1) {
+        if (thumbsEl) {
+            thumbsEl.innerHTML = images.map((img, i) => `
+                <button class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}">
+                    <img src="${img}" alt="Фото ${i+1}" class="gallery-thumb-img">
+                </button>
+            `).join('');
+            thumbsEl.style.display = 'flex';
+
+            thumbsEl.querySelectorAll('.gallery-thumb img').forEach(img => {
+                img.onerror = function() {
+                    this.closest('.gallery-thumb').remove();
+                    const remaining = thumbsEl.querySelectorAll('.gallery-thumb').length;
+                    if (remaining <= 1) {
+                        thumbsEl.style.display = 'none';
+                        if (prevBtn) prevBtn.style.display = 'none';
+                        if (nextBtn) nextBtn.style.display = 'none';
+                    }
+                };
+            });
         }
-        return `
-            <button class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}">
-                <img src="${imgSrc}" alt="Фото ${i+1}" class="gallery-thumb-img">
-            </button>
-        `;
-    }).join('');
-    
-    // Задержка для рендеринга DOM перед навешиванием обработчиков
-    setTimeout(() => setupGalleryListeners(), 100);
-}
-    
-    // Бейджи
-    // Бейджи
-const badgesEl = document.querySelector('.gallery-badges');
-if (badgesEl) {
-    let badgesHtml = '';
-    
-    // Хит продаж — только если товар в топ-5 по покупкам И рейтинг выше 4.5
-    if (product.purchase_count >= 200 && product.rating >= 4.5) {
-        badgesHtml += '<span class="gallery-badge bestseller">Хит продаж</span>';
-    }
-    
-    // Новинка — если год сбора 2026
-    if (product.year === 2026) {
-        badgesHtml += '<span class="gallery-badge" style="background: #337B57;">Новинка</span>';
-    }
-    
-    // ✅ СКИДКА — добавляем динамически
-    if (product.old_price && product.old_price > product.price) {
-        const discount = Math.round((1 - product.price / product.old_price) * 100);
-        badgesHtml += `<span class="gallery-badge discount-badge-on-image">-${discount}%</span>`;
-    }
-    
-    // В наличии
-    if (product.in_stock) {
-        badgesHtml += '<span class="gallery-badge in-stock">В наличии</span>';
+        if (prevBtn) prevBtn.style.display = '';
+        if (nextBtn) nextBtn.style.display = '';
+        setTimeout(() => setupGalleryListeners(), 100);
     } else {
-        badgesHtml += '<span class="gallery-badge" style="background: #0D2719;">Нет в наличии</span>';
+        if (thumbsEl) { thumbsEl.innerHTML = ''; thumbsEl.style.display = 'none'; }
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
     }
     
-    badgesEl.innerHTML = badgesHtml;
-}
+    // Бейджи (левый верхний угол)
+    const badgesEl = document.querySelector('.gallery-badges');
+    if (badgesEl) {
+        let badgesHtml = '';
+        if (product.purchase_count >= 200 && product.rating >= 4.5) {
+            badgesHtml += '<span class="gallery-badge bestseller">Хит продаж</span>';
+        }
+        if (product.year === 2026) {
+            badgesHtml += '<span class="gallery-badge" style="background: #337B57;">Новинка</span>';
+        }
+        if (product.in_stock) {
+            badgesHtml += '<span class="gallery-badge in-stock">В наличии</span>';
+        } else {
+            badgesHtml += '<span class="gallery-badge" style="background: #0D2719;">Нет в наличии</span>';
+        }
+        badgesEl.innerHTML = badgesHtml;
+    }
+
+    // Бейдж скидки — правый верхний угол, зелёный кружок (как в каталоге)
+    const galleryMain = document.querySelector('.gallery-main');
+    let galleryDiscountBadge = document.querySelector('.gallery-main .discount-badge');
+    if (!galleryDiscountBadge && galleryMain) {
+        galleryDiscountBadge = document.createElement('div');
+        galleryDiscountBadge.className = 'discount-badge';
+        galleryMain.appendChild(galleryDiscountBadge);
+    }
+    if (galleryDiscountBadge) {
+        if (product.old_price && product.old_price > product.price) {
+            const discount = Math.round((1 - product.price / product.old_price) * 100);
+            galleryDiscountBadge.textContent = `-${discount}%`;
+            galleryDiscountBadge.style.display = 'flex';
+        } else {
+            galleryDiscountBadge.style.display = 'none';
+        }
+    }
     
     // Рейтинг (динамический из отзывов)
 // Рейтинг (динамический из отзывов)
@@ -505,14 +533,17 @@ async function addToCartApi(productId, quantity, button) {
 // ПОХОЖИЕ ТОВАРЫ
 // ========================
 function createSimilarCard(p) {
+    const isSet = (p.category_name || '').toLowerCase().includes('набор');
+    const priceUnit = isSet ? '' : '<span class="card-price-unit">/ 50 г</span>';
+
     // Расчёт скидки
     let discountBadge = '';
     if (p.old_price && p.old_price > p.price) {
         const discount = Math.round((1 - p.price / p.old_price) * 100);
         discountBadge = `<div class="discount-badge">-${discount}%</div>`;
     }
-    
-    const oldPriceHtml = p.old_price 
+
+    const oldPriceHtml = p.old_price
         ? `<span class="card-old-price">${p.old_price} Br</span>`
         : '';
     
@@ -526,8 +557,8 @@ function createSimilarCard(p) {
             <div class="card-badge">Купили <span class="purchase-count">${p.purchase_count || 0}</span> раз</div>
             <div class="card-body">
                 <a href="product.html?slug=${p.slug}" class="card-name-link"><div class="card-name">${p.name}</div></a>
-                <div class="card-desc">${p.short_desc || ''}</div>
-                <div class="card-price">${p.price} Br <span class="card-price-unit">/ 50 г</span>${oldPriceHtml}</div>
+                <a href="product.html?slug=${p.slug}" class="card-desc-link"><div class="card-desc">${p.short_desc || ''}</div></a>
+                <div class="card-price">${p.price} Br ${priceUnit}${oldPriceHtml}</div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">
                     <button class="qty-btn minus">−</button><span class="qty-value">1</span><button class="qty-btn plus">+</button>
@@ -990,6 +1021,29 @@ function getReviewWord(count) {
 
 // МОДАЛЬНОЕ ОКНО ВХОД/РЕГИСТРАЦИЯ
 // ========================
+function showForgotBtn(form, email) {
+    if (form.querySelector('.forgot-pwd-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'forgot-pwd-btn';
+    btn.textContent = 'Забыли пароль?';
+    btn.addEventListener('click', function() { handleForgotPassword(email); });
+    const submitBtn = form.querySelector('.modal-submit-btn');
+    if (submitBtn) submitBtn.insertAdjacentElement('afterend', btn);
+}
+
+async function handleForgotPassword(email) {
+    alert('Мы отправим инструкцию по восстановлению на вашу почту');
+    if (!email) return;
+    try {
+        await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    } catch(e) {}
+}
+
 const modal = document.getElementById('loginModal');
 const accountIcon = document.getElementById('accountIcon');
 const closeModal = document.getElementById('closeModal');
@@ -1109,6 +1163,7 @@ modalTabs.forEach(tab => {
   });
 });
 
+let loginAttempts = 0;
 // Вход
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -1177,7 +1232,9 @@ if (payload.role === 'admin') {
     window.location.href = 'account.html';
 }
         } else {
+            loginAttempts++;
             alert(data.error || 'Ошибка входа');
+            if (loginAttempts >= 3) showForgotBtn(this, email);
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -1295,3 +1352,46 @@ function setupPasswordToggles() {
 
 // Запускаем при загрузке
 document.addEventListener('DOMContentLoaded', setupPasswordToggles);
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.contact-card', '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        if (el.getBoundingClientRect().top <= viewH) return;
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            observer.observe(el);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

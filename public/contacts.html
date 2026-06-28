@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Контакты — Forest Tea</title>
 
@@ -11,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600&display=swap" rel="stylesheet" />
 
   <!-- Подключаем внешний CSS -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -81,6 +82,15 @@
     </div>
 
   </header>
+
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
   <!-- Хлебные крошки -->
 <nav class="breadcrumbs" aria-label="Хлебные крошки">
   <ol class="breadcrumbs-list">
@@ -102,18 +112,18 @@
   <main class="contacts-main">
     
     <!-- Заголовок страницы -->
-    <h1 class="contacts-page-title">Контакты</h1>
+    <h1 class="contacts-page-title contacts-reveal">Контакты</h1>
 
     <!-- Приветственный текст -->
-    <p class="contacts-intro">
+    <p class="contacts-intro contacts-reveal">
       Мы всегда рады вашим вопросам и заказам. Свяжитесь с нами любым удобным способом
     </p>
 
     <!-- Три карточки контактов по центру -->
     <div class="contact-cards">
-      
+
       <!-- Карточка 1 — Телефоны -->
-      <div class="contact-card">
+      <div class="contact-card contacts-reveal">
         <div class="contact-card-inner">
         <div class="contact-card-icon">
           <img src="pictures/phone.png" alt="Телефон" class="card-icon-img">
@@ -129,7 +139,7 @@
       </div>
 
       <!-- Карточка 2 — Почта -->
-      <div class="contact-card">
+      <div class="contact-card contacts-reveal">
         <div class="contact-card-inner">
         <div class="contact-card-icon">
           <img src="pictures/email.png" alt="Почта" class="card-icon-img">
@@ -144,7 +154,7 @@
       </div>
 
       <!-- Карточка 3 — Адрес -->
-      <div class="contact-card">
+      <div class="contact-card contacts-reveal">
         <div class="contact-card-inner">
         <div class="contact-card-icon">
           <img src="pictures/location.png" alt="Адрес" class="card-icon-img">
@@ -162,21 +172,21 @@
     </div><!-- /contact-cards -->
 
    <!-- Социальные сети -->
-<div class="contact-socials-centered">
+<div class="contact-socials-centered contacts-reveal">
   <h3 class="socials-title">Мы в соцсетях</h3>
-  
+
   <div class="socials-row">
     <div class="social-item">
       <img src="pictures/telegram.png" alt="Telegram" class="social-icon">
       <a href="https://t.me/forestteabel" class="social-name-link">@forestteabel</a>
     </div>
-    
+
     <!-- Instagram 2 -->
     <div class="social-item">
       <img src="pictures/instagram.png" alt="Instagram" class="social-icon">
       <a href="https://www.instagram.com/forestteabel/" class="social-name-link">@forestteabel</a>
     </div>
-    
+
     <!-- Facebook -->
     <div class="social-item">
       <img src="pictures/youtube.png" alt="Youtube" class="social-icon">
@@ -186,10 +196,10 @@
 </div>
 
     <!-- Разделительная линия -->
-    <div class="divider-line"></div>
+    <div class="divider-line contacts-reveal"></div>
 
 <!-- Секция "Личные консультации" -->
-<div class="consultation-section">
+<div class="consultation-section contacts-reveal">
   <h2 class="consultation-title">Личные консультации</h2>
   
   <!-- Двухколоночный макет: карта + информация -->
@@ -241,10 +251,10 @@
 
 
     <!-- Разделительная линия -->
-    <div class="divider-line"></div>
+    <div class="divider-line contacts-reveal"></div>
 
     <!-- Форма обратной связи -->
-    <div class="feedback-section">
+    <div class="feedback-section contacts-reveal">
       <h2 class="feedback-title">Обратная связь</h2>
       <p class="feedback-subtitle">Напишите нам, мы ответим в ближайшее время</p>
 
@@ -421,7 +431,7 @@
       </div>
     </div>
 
-  <script src="script.js"></script>
-  <script src="contacts.js"></script>
+  <script src="script.js?v=4"></script>
+  <script src="contacts.js?v=3"></script>
 </body>
 </html>

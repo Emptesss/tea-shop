@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="../pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Админ-панель — Forest Tea</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -244,7 +245,9 @@
     <div class="modal-content" style="max-width:500px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <h2 class="section-title" style="margin:0;">Отмена заказа</h2>
-            <button class="btn btn-outline btn-sm" onclick="closeCancelOrderModal()">✕</button>
+            <button class="admin-modal-close-btn" onclick="closeCancelOrderModal()">
+                <img src="/pictures/close.png" alt="Закрыть">
+            </button>
         </div>
         
         <div style="text-align:center;margin-bottom:20px;">

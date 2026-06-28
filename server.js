@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 // Загрузка переменных окружения
 require('dotenv').config();
@@ -24,40 +25,68 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Функция отправки письма
+// ========================
+// ОБЩИЙ ШАБЛОН ПИСЕМ
+// ========================
+const heroAttachment = {
+    filename: 'hero1.jpg',
+    path: path.join(__dirname, 'public', 'pictures', 'hero1.jpg'),
+    cid: 'hero@foresttea'
+};
+
+function makeEmailHtml(contentHtml, footerText) {
+    return `<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;600;700&display=swap');</style>
+    </head>
+    <body style="margin:0; padding:0; background:#f4f4f4;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4; padding:36px 0;">
+            <tr><td align="center">
+            <div style="max-width:560px; width:100%; border-radius:20px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+                <table width="560" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="560" style="background-image:url('cid:hero@foresttea'); background-size:cover; background-position:center 30%; background-color:#0a1f14; padding:0;">
+                            <table width="560" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" valign="middle" height="240" style="background:rgba(3,10,6,0.40); height:240px; padding:0 30px;">
+                                        <p style="font-family:'Montserrat Alternates',sans-serif; font-size:44px; font-weight:700; color:#ffffff; margin:0; letter-spacing:5px; text-shadow:0 2px 20px rgba(0,0,0,0.5);">Forest Tea</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <div style="background:#ffffff; padding:48px 52px; text-align:center;">
+                    ${contentHtml}
+                </div>
+                <div style="background:#0a1f14; padding:26px 52px; text-align:center;">
+                    <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:rgba(255,255,255,0.45); margin:0; line-height:1.7;">${footerText}</p>
+                </div>
+            </div>
+            </td></tr>
+        </table>
+    </body>
+    </html>`;
+}
+
+// Функция отправки письма о подписке
 async function sendSubscriptionEmail(to, confirmationLink) {
+    const content = `
+        <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">Подписка на рассылку</h2>
+        <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+        <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 32px;">
+            Спасибо, что подписались на новости Forest Tea.<br>
+            Нажмите кнопку ниже, чтобы подтвердить подписку.
+        </p>
+        <a href="${confirmationLink}" style="display:inline-block; background:#0a1f14; color:#ffffff; font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; text-decoration:none; padding:16px 40px; border-radius:100px; letter-spacing:0.5px; margin:0 0 24px;">Подтвердить подписку</a>
+    `;
     const mailOptions = {
         from: '"Forest Tea" <info.foresttea@gmail.com>',
         to: to,
-        subject: 'Подписка на рассылку Forest Tea',
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h1 style="color: #1a3a2a; margin: 0;">🌿 Forest Tea</h1>
-                </div>
-                <div style="background: #f9f9f9; border-radius: 10px; padding: 30px;">
-                    <h2 style="color: #2c3e50; margin-top: 0;">Спасибо за подписку!</h2>
-                    <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                        Вы подписались на новости и акции Forest Tea. 
-                        Мы будем присылать вам информацию о новинках, специальных предложениях и чайных советах.
-                    </p>
-                    <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                        Для подтверждения подписки, пожалуйста, перейдите по ссылке:
-                    </p>
-                    <div style="text-align: center; margin: 25px 0;">
-                        <a href="${confirmationLink}" 
-                           style="display: inline-block; background: #27ae60; color: white; 
-                                  padding: 12px 30px; text-decoration: none; border-radius: 25px;
-                                  font-size: 16px; font-weight: bold;">
-                            Подтвердить подписку
-                        </a>
-                    </div>
-                    <p style="font-size: 12px; color: #999; margin-top: 20px;">
-                        Если вы не подписывались на рассылку, просто проигнорируйте это письмо.
-                    </p>
-                </div>
-            </div>
-        `
+        subject: 'Подписка на рассылку — Forest Tea',
+        html: makeEmailHtml(content, 'Если вы не подписывались на рассылку — просто проигнорируйте это письмо.'),
+        attachments: [heroAttachment]
     };
 
     try {
@@ -572,6 +601,58 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
+// Топ товаров, купленных за текущий календарный месяц (для главной страницы)
+app.get('/api/products/popular-this-month', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 3;
+
+        const result = await pool.query(
+            `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.old_price,
+                    p.in_stock, p.image1, c.name as category_name,
+                    m.month_qty as purchase_count
+             FROM products p
+             JOIN (
+                 SELECT oi.product_id, SUM(oi.quantity) as month_qty
+                 FROM order_items oi
+                 JOIN orders o ON oi.order_id = o.id
+                 WHERE o.created_at >= date_trunc('month', CURRENT_DATE)
+                 GROUP BY oi.product_id
+             ) m ON m.product_id = p.id
+             LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.is_active = true
+             ORDER BY m.month_qty DESC
+             LIMIT $1`,
+            [limit]
+        );
+
+        // Если в этом месяце ещё не было заказов — берём общий рейтинг покупок как запасной вариант
+        let products = result.rows;
+        if (products.length === 0) {
+            const fallback = await pool.query(
+                `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.old_price,
+                        p.in_stock, p.image1, c.name as category_name, p.purchase_count
+                 FROM products p
+                 LEFT JOIN categories c ON p.category_id = c.id
+                 WHERE p.is_active = true
+                 ORDER BY p.purchase_count DESC
+                 LIMIT $1`,
+                [limit]
+            );
+            products = fallback.rows;
+        }
+
+        const monthNames = ['январе', 'феврале', 'марте', 'апреле', 'мае', 'июне',
+            'июле', 'августе', 'сентябре', 'октябре', 'ноябре', 'декабре'];
+        const monthName = monthNames[new Date().getMonth()];
+
+        res.json({ products, monthName });
+
+    } catch (error) {
+        console.error('Ошибка получения популярных товаров месяца:', error);
+        res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+    }
+});
+
 // Получить товар по slug
 // Получить товар по slug
 app.get('/api/products/:slug', async (req, res) => {
@@ -619,17 +700,19 @@ app.get('/api/products/:slug', async (req, res) => {
         // Похожие товары (по категории и вкусам)
         const similarResult = await pool.query(
             `SELECT p.id, p.name, p.slug, p.short_desc, p.price, p.image1, p.purchase_count,
+                    c.name as category_name, c.slug as category_slug,
                     COALESCE(
-                        (SELECT ROUND(AVG(rating)::numeric, 1) 
-                         FROM reviews 
+                        (SELECT ROUND(AVG(rating)::numeric, 1)
+                         FROM reviews
                          WHERE product_id = p.id AND is_approved = true),
                         0
                     ) as rating,
-                    (SELECT COUNT(*) FROM product_tastes pt 
-                     WHERE pt.product_id = p.id 
+                    (SELECT COUNT(*) FROM product_tastes pt
+                     WHERE pt.product_id = p.id
                      AND pt.taste_id IN (SELECT taste_id FROM product_tastes WHERE product_id = $1))
                     as matching_tastes
              FROM products p
+             LEFT JOIN categories c ON p.category_id = c.id
              WHERE p.id != $1 AND p.is_active = true
              ORDER BY matching_tastes DESC, RANDOM()
              LIMIT 4`,
@@ -972,8 +1055,12 @@ app.get('/api/auth/profile', authenticateToken, async (req, res) => {
 // Обновить профиль
 app.put('/api/auth/profile', authenticateToken, async (req, res) => {
     try {
-        const { name, lastName, middleName, phone, birthDate } = req.body;
+        const { name, lastName, middleName, email, phone, birthDate } = req.body;
         const userId = req.user.id;
+
+        if (name !== undefined && (!name || !name.trim())) {
+            return res.status(400).json({ error: 'Имя не должно быть пустым' });
+        }
 
         // Валидация телефона только если он передан и не пустой
         if (phone && phone.trim() !== '') {
@@ -984,22 +1071,36 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
             }
         }
 
+        if (email && email.trim() !== '') {
+            const existing = await pool.query(
+                'SELECT id FROM users WHERE email = $1 AND id != $2',
+                [email.trim(), userId]
+            );
+            if (existing.rows.length > 0) {
+                return res.status(400).json({ error: 'Этот email уже используется другим пользователем' });
+            }
+        }
+
         // ✅ Явное приведение типов для параметров
+        // last_name/middle_name пишутся напрямую (не COALESCE), чтобы их можно было очистить —
+        // отчество не у всех есть, и пользователь должен мочь стереть поле и сохранить пустым.
         await pool.query(
-            `UPDATE users 
+            `UPDATE users
              SET name = COALESCE($1::text, name),
-                 last_name = COALESCE($2::text, last_name),
-                 middle_name = COALESCE($3::text, middle_name),
-                 phone = $4::text,
-                 birth_date = $5::date,
+                 last_name = $2::text,
+                 middle_name = $3::text,
+                 email = COALESCE($4::text, email),
+                 phone = $5::text,
+                 birth_date = $6::date,
                  updated_at = NOW()
-             WHERE id = $6`,
+             WHERE id = $7`,
             [
-                name || null, 
-                lastName || null, 
-                middleName || null, 
+                name || null,
+                lastName || null,
+                middleName || null,
+                email || null,
                 phone || null,        // Если пустая строка — отправится null
-                birthDate || null, 
+                birthDate || null,
                 userId
             ]
         );
@@ -1120,6 +1221,114 @@ app.put('/api/auth/change-password', authenticateToken, async (req, res) => {
         console.error('Ошибка смены пароля:', error);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
+});
+
+// ========================
+// API — СБРОС ПАРОЛЯ
+// ========================
+app.post('/api/auth/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email обязателен' });
+
+        const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (userResult.rows.length === 0) {
+            return res.json({ message: 'ok' });
+        }
+
+        const user = userResult.rows[0];
+        const tempPassword = crypto.randomBytes(4).toString('hex');
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hashedPassword, user.id]);
+
+        const forgotContent = `
+            <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">Восстановление доступа</h2>
+            <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+            <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 32px;">
+                Мы получили запрос на сброс пароля для аккаунта<br>
+                <strong style="color:#0a1f14;">${email}</strong>
+            </p>
+            <div style="background:#f0f7f3; border:2px solid #337B57; border-radius:16px; padding:26px 40px; display:inline-block; margin:0 0 32px;">
+                <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 12px;">Временный пароль</p>
+                <p style="font-family:'Montserrat',sans-serif; font-size:34px; font-weight:700; color:#0a1f14; letter-spacing:10px; margin:0;">${tempPassword}</p>
+            </div>
+            <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#444; line-height:1.8; margin:0;">
+                Войдите с этим паролем и сразу смените его<br>
+                в личном кабинете в разделе <strong style="color:#0a1f14;">«Настройки»</strong>.
+            </p>
+        `;
+        await transporter.sendMail({
+            from: '"Forest Tea" <info.foresttea@gmail.com>',
+            to: email,
+            subject: 'Восстановление пароля — Forest Tea',
+            html: makeEmailHtml(forgotContent, 'Если вы не запрашивали сброс — просто проигнорируйте это письмо.<br>Ваш пароль останется без изменений.'),
+            attachments: [heroAttachment]
+        });
+
+        res.json({ message: 'ok' });
+    } catch (error) {
+        console.error('Ошибка forgot-password:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+// Превью письма в браузере — открыть localhost:3000/preview/email
+app.get('/preview/email', (req, res) => {
+    const sampleEmail = 'user@example.com';
+    const samplePassword = 'a1b2c3d4';
+    res.send(`
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;600;700&display=swap');
+            </style>
+        </head>
+        <body style="margin:0; padding:0; background:#f4f4f4;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4; padding:36px 0;">
+                <tr><td align="center">
+                <div style="max-width:560px; width:100%; border-radius:20px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+
+                    <!-- HERO -->
+                    <div style="height:240px; background: linear-gradient(rgba(3,10,6,0.40), rgba(3,10,6,0.40)), url('/pictures/hero1.jpg') center 30% / cover no-repeat; background-color:#0a1f14; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 20px; box-sizing:border-box;">
+                        <p style="font-family:'Montserrat Alternates',sans-serif; font-size:44px; font-weight:700; color:#ffffff; margin:0; letter-spacing:5px; text-shadow:0 2px 20px rgba(0,0,0,0.5);">Forest Tea</p>
+                    </div>
+
+                    <!-- КОНТЕНТ -->
+                    <div style="background:#ffffff; padding:48px 52px; text-align:center;">
+                        <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">Ваш временный пароль</h2>
+                        <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+
+                        <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 32px;">
+                            Мы получили запрос на сброс пароля для аккаунта<br>
+                            <strong style="color:#0a1f14;">${sampleEmail}</strong>
+                        </p>
+
+                        <div style="background:#f0f7f3; border:2px solid #337B57; border-radius:16px; padding:26px 40px; display:inline-block; margin:0 0 32px;">
+                            <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 12px;">Временный пароль</p>
+                            <p style="font-family:'Montserrat',sans-serif; font-size:34px; font-weight:700; color:#0a1f14; letter-spacing:10px; margin:0;">${samplePassword}</p>
+                        </div>
+
+                        <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#444; line-height:1.8; margin:0;">
+                            Войдите с этим паролем и сразу смените его<br>
+                            в личном кабинете в разделе <strong style="color:#0a1f14;">«Безопасность»</strong>.
+                        </p>
+                    </div>
+
+                    <!-- ПОДВАЛ -->
+                    <div style="background:#0a1f14; padding:26px 52px; text-align:center;">
+                        <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:rgba(255,255,255,0.45); margin:0; line-height:1.7;">
+                            Если вы не запрашивали сброс — просто проигнорируйте это письмо.<br>Ваш пароль останется без изменений.
+                        </p>
+                    </div>
+
+                </div>
+                </td></tr>
+            </table>
+        </body>
+        </html>
+    `);
 });
 
 // ========================
@@ -1463,7 +1672,51 @@ const orderResult = await client.query(
         }
         
         await client.query('COMMIT');
-        
+
+        // Письмо о подтверждении заказа (не блокируем ответ)
+        if (email) {
+            const orderNumber = orderResult.rows[0].order_number;
+            const deliveryDesc = delivery_method === 'courier'
+                ? 'Курьерская доставка — 1–2 рабочих дня.<br>Заказы до 15:00 доставляются на следующий день.'
+                : delivery_method === 'post'
+                ? 'Доставка почтой — 2–5 рабочих дней по всей Беларуси.'
+                : 'Самовывоз из магазина — мы уведомим вас, когда заказ будет готов.';
+            const paymentDesc = payment_method === 'card' ? 'Онлайн-оплата картой' : 'Наличными при получении';
+            const itemsRows = cartResult.rows.map(item => `
+                <tr>
+                    <td style="padding:10px 0; font-family:'Montserrat',sans-serif; font-size:15px; color:#333; border-bottom:1px solid #f0f0f0;">${item.name}</td>
+                    <td style="padding:10px 0; font-family:'Montserrat',sans-serif; font-size:14px; color:#777; border-bottom:1px solid #f0f0f0; text-align:center; white-space:nowrap;">${item.quantity} шт.</td>
+                    <td style="padding:10px 0; font-family:'Montserrat',sans-serif; font-size:15px; color:#0a1f14; font-weight:600; border-bottom:1px solid #f0f0f0; text-align:right; white-space:nowrap;">${(item.price * item.quantity).toFixed(2)} Br</td>
+                </tr>
+            `).join('');
+            const orderContent = `
+                <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">${name}, спасибо за заказ!</h2>
+                <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+                <div style="background:#f0f7f3; border:2px solid #337B57; border-radius:16px; padding:16px 32px; display:inline-block; margin:0 0 28px;">
+                    <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 6px;">Номер заказа</p>
+                    <p style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#0a1f14; margin:0; letter-spacing:1px;">${orderNumber}</p>
+                </div>
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px; text-align:left;">${itemsRows}</table>
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px; text-align:left;">
+                    ${deliveryPrice > 0 ? `<tr><td style="font-family:'Montserrat',sans-serif; font-size:15px; color:#777; padding:4px 0;">Доставка</td><td style="font-family:'Montserrat',sans-serif; font-size:15px; color:#333; text-align:right; padding:4px 0;">${deliveryPrice} Br</td></tr>` : ''}
+                    <tr><td style="font-family:'Montserrat',sans-serif; font-size:17px; font-weight:700; color:#0a1f14; padding:10px 0 0;">Итого</td><td style="font-family:'Montserrat',sans-serif; font-size:17px; font-weight:700; color:#337B57; text-align:right; padding:10px 0 0;">${total} Br</td></tr>
+                </table>
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin:0; border-radius:12px; overflow:hidden;">
+                    <tr>
+                        <td style="background:#f9f9f9; padding:16px 20px; font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:2px; text-transform:uppercase; width:50%; vertical-align:top;">Доставка<br><span style="font-size:14px; color:#333; font-weight:400; letter-spacing:0; text-transform:none; line-height:1.7;">${deliveryDesc}</span></td>
+                        <td style="background:#f0f7f3; padding:16px 20px; font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:2px; text-transform:uppercase; width:50%; vertical-align:top;">Оплата<br><span style="font-size:14px; color:#333; font-weight:400; letter-spacing:0; text-transform:none;">${paymentDesc}</span></td>
+                    </tr>
+                </table>
+            `;
+            transporter.sendMail({
+                from: '"Forest Tea" <info.foresttea@gmail.com>',
+                to: email,
+                subject: `Заказ №${orderNumber} оформлен — Forest Tea`,
+                html: makeEmailHtml(orderContent, 'Если у вас есть вопросы по заказу — просто ответьте на это письмо.'),
+                attachments: [heroAttachment]
+            }).catch(err => console.error('Ошибка письма о заказе:', err));
+        }
+
         res.status(201).json({
             message: 'Заказ успешно создан',
             order: {
@@ -1773,34 +2026,26 @@ app.post('/api/feedback', async (req, res) => {
         });
         
         // Отправляем подтверждение пользователю
+        const feedbackContent = `
+            <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">${name}, спасибо!</h2>
+            <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+            <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 28px;">
+                Мы получили ваше сообщение<br>и ответим в ближайшее время.
+            </p>
+            <div style="background:#f0f7f3; border:2px solid #337B57; border-radius:16px; padding:20px 40px; display:inline-block; margin:0 0 28px; text-align:left;">
+                <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">Тема обращения</p>
+                <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#0a1f14; font-weight:600; margin:0;">${themeText}</p>
+            </div>
+            <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#444; line-height:1.8; margin:0;">
+                Если появятся дополнительные вопросы —<br>просто ответьте на это письмо.
+            </p>
+        `;
         await transporter.sendMail({
             from: '"Forest Tea" <info.foresttea@gmail.com>',
             to: email,
             subject: 'Мы получили ваше сообщение — Forest Tea',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <h1 style="color: #1a3a2a; margin: 0;">🌿 Forest Tea</h1>
-                    </div>
-                    <div style="background: #f9f9f9; border-radius: 10px; padding: 30px;">
-                        <h2 style="color: #2c3e50;">${name}, спасибо за обращение!</h2>
-                        <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                            Мы получили ваше сообщение и ответим в ближайшее время (обычно в течение 24 часов).
-                        </p>
-                        <p style="font-size: 14px; color: #666;">
-                            Тема: <strong>${themeText}</strong>
-                        </p>
-                        <p style="font-size: 16px; color: #333; line-height: 1.6;">
-                            Если у вас появились дополнительные вопросы, просто ответьте на это письмо.
-                        </p>
-                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                            <p style="font-size: 14px; color: #999;">
-                                С уважением,<br>команда Forest Tea
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `
+            html: makeEmailHtml(feedbackContent, 'С уважением, команда Forest Tea'),
+            attachments: [heroAttachment]
         });
         
         res.json({ message: 'Сообщение отправлено!' });
@@ -1959,7 +2204,7 @@ app.put('/api/admin/orders/:id', authenticateToken, requireAdmin, async (req, re
         
         // Получаем текущий заказ
         const order = await pool.query(
-            'SELECT payment_method, payment_status, delivery_method, status FROM orders WHERE id = $1',
+            'SELECT payment_method, payment_status, delivery_method, status, email, name, order_number FROM orders WHERE id = $1',
             [orderId]
         );
         
@@ -1970,7 +2215,6 @@ app.put('/api/admin/orders/:id', authenticateToken, requireAdmin, async (req, re
         const currentOrder = order.rows[0];
         let newPaymentStatus = currentOrder.payment_status;
         
-        // ✅ Логика: когда меняем payment_status
         if (status === 'REFUNDED') {
             // Возврат оформлен
             newPaymentStatus = 'REFUNDED';
@@ -2008,15 +2252,41 @@ app.put('/api/admin/orders/:id', authenticateToken, requireAdmin, async (req, re
         
         // Обновляем заказ
         await pool.query(
-            `UPDATE orders 
-             SET status = $1, 
-                 payment_status = $2, 
-                 updated_at = NOW() 
+            `UPDATE orders
+             SET status = $1,
+                 payment_status = $2,
+                 updated_at = NOW()
              WHERE id = $3`,
             [status, newPaymentStatus, orderId]
         );
-        
-        res.json({ 
+
+        // Уведомление о готовности к самовывозу
+        if (status === 'READY_FOR_PICKUP' && currentOrder.delivery_method === 'pickup' && currentOrder.email) {
+            const pickupContent = `
+                <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">Заказ готов к выдаче!</h2>
+                <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+                <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 28px;">
+                    ${currentOrder.name ? currentOrder.name + ', ваш' : 'Ваш'} заказ <strong style="color:#0a1f14;">№${currentOrder.order_number}</strong><br>ждёт вас и готов к получению.
+                </p>
+                <div style="background:#f0f7f3; border:2px solid #337B57; border-radius:16px; padding:22px 36px; display:inline-block; margin:0 0 28px; text-align:left;">
+                    <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#337B57; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">Адрес самовывоза</p>
+                    <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#0a1f14; font-weight:600; margin:0 0 4px;">ул. Чайная, д. 15</p>
+                    <p style="font-family:'Montserrat',sans-serif; font-size:14px; color:#555; margin:0;">агрогородок Лесной, Минский район</p>
+                </div>
+                <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#444; line-height:1.8; margin:0;">
+                    Заберите заказ в любое удобное время<br>в рабочие часы нашего магазина.
+                </p>
+            `;
+            transporter.sendMail({
+                from: '"Forest Tea" <info.foresttea@gmail.com>',
+                to: currentOrder.email,
+                subject: `Заказ №${currentOrder.order_number} готов к выдаче — Forest Tea`,
+                html: makeEmailHtml(pickupContent, 'Если у вас есть вопросы — просто ответьте на это письмо.'),
+                attachments: [heroAttachment]
+            }).catch(err => console.error('Ошибка письма о готовности:', err));
+        }
+
+        res.json({
             message: 'Статус обновлён',
             status: status,
             payment_status: newPaymentStatus
@@ -2372,16 +2642,15 @@ app.delete('/api/orders/:orderId/items/:itemId', authenticateToken, async (req, 
         
         if (orderCheck.rows.length === 0) return res.status(404).json({ error: 'Заказ не найден' });
         if (orderCheck.rows[0].status !== 'NEW') return res.status(400).json({ error: 'Можно менять только новый заказ' });
-        
+
+        const currentCountCheck = await client.query('SELECT COUNT(*) FROM order_items WHERE order_id = $1', [orderId]);
+        if (parseInt(currentCountCheck.rows[0].count) <= 1) {
+            return res.status(400).json({ error: 'Нельзя удалить все товары из заказа. Чтобы отказаться от заказа полностью, отмените его.' });
+        }
+
         // ✅ Ищем по product_id
         await client.query('DELETE FROM order_items WHERE product_id = $1 AND order_id = $2', [productId, orderId]);
-        
-        const itemsCheck = await client.query('SELECT COUNT(*) FROM order_items WHERE order_id = $1', [orderId]);
-        if (parseInt(itemsCheck.rows[0].count) === 0) {
-            await client.query('UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2', ['CANCELLED', orderId]);
-            return res.json({ message: 'Все товары удалены, заказ отменён', cancelled: true });
-        }
-        
+
         const totalResult = await client.query('SELECT COALESCE(SUM(total), 0) as subtotal FROM order_items WHERE order_id = $1', [orderId]);
         const newSubtotal = parseFloat(totalResult.rows[0].subtotal);
         const deliveryRow = await client.query('SELECT delivery_price FROM orders WHERE id = $1', [orderId]);
@@ -2413,8 +2682,8 @@ app.put('/api/admin/orders/:id/cancel', authenticateToken, requireAdmin, async (
         
         // Получаем полную информацию о заказе
         const orderCheck = await client.query(
-            `SELECT id, status, payment_status, payment_method, delivery_method, 
-                    subtotal, delivery_price, total 
+            `SELECT id, status, payment_status, payment_method, delivery_method,
+                    subtotal, delivery_price, total, email, name, order_number
              FROM orders WHERE id = $1`,
             [orderId]
         );
@@ -2478,14 +2747,41 @@ app.put('/api/admin/orders/:id/cancel', authenticateToken, requireAdmin, async (
         );
         
         await client.query('COMMIT');
-        
-        res.json({ 
+
+        // Уведомление пользователю об отмене
+        if (order.email) {
+            const cancelContent = `
+                <h2 style="font-family:'Montserrat Alternates',sans-serif; font-size:26px; font-weight:600; color:#0a1f14; margin:0 0 10px;">Заказ отменён</h2>
+                <div style="width:32px; height:2px; background:#337B57; margin:0 auto 26px;"></div>
+                <p style="font-family:'Montserrat',sans-serif; font-size:17px; color:#333; line-height:1.8; margin:0 0 28px;">
+                    ${order.name ? order.name + ', ваш' : 'Ваш'} заказ <strong style="color:#0a1f14;">№${order.order_number}</strong> был отменён администратором.
+                </p>
+                <div style="background:#fff5f5; border:2px solid #e07070; border-radius:16px; padding:20px 32px; display:inline-block; margin:0 0 28px; text-align:left; max-width:100%;">
+                    <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#c05050; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">Причина отмены</p>
+                    <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#0a1f14; font-weight:600; margin:0; line-height:1.6;">${reason.trim()}</p>
+                </div>
+                ${refundAmount > 0 ? `
+                <p style="font-family:'Montserrat',sans-serif; font-size:16px; color:#333; line-height:1.8; margin:0;">
+                    К возврату: <strong style="color:#337B57;">${refundAmount.toFixed(2)} Br</strong><br>
+                    <span style="font-size:14px; color:#777;">Средства будут возвращены в течение 3–5 рабочих дней.</span>
+                </p>` : ''}
+            `;
+            transporter.sendMail({
+                from: '"Forest Tea" <info.foresttea@gmail.com>',
+                to: order.email,
+                subject: `Заказ №${order.order_number} отменён — Forest Tea`,
+                html: makeEmailHtml(cancelContent, 'Если у вас есть вопросы — просто ответьте на это письмо.'),
+                attachments: [heroAttachment]
+            }).catch(err => console.error('Ошибка письма об отмене:', err));
+        }
+
+        res.json({
             message: 'Заказ отменён администратором',
             status: 'CANCELLED',
             payment_status: newPaymentStatus,
             refund_amount: refundAmount,
-            refund_description: refundAmount > 0 
-                ? `К возврату: ${refundAmount.toFixed(2)} Br` 
+            refund_description: refundAmount > 0
+                ? `К возврату: ${refundAmount.toFixed(2)} Br`
                 : 'Возврат не требуется'
         });
         

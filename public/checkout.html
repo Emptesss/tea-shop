@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Оформление заказа — Forest Tea</title>
 
@@ -52,6 +53,15 @@
       <div class="header-icon" title="Аккаунт" id="accountIcon"><img src="pictures/profile.png" width="35" height="35" alt="Аккаунт" /></div>
     </div>
   </header>
+
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
 
   <!-- Хлебные крошки -->
   <nav class="breadcrumbs">
@@ -260,12 +270,9 @@
 
     <!-- Сводка -->
     <div class="checkout-summary-col">
-      <div class="checkout-summary-card">
+      <div class="checkout-summary-card" style="opacity:0">
         <h3 class="checkout-summary-title">Ваш заказ</h3>
         <div class="checkout-items">
-          <div class="checkout-item"><img src="pictures/tea1.jpg" alt="Горная матча" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Горная матча</span><span class="checkout-item-qty">× 2</span></div><span class="checkout-item-price">70 Br</span></div>
-          <div class="checkout-item"><img src="pictures/tea2.jpg" alt="Молочный улун" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Молочный улун</span><span class="checkout-item-qty">× 1</span></div><span class="checkout-item-price">42 Br</span></div>
-          <div class="checkout-item"><img src="pictures/tea3.jpg" alt="Выдержанный пуэр" class="checkout-item-img"><div class="checkout-item-info"><span class="checkout-item-name">Выдержанный пуэр</span><span class="checkout-item-qty">× 3</span></div><span class="checkout-item-price">174 Br</span></div>
         </div>
         <div class="checkout-summary-divider"></div>
         <div class="checkout-summary-row"><span>Товары</span><span id="checkoutSubtotal">Br</span></div>
@@ -281,7 +288,7 @@
 </main>
 
    <!-- ФУТЕР -->
-  <footer class="footer">
+  <footer class="footer" style="opacity:0">
     <div class="footer-container">
       <div class="footer-subscribe">
         <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>

@@ -137,3 +137,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// ========================
+// АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// (без скролла и IntersectionObserver — играет один раз, предсказуемо,
+// одинаково для всех блоков, без рывков и "зависших" элементов)
+// ========================
+(function() {
+    const main = document.querySelector('.contacts-main');
+    if (!main) return;
+
+    const items = Array.from(main.querySelectorAll('.contacts-reveal'));
+    if (items.length === 0) return;
+
+    function play() {
+        items.forEach((el, i) => {
+            el.style.animationDelay = Math.min(i * 0.08, 0.32) + 's';
+            el.classList.add('contacts-reveal-play');
+            el.addEventListener('animationend', function handler() {
+                el.classList.remove('contacts-reveal-play');
+                el.style.animationDelay = '';
+                el.removeEventListener('animationend', handler);
+            });
+        });
+    }
+
+    // Если страница была предзагружена браузером заранее (prerendering),
+    // запускаем анимацию в момент её реального показа пользователю
+    if (document.prerendering) {
+        document.addEventListener('prerenderingchange', play, { once: true });
+    } else {
+        play();
+    }
+})();

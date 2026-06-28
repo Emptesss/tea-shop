@@ -176,3 +176,46 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
   iconImg.style.borderRadius = '50%';
   iconImg.style.objectFit = 'cover';
 });
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.contact-card', '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        if (el.getBoundingClientRect().top <= viewH) return;
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            observer.observe(el);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

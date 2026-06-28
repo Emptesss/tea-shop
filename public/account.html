@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Личный кабинет — Forest Tea</title>
 
@@ -61,6 +62,15 @@
     </div>
   </header>
 
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
+
   <!-- Хлебные крошки -->
   <nav class="breadcrumbs">
     <ol class="breadcrumbs-list">
@@ -77,7 +87,7 @@
  
 
 <!-- Приветствие -->
-<div class="account-header">
+<div class="account-header" style="opacity:0">
   <div class="account-header-bg"></div>
   <div class="account-header-content">
     <div class="account-avatar-wrapper" id="avatarWrapper">
@@ -88,7 +98,7 @@
       <input type="file" id="avatarInput" class="avatar-input" accept="image/*">
     </div>
     <div class="account-header-info">
-      <h2 class="account-title">Анна, добрый день!</h2>
+      <h2 class="account-title"></h2>
       <p class="account-subtitle">Рады видеть вас снова</p>
     </div>
     <button class="account-logout-btn" id="logoutBtn">
@@ -98,13 +108,13 @@
 </div>
 
   <!-- Контент: табы + панели -->
-  <div class="account-tabs">
+  <div class="account-tabs" style="opacity:0">
     <button class="account-tab" data-tab="profile">Профиль</button>
 <button class="account-tab active" data-tab="orders">Заказы</button>
     <button class="account-tab" data-tab="settings">Настройки</button>
   </div>
 
-  <div class="account-content">
+  <div class="account-content" style="opacity:0">
     
     <!-- Профиль -->
     <div class="account-panel" id="panel-profile">
@@ -118,13 +128,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">Фамилия</label>
-              <input type="text" class="form-input" id="profileName" placeholder="Ваша фамилия">
+              <input type="text" class="form-input" id="profileLastName" placeholder="Ваша фамилия">
             </div>
           </div>
            <div class="form-row">
             <div class="form-group">
               <label class="form-label">Отчество</label>
-              <input type="text" class="form-input" id="profileName" placeholder="Ваше отчество">
+              <input type="text" class="form-input" id="profileMiddleName" placeholder="Ваше отчество">
             </div>
             <div class="form-group">
               <label class="form-label">Email</label>
@@ -134,11 +144,11 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Телефон</label>
-              <input type="tel" class="form-input" id="profilePhone" value="+375 (29) 123-45-67" placeholder="+375 (__) ___-__-__">
+              <input type="tel" class="form-input" id="profilePhone" placeholder="+375 (__) ___-__-__">
             </div>
             <div class="form-group">
               <label class="form-label">Дата рождения</label>
-              <input type="date" class="form-input" id="profileBirth" placeholder="ДД.ММ.ГГГГ">
+              <input type="text" class="form-input" id="profileBirth" placeholder="ДД.ММ.ГГГГ" inputmode="numeric" maxlength="10">
             </div>
           </div>
           <button type="submit" class="account-save-btn">Сохранить изменения</button>
@@ -148,49 +158,6 @@
 
     <!-- Заказы -->
 <div class="account-panel active" id="panel-orders">
-  
-  <div class="order-card">
-    <div class="order-header">
-      <span class="order-number">Заказ №2468</span>
-      <span class="order-date">15 марта 2026</span>
-      <span class="order-status delivered">Доставлен</span>
-    </div>
-    <div class="order-items">
-      <div class="order-item">
-        <img src="pictures/tea1.jpg" alt="Горная матча" class="order-item-img">
-        <div class="order-item-info">
-          <span class="order-item-name">Горная матча, 50 г</span>
-          <span class="order-item-qty">× 2</span>
-        </div>
-        <span class="order-item-price">64 Br</span>
-      </div>
-    </div>
-    <div class="order-footer">
-      <span class="order-total">Итого: 70 Br</span>
-    </div>
-  </div>
-
-  <div class="order-card">
-    <div class="order-header">
-      <span class="order-number">Заказ №2401</span>
-      <span class="order-date">2 марта 2026</span>
-      <span class="order-status processing">В обработке</span>
-    </div>
-    <div class="order-items">
-      <div class="order-item">
-        <img src="pictures/tea2.jpg" alt="Молочный улун" class="order-item-img">
-        <div class="order-item-info">
-          <span class="order-item-name">Молочный улун, 50 г</span>
-          <span class="order-item-qty">× 1</span>
-        </div>
-        <span class="order-item-price">42 Br</span>
-      </div>
-    </div>
-    <div class="order-footer">
-      <span class="order-total">Итого: 48 Br</span>
-    </div>
-  </div>
-
 </div>
 
     <!-- Настройки -->
@@ -222,7 +189,7 @@
 </main>
 
   <!-- ФУТЕР -->
-  <footer class="footer">
+  <footer class="footer" style="opacity:0">
     <div class="footer-container">
       <div class="footer-subscribe">
         <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>

@@ -34,11 +34,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const phoneInput = document.querySelector('#panel-profile input[type="tel"]');
         if (phoneInput) phoneInput.value = user.phone || '';
         
-        const birthInput = document.querySelector('#panel-profile input[type="date"]');
+        const birthInput = document.getElementById('profileBirth');
 if (birthInput && user.birth_date) {
-    // Берём только дату (первые 10 символов: YYYY-MM-DD)
+    // YYYY-MM-DD с сервера -> ДД.ММ.ГГГГ для отображения
     const dateStr = String(user.birth_date).substring(0, 10);
-    birthInput.value = dateStr;
+    const [y, m, d] = dateStr.split('-');
+    if (y && m && d) birthInput.value = `${d}.${m}.${y}`;
 }
         
         // Загружаем аватар 
@@ -52,6 +53,28 @@ if (birthInput && user.birth_date) {
     } catch (error) {
       console.error('Ошибка загрузки профиля:', error);
     }
+  }
+
+  // ========================
+  // МАСКА ДЛЯ ДАТЫ РОЖДЕНИЯ (ДД.ММ.ГГГГ)
+  // ========================
+  const birthDateInput = document.getElementById('profileBirth');
+  if (birthDateInput) {
+    birthDateInput.addEventListener('input', function() {
+      let digits = this.value.replace(/\D/g, '').substring(0, 8);
+      let formatted = digits.substring(0, 2);
+      if (digits.length > 2) formatted += '.' + digits.substring(2, 4);
+      if (digits.length > 4) formatted += '.' + digits.substring(4, 8);
+      this.value = formatted;
+    });
+  }
+
+  // Преобразование ДД.ММ.ГГГГ -> YYYY-MM-DD для отправки на сервер
+  function birthDateToIso(value) {
+    const match = String(value || '').trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if (!match) return null;
+    const [, d, m, y] = match;
+    return `${y}-${m}-${d}`;
   }
 
   // ========================
@@ -161,13 +184,33 @@ if (birthInput && user.birth_date) {
       e.preventDefault();
       
       const nameInputs = this.querySelectorAll('input[type="text"]');
-      const name = nameInputs[0]?.value || '';
+      const name = nameInputs[0]?.value.trim() || '';
       const lastName = nameInputs[1]?.value || '';
       const middleName = nameInputs[2]?.value || '';
-      
+
+      const email = this.querySelector('input[type="email"]')?.value.trim();
       const phone = this.querySelector('input[type="tel"]')?.value;
-      const birthDate = this.querySelector('input[type="date"]')?.value;
-      
+      const birthDateRaw = this.querySelector('#profileBirth')?.value.trim();
+
+      if (!name) {
+        alert('Имя не должно быть пустым');
+        return;
+      }
+
+      if (!email) {
+        alert('Email обязателен');
+        return;
+      }
+
+      let birthDate = null;
+      if (birthDateRaw) {
+        birthDate = birthDateToIso(birthDateRaw);
+        if (!birthDate) {
+          alert('Неверный формат даты рождения. Используйте ДД.ММ.ГГГГ');
+          return;
+        }
+      }
+
       let formattedPhone = '';
       if (phone && phone.trim() !== '') {
         if (!validateBelarusPhone(phone)) {
@@ -186,10 +229,11 @@ if (birthInput && user.birth_date) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ 
-            name, 
-            lastName, 
-            middleName, 
+          body: JSON.stringify({
+            name,
+            lastName,
+            middleName,
+            email,
             phone: formattedPhone || null,
             birthDate: birthDate || null
           })
@@ -409,8 +453,12 @@ if (birthInput && user.birth_date) {
   // ========================
   // ЗАГРУЗКА ЗАКАЗОВ И ПРОФИЛЯ
   // ========================
-  loadProfile();  // ✅ Загружаем профиль
-  loadOrders();   // ✅ Загружаем заказы
+  Promise.all([loadProfile(), loadOrders()]).then(() => {
+    ['.account-header', '.account-tabs', '.account-content', '.footer'].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) { el.style.transition = 'opacity 0.3s ease'; el.style.opacity = '1'; }
+    });
+  });
   
   // При загрузке открываем вкладку "Заказы"
   const ordersTab = document.querySelector('.account-tab[data-tab="orders"]');
@@ -524,13 +572,9 @@ function renderOrders(orders) {
             hintHtml = '<p style="font-size:12px;color:#2ecc71;margin-top:6px;">Заказ ждёт вас в магазине!</p>';
         } else if (order.status === 'SHIPPED') {
             hintHtml = '<p style="font-size:12px;color:#9b59b6;margin-top:6px;">Заказ в пути</p>';
-        } else if (order.status === 'DELIVERED') {
-            hintHtml = '<p style="font-size:12px;color:#27ae60;margin-top:6px;">Заказ доставлен</p>';
-} else if (order.status === 'CANCELLED') {
-    hintHtml = '<p style="font-size:12px;color:#e74c3c;margin-top:6px;">Заказ отменён</p>';
-} else if (order.status === 'REFUNDED') {
-    hintHtml = '<p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Деньги возвращены</p>';
-}
+        } else if (order.status === 'REFUNDED') {
+            hintHtml = '<p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">Деньги возвращены</p>';
+        }
         
         const itemsHtml = order.items.map(item => {
             const imgSrc = item.product_image || 'pictures/placeholder.jpg';
@@ -649,8 +693,13 @@ window.changeEditQty = function(index, delta) {
 };
 
 window.removeEditItem = async function(index) {
+    if (currentEditOrderItems.length <= 1) {
+        alert('Нельзя удалить все товары из заказа. Если хотите отказаться от заказа полностью — используйте кнопку «Отменить заказ».');
+        return;
+    }
+
     if (!confirm('Удалить товар из заказа?')) return;
-    
+
     const item = currentEditOrderItems[index];
     const token = localStorage.getItem('token');
     
@@ -664,16 +713,6 @@ window.removeEditItem = async function(index) {
         if (!res.ok) {
             const err = await res.json();
             alert('Ошибка: ' + (err.error || 'Не удалось удалить'));
-            return;
-        }
-        
-        const data = await res.json();
-        
-        // Если сервер вернул что заказ отменён (все товары удалены)
-        if (data.cancelled) {
-            alert('Все товары удалены, заказ отменён');
-            closeEditOrderModal();
-            loadOrders();
             return;
         }
     } catch(e) {
@@ -816,7 +855,50 @@ window.repeatOrder = async function(orderNumber) {
     }));
     
     sessionStorage.setItem('repeatOrderItems', JSON.stringify(repeatItems));
-    
+
     // Перенаправляем на оформление
     window.location.href = 'checkout.html';
 };
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.contact-card', '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        if (el.getBoundingClientRect().top <= viewH) return;
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            observer.observe(el);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

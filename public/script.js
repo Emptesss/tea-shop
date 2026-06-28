@@ -333,63 +333,47 @@ if (sliderMin && sliderMax) {
   // ========================
 // ЗАГРУЗКА КАТЕГОРИЙ В КАТАЛОГЕ (ДИНАМИЧЕСКИЕ ЧИПСЫ)
 // ========================
-async function loadCategoryChips() {
+function loadCategoryChips() {
     const container = document.querySelector('.categories-scroll');
     if (!container) return;
-    
-    try {
-        const res = await fetch('/api/categories');
-        const categories = await res.json();
-        
-        if (!Array.isArray(categories) || categories.length === 0) return;
-        
-        let chipsHTML = '<button class="category-chip active" data-slug="">Все</button>';
-        
-        categories.forEach(cat => {
-            chipsHTML += `<button class="category-chip" data-slug="${cat.slug}">${cat.name}</button>`;
-        });
-        
-        container.innerHTML = chipsHTML;
-        
-        // Навешиваем обработчики
-        document.querySelectorAll('.category-chip').forEach(chip => {
-            chip.addEventListener('click', function() {
-                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                
-                const slug = this.dataset.slug;
-                currentPage = 1;
-                const filters = getCurrentFilters();
-                
-                if (slug) {
-                    filters.category = slug;
-                } else {
-                    delete filters.category;
-                }
-                
-                if (window.history.pushState) {
-                    const newUrl = window.location.pathname + (slug ? '?category=' + slug : '');
-                    window.history.pushState({}, '', newUrl);
-                }
-                
-                currentFilters = filters;
-                loadProducts(filters);
-            });
-        });
-        
-        // Проверяем URL параметр
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlCategory = urlParams.get('category');
-        if (urlCategory) {
-            const chip = container.querySelector(`[data-slug="${urlCategory}"]`);
-            if (chip) {
-                container.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
+
+    // Категории уже отрисованы в HTML — просто навешиваем обработчики,
+    // без перезапроса к серверу и пересборки DOM (раньше это вызывало
+    // визуальный скачок: сначала кнопка «Все», затем остальные категории).
+    container.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            container.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+
+            const slug = this.dataset.slug;
+            currentPage = 1;
+            const filters = getCurrentFilters();
+
+            if (slug) {
+                filters.category = slug;
+            } else {
+                delete filters.category;
             }
+
+            if (window.history.pushState) {
+                const newUrl = window.location.pathname + (slug ? '?category=' + slug : '');
+                window.history.pushState({}, '', newUrl);
+            }
+
+            currentFilters = filters;
+            loadProducts(filters);
+        });
+    });
+
+    // Подсвечиваем активную категорию по URL-параметру
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCategory = urlParams.get('category');
+    if (urlCategory) {
+        const chip = container.querySelector(`[data-slug="${urlCategory}"]`);
+        if (chip) {
+            container.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
         }
-        
-    } catch(e) {
-        console.error('Ошибка загрузки категорий:', e);
     }
 }
 
@@ -429,11 +413,6 @@ function setupCategoryChipsListeners() {
     });
 }
 
-// Вызываем при загрузке
-document.addEventListener('DOMContentLoaded', function() {
-    loadCategoryChips();
-});
-  
   // ========================
   // КНОПКА "ПОКАЗАТЬ ЕЩЁ"
   // ========================
@@ -684,6 +663,30 @@ modalTabs.forEach(tab => {
   });
 });
 
+function showForgotBtn(form, email) {
+    if (form.querySelector('.forgot-pwd-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'forgot-pwd-btn';
+    btn.textContent = 'Забыли пароль?';
+    btn.addEventListener('click', function() { handleForgotPassword(email); });
+    const submitBtn = form.querySelector('.modal-submit-btn');
+    if (submitBtn) submitBtn.insertAdjacentElement('afterend', btn);
+}
+
+async function handleForgotPassword(email) {
+    alert('Мы отправим инструкцию по восстановлению на вашу почту');
+    if (!email) return;
+    try {
+        await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    } catch(e) {}
+}
+
+let loginAttempts = 0;
 // Вход
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -758,9 +761,11 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             modal.classList.remove('open');
             document.body.style.overflow = '';
             window.location.href = 'account.html';
-            
+
         } else {
+            loginAttempts++;
             alert(data.error || 'Ошибка входа');
+            if (loginAttempts >= 3) showForgotBtn(this, email);
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -1062,17 +1067,34 @@ async function loadProducts(filters = {}, append = false) {
         
         totalPages = data.pagination.totalPages;
         
+        let newCards;
         if (append) {
             // Добавляем товары к существующим
-            grid.innerHTML += data.products.map(product => createProductCard(product)).join('');
+            const beforeCount = grid.querySelectorAll('.catalog-product-card').length;
+            grid.insertAdjacentHTML('beforeend', data.products.map(product => createProductCard(product)).join(''));
+            newCards = Array.from(grid.querySelectorAll('.catalog-product-card')).slice(beforeCount);
         } else {
             // Заменяем все товары
             grid.innerHTML = data.products.map(product => createProductCard(product)).join('');
+            newCards = Array.from(grid.querySelectorAll('.catalog-product-card'));
         }
-        
+
+        // Плавное каскадное появление карточек
+        newCards.forEach((card, i) => {
+            card.style.animationDelay = Math.min(i * 0.06, 0.6) + 's';
+            card.classList.add('card-appear');
+            // Снимаем класс анимации после её завершения, иначе fill-mode
+            // "держит" transform и блокирует плавный transition при hover
+            card.addEventListener('animationend', function handler() {
+                card.classList.remove('card-appear');
+                card.style.animationDelay = '';
+                card.removeEventListener('animationend', handler);
+            });
+        });
+
         // Управляем кнопкой "Показать ещё"
         updateLoadMoreButton();
-        
+
         setupProductCardListeners();
         
     } catch (error) {
@@ -1118,21 +1140,31 @@ document.addEventListener('click', function(e) {
 function renderProducts(products) {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
-    
+
     if (products.length === 0) {
         grid.innerHTML = '<div style="text-align:center;padding:40px;color:white;">Товары не найдены</div>';
         return;
     }
-    
+
     grid.innerHTML = products.map(product => createProductCard(product)).join('');
+
+    // Плавное каскадное появление карточек
+    const cards = grid.querySelectorAll('.catalog-product-card');
+    cards.forEach((card, i) => {
+        card.style.animationDelay = Math.min(i * 0.06, 0.6) + 's';
+        card.classList.add('card-appear');
+    });
 }
 
 // Создание HTML одной карточки товара
 function createProductCard(product) {
-    const stockBadge = product.in_stock 
+    const stockBadge = product.in_stock
         ? '<div class="stock-badge in-stock">В наличии</div>'
         : '<div class="stock-badge out-of-stock">Нет в наличии</div>';
-    
+
+    const isSet = (product.category_name || '').toLowerCase().includes('набор');
+    const priceUnit = isSet ? '' : '<span class="card-price-unit">/ 50 г</span>';
+
     // Расчёт скидки в процентах
     let discountBadge = '';
     if (product.old_price && product.old_price > product.price) {
@@ -1163,8 +1195,8 @@ function createProductCard(product) {
                     <div class="card-desc">${product.short_desc || ''}</div>
                 </a>
                 <div class="card-price">
-                    ${product.price} Br 
-                    <span class="card-price-unit">/ 50 г</span>
+                    ${product.price} Br
+                    ${priceUnit}
                     ${oldPriceHtml}
                 </div>
                 <div class="qty-label">Выберите количество:</div>
@@ -1601,11 +1633,14 @@ if (urlCategory) {
 async function loadMainPageProducts() {
     const cardsRow = document.querySelector('.products-section .cards-row');
     if (!cardsRow) return; // не на главной — выходим
-    
+
     try {
-        const response = await fetch('/api/products?limit=3&sort=popular');
+        const response = await fetch('/api/products/popular-this-month?limit=3');
         const data = await response.json();
-        
+
+        const monthEl = document.querySelector('.products-section .section-subtitle .highlight-green');
+        if (monthEl && data.monthName) monthEl.textContent = data.monthName;
+
         if (data.products && data.products.length > 0) {
             cardsRow.innerHTML = data.products.map(product => createMainPageCard(product)).join('');
             setupMainPageCardListeners();
@@ -1616,10 +1651,13 @@ async function loadMainPageProducts() {
 }
 
 function createMainPageCard(product) {
-    const stockBadge = product.in_stock 
+    const stockBadge = product.in_stock
         ? '<div class="stock-badge in-stock">В наличии</div>'
         : '<div class="stock-badge out-of-stock">Нет в наличии</div>';
-    
+
+    const isSet = (product.category_name || '').toLowerCase().includes('набор');
+    const priceUnit = isSet ? '' : '<span class="card-price-unit">/ 50 г</span>';
+
     // Расчёт скидки в процентах
     let discountBadge = '';
     if (product.old_price && product.old_price > product.price) {
@@ -1646,7 +1684,7 @@ function createMainPageCard(product) {
                 <a href="product.html?slug=${product.slug}" class="card-desc-link">
                     <div class="card-desc">${product.short_desc || ''}</div>
                 </a>
-                <div class="card-price">${product.price} Br <span class="card-price-unit">/ 50 г</span>${oldPriceHtml}</div>
+                <div class="card-price">${product.price} Br ${priceUnit}${oldPriceHtml}</div>
                 <div class="qty-label">Выберите количество:</div>
                 <div class="qty-selector">
                     <button class="qty-btn minus">−</button><span class="qty-value">1</span><button class="qty-btn plus">+</button>
@@ -1687,13 +1725,8 @@ function setupMainPageCardListeners() {
         });
     });
     
-    // Избранное
-    cardsRow.querySelectorAll('.card-favorite-bottom').forEach(btn => {
-        btn.addEventListener('click', function() {
-            toggleFavoriteBottom(this);
-        });
-    });
-    
+    // Избранное — обработчик уже навешан через onclick в разметке карточки
+
     // Эффект лупы
     cardsRow.querySelectorAll('.card-image-wrapper').forEach(wrapper => {
         const img = wrapper.querySelector('.card-image');
@@ -2120,23 +2153,17 @@ function setupProductCardsAnimation() {
         valueCards.forEach(card => {
             if (isInView(card, 80)) {
                 card.classList.add('animate-visible');
-                setTimeout(() => { card.style.transition = 'transform 0.2s ease'; }, 750);
             }
         });
 
-        // ✅ Шаги — карточки вылетают, номера на линии
+        // ✅ Шаги — карточки и номера появляются вместе, без доп. задержек
         journeySteps.forEach((step, i) => {
             if (isInView(step, 100)) {
                 step.classList.add('animate-visible');
                 const marker = step.querySelector('.journey-marker');
                 const card = step.querySelector('.journey-card-left, .journey-card-right');
-                // Номер проявляется сразу
-                setTimeout(() => marker?.classList.add('animate-visible'), 100);
-                // Карточка вылетает
-                setTimeout(() => {
-                    card?.classList.add('animate-visible');
-                    if (card) setTimeout(() => { card.style.transition = 'transform 0.2s ease'; }, 850);
-                }, 250);
+                marker?.classList.add('animate-visible');
+                card?.classList.add('animate-visible');
             }
         });
 
@@ -2149,5 +2176,74 @@ function setupProductCardsAnimation() {
         t = setTimeout(() => { t = null; check(); }, 20);
     }, { passive: true });
 
-    setTimeout(check, 300);
+    // Даём браузеру отрисовать скрытое состояние перед тем, как сделать
+    // элементы видимыми — иначе transition не запустится (классы
+    // добавятся в один и тот же тик, без промежуточного рендера)
+    function startReveal() {
+        requestAnimationFrame(() => requestAnimationFrame(check));
+    }
+
+    // Если страница была предзагружена браузером заранее (prerendering),
+    // запускаем анимацию в момент её реального показа пользователю,
+    // а не в момент фоновой загрузки — иначе анимация "сгорает" незаметно
+    if (document.prerendering) {
+        document.addEventListener('prerenderingchange', startReveal, { once: true });
+    } else {
+        startReveal();
+    }
 })();
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    const aboveFold = [];
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            if (el.getBoundingClientRect().top <= viewH) {
+                // Элемент уже виден при загрузке — не ждём IntersectionObserver,
+                // проигрываем анимацию явно, чтобы она точно сработала
+                aboveFold.push(el);
+            } else {
+                observer.observe(el);
+            }
+        });
+    });
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            aboveFold.forEach(el => el.classList.add('ft-visible'));
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

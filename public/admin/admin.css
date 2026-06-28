@@ -25,7 +25,7 @@ body {
 .hidden { display: none !important; }
 
 .sidebar {
-  width: 260px;
+  width: 210px;
   background: rgba(10, 20, 15, 0.9);
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--border);
@@ -420,6 +420,34 @@ tr.refund-pending:hover {
 /* ======================== */
 /* МОДАЛКА ОТМЕНЫ ЗАКАЗА */
 /* ======================== */
+.cancel-reason-option {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.admin-modal-close-btn {
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.admin-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-modal-close-btn img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
 .cancel-reason-option:hover {
     background: rgba(255,255,255,0.05) !important;
     border-color: rgba(255,255,255,0.2) !important;

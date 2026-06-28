@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Горная матча — Forest Tea</title>
 
@@ -80,6 +81,15 @@
 
   </header>
 
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
+
    <!-- Хлебные крошки -->
 <nav class="breadcrumbs" aria-label="Хлебные крошки">
   <ol class="breadcrumbs-list">
@@ -109,33 +119,21 @@
       <div class="product-gallery">
         
         <!-- Миниатюры -->
-        <div class="gallery-thumbnails">
-          <button class="gallery-thumb active" data-index="0">
-            <img src="pictures/tea/gornayamatcha2.jpg" alt="Горная матча" class="gallery-thumb-img">
-          </button>
-          <button class="gallery-thumb" data-index="1">
-            <img src="pictures/tea/gornayamatcha2.png" alt="Горная матча" class="gallery-thumb-img">
-          </button>
-    
-        </div>
+        <div class="gallery-thumbnails" style="display:none;"></div>
 
         <!-- Основное изображение -->
         <div class="gallery-main">
-          <img src="pictures/tea/gornayamatcha2.jpg" alt="Горная матча" class="gallery-main-img" id="mainProductImage">
+          <img src="" alt="" class="gallery-main-img" id="mainProductImage" style="display:none;">
           
                 <!-- Бейджи -->
           <!-- Бейджи -->
-<div class="gallery-badges">
-  <span class="gallery-badge bestseller">Хит продаж</span>
-  <span class="gallery-badge in-stock">В наличии</span>
-  <span class="gallery-badge discount-badge-on-image" style="display:none;">-20%</span>
-</div>
+<div class="gallery-badges"></div>
 
           <!-- Кнопки навигации -->
-          <button class="gallery-nav gallery-prev" aria-label="Предыдущее фото">
+          <button class="gallery-nav gallery-prev" aria-label="Предыдущее фото" style="display:none;">
             <img src="pictures/arrow-left.png" alt="←" class="gallery-nav-icon">
           </button>
-          <button class="gallery-nav gallery-next" aria-label="Следующее фото">
+          <button class="gallery-nav gallery-next" aria-label="Следующее фото" style="display:none;">
             <img src="pictures/arrow-right.png" alt="→" class="gallery-nav-icon">
           </button>
         </div><!-- /gallery-main -->
@@ -143,7 +141,7 @@
       </div><!-- /product-gallery -->
 
       <!-- Информация о товаре (справа) -->
-      <div class="product-info">
+      <div class="product-info" style="opacity:0">
         
         <!-- Название и рейтинг -->
         <h1 class="product-title">Горная матча</h1>
@@ -354,7 +352,7 @@
   </main>
 
   <!-- ФУТЕР -->
-  <footer class="footer">
+  <footer class="footer" style="opacity:0">
     <div class="footer-container">
       <div class="footer-subscribe">
         <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>

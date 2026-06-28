@@ -86,7 +86,12 @@ document.addEventListener('DOMContentLoaded', function() {
       sessionStorage.removeItem('repeatOrderItems');
   });
   
-  loadCheckoutCart();
+  loadCheckoutCart().then(() => {
+    const card = document.querySelector('.checkout-summary-card');
+    if (card) { card.style.transition = 'opacity 0.3s ease'; card.style.opacity = '1'; }
+    const footer = document.querySelector('.footer');
+    if (footer) { footer.style.transition = 'opacity 0.3s ease'; footer.style.opacity = '1'; }
+  });
   setupPasswordToggles();
 });
 
@@ -150,6 +155,22 @@ function updateCheckoutTotal(items) {
     if (totalEl) totalEl.textContent = subtotal + ' Br';
 }
 
+// ✅ Считает сумму к предоплате на основе ТЕКУЩЕГО выбора способа оплаты/доставки
+function getAmountToPay() {
+    const paymentEl = document.querySelector('input[name="payment"]:checked');
+    const deliveryEl = document.querySelector('input[name="delivery"]:checked');
+    const payment_method = paymentEl ? paymentEl.value : 'card';
+    const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
+
+    if (payment_method === 'card' || payment_method === 'erip') {
+        const totalText = document.getElementById('checkoutTotal').textContent;
+        return parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
+    } else if (payment_method === 'cash' && delivery_method !== 'pickup') {
+        return delivery_method === 'courier' ? 10 : 15;
+    }
+    return 0;
+}
+
 // ========================
 // АККОРДЕОН ШАГОВ
 // ========================
@@ -191,31 +212,31 @@ function nextStep(currentId, nextId) {
 
   // ✅ При переходе с оплаты — открываем модалку, меняем кнопку
   if (currentId === 'cardPayment') {
-    const paymentEl = document.querySelector('input[name="payment"]:checked');
-    const deliveryEl = document.querySelector('input[name="delivery"]:checked');
-    const payment_method = paymentEl ? paymentEl.value : 'card';
-    const delivery_method = deliveryEl ? deliveryEl.value : 'pickup';
-    
-    let amountToPay = 0;
-    
-    if (payment_method === 'card' || payment_method === 'erip') {
-        const totalText = document.getElementById('checkoutTotal').textContent;
-        amountToPay = parseFloat(totalText.replace(/[^0-9.]/g, '')) || 0;
-    } else if (payment_method === 'cash' && delivery_method !== 'pickup') {
-        const deliveryPrice = delivery_method === 'courier' ? 10 : 15;
-        amountToPay = deliveryPrice;
-    }
-    
+    const amountToPay = getAmountToPay();
+
     if (amountToPay > 0) {
         showCardPayment(amountToPay);
     }
-    
+
     // Меняем кнопку "Продолжить" на "Изменить способ оплаты"
     const nextBtn = current.querySelector('.step-next-btn');
     if (nextBtn) {
         nextBtn.textContent = 'Изменить способ оплаты';
+        // ✅ Пересчитываем способ оплаты/сумму заново при каждом клике —
+        // пользователь мог вернуться и поменять способ оплаты или доставки
         nextBtn.onclick = function() {
-            showCardPayment(amountToPay);
+            const currentAmount = getAmountToPay();
+            if (currentAmount > 0) {
+                showCardPayment(currentAmount);
+            } else {
+                // Без попапа — закрываем шаг оплаты и открываем следующий шаг (комментарий)
+                current.classList.remove('active');
+                const commentCard = document.getElementById('cardComment');
+                if (commentCard) {
+                    commentCard.classList.remove('locked');
+                    commentCard.classList.add('active');
+                }
+            }
         };
     }
   }
@@ -550,6 +571,29 @@ function setupPasswordToggles() {
 // ========================
 // МОДАЛЬНОЕ ОКНО ВХОД/РЕГИСТРАЦИЯ
 // ========================
+function showForgotBtn(form, email) {
+    if (form.querySelector('.forgot-pwd-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'forgot-pwd-btn';
+    btn.textContent = 'Забыли пароль?';
+    btn.addEventListener('click', function() { handleForgotPassword(email); });
+    const submitBtn = form.querySelector('.modal-submit-btn');
+    if (submitBtn) submitBtn.insertAdjacentElement('afterend', btn);
+}
+
+async function handleForgotPassword(email) {
+    alert('Мы отправим инструкцию по восстановлению на вашу почту');
+    if (!email) return;
+    try {
+        await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    } catch(e) {}
+}
+
 const modal = document.getElementById('loginModal');
 const accountIcon = document.getElementById('accountIcon');
 const modalTabs = document.querySelectorAll('.modal-tab');
@@ -639,6 +683,7 @@ modalTabs.forEach(tab => {
   });
 });
 
+let loginAttempts = 0;
 // Вход
 document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -688,7 +733,9 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
             loadCheckoutCart();
             
         } else {
+            loginAttempts++;
             alert(data.error || 'Ошибка входа');
+            if (loginAttempts >= 3) showForgotBtn(this, email);
         }
     } catch (error) {
         console.error('Ошибка:', error);
@@ -830,3 +877,46 @@ if (cardPaymentModal) {
         if (e.target === this) closeCardPayment();
     });
 }
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.contact-card', '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        if (el.getBoundingClientRect().top <= viewH) return;
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            observer.observe(el);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

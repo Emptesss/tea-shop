@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const card = this.closest('.blog-card');
       const fullText = card.querySelector('.blog-card-full-text');
       const excerpt = card.querySelector('.blog-card-excerpt');
-      
+
       if (fullText.style.display === 'block') {
         fullText.style.display = 'none';
         excerpt.style.display = '-webkit-box';
@@ -60,17 +60,15 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       if (visibleCount === 1 && singleCard) {
-        blogGrid.style.gridTemplateColumns = '1fr';
-        blogGrid.style.justifyItems = 'center';
+        blogGrid.style.columnCount = '1';
         singleCard.querySelector('.blog-card-image').style.height = '320px';
       } else {
-        blogGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        blogGrid.style.justifyItems = 'stretch';
+        blogGrid.style.columnCount = '';
         blogCards.forEach(card => {
           card.querySelector('.blog-card-image').style.height = '220px';
         });
       }
-      
+
       updatePagination();  // ← проверяем пагинацию
     });
   });
@@ -102,17 +100,15 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       if (visibleCount === 1 && singleCard) {
-        blogGrid.style.gridTemplateColumns = '1fr';
-        blogGrid.style.justifyItems = 'center';
+        blogGrid.style.columnCount = '1';
         singleCard.querySelector('.blog-card-image').style.height = '320px';
       } else {
-        blogGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        blogGrid.style.justifyItems = 'stretch';
+        blogGrid.style.columnCount = '';
         blogCards.forEach(card => {
           card.querySelector('.blog-card-image').style.height = '220px';
         });
       }
-      
+
       updatePagination();  // ← проверяем пагинацию
     });
   }
@@ -135,6 +131,29 @@ document.addEventListener('DOMContentLoaded', function() {
 // ========================
 // МОДАЛЬНОЕ ОКНО ВХОД/РЕГИСТРАЦИЯ
 // ========================
+function showForgotBtn(form, email) {
+    if (form.querySelector('.forgot-pwd-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'forgot-pwd-btn';
+    btn.textContent = 'Забыли пароль?';
+    btn.addEventListener('click', function() { handleForgotPassword(email); });
+    const submitBtn = form.querySelector('.modal-submit-btn');
+    if (submitBtn) submitBtn.insertAdjacentElement('afterend', btn);
+}
+
+async function handleForgotPassword(email) {
+    alert('Мы отправим инструкцию по восстановлению на вашу почту');
+    if (!email) return;
+    try {
+        await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    } catch(e) {}
+}
+
 const modal = document.getElementById('loginModal');
 const accountIcon = document.getElementById('accountIcon');
 const closeModal = document.getElementById('closeModal');
@@ -246,6 +265,7 @@ modalTabs.forEach(tab => {
     });
 });
 
+let loginAttempts = 0;
 // Вход
 document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -285,7 +305,9 @@ const password = passwordInput?.value;
             document.body.style.overflow = '';
             window.location.href = 'account.html';
         } else {
+            loginAttempts++;
             alert(data.error || 'Ошибка входа');
+            if (loginAttempts >= 3) showForgotBtn(this, email);
         }
     } catch (error) {
         alert('Ошибка соединения с сервером');
@@ -379,3 +401,46 @@ function setupPasswordToggles() {
 }
 
 document.addEventListener('DOMContentLoaded', setupPasswordToggles);
+
+// ========================
+// АНИМАЦИИ ПРОКРУТКИ
+// ========================
+function initScrollReveal() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const viewH = window.innerHeight;
+    const selector = [
+        '.product-card', '.why-us-card', '.blog-card',
+        '.section-title', '.section-subtitle',
+        '.delivery-card-item',
+        '.contact-card', '.faq-item',
+        '.about-img', '.about-text-content',
+        '.checkout-block', '.account-orders-block'
+    ].join(',');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('ft-visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.07, rootMargin: '0px 0px -24px 0px' });
+
+    const parentMap = new Map();
+    document.querySelectorAll(selector).forEach(el => {
+        if (el.getBoundingClientRect().top <= viewH) return;
+        const p = el.parentElement;
+        if (!parentMap.has(p)) parentMap.set(p, []);
+        parentMap.get(p).push(el);
+    });
+
+    parentMap.forEach(group => {
+        group.forEach((el, i) => {
+            el.classList.add('ft-reveal');
+            if (i > 0) el.style.transitionDelay = Math.min(i * 0.11, 0.33) + 's';
+            observer.observe(el);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initScrollReveal);

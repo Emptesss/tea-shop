@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forest Tea — интернет-магазин чая</title>
 
@@ -82,6 +83,15 @@
     </div>
 
   </header>
+
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
 
   <!-- ========================
        HERO SECTION
@@ -388,7 +398,7 @@
 </div>
 
   <!-- Подключаем внешний JavaScript -->
-  <script src="script.js"></script>
+  <script src="script.js?v=4"></script>
 
 </body>
 </html>

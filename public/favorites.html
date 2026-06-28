@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="pictures/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Избранное — Forest Tea</title>
 
@@ -61,6 +62,15 @@
     </div>
   </header>
 
+  <script>
+  (function () {
+    var page = location.pathname.split('/').pop() || 'glavnaya.html';
+    document.querySelectorAll('.header-nav a').forEach(function (a) {
+      if (a.getAttribute('href') === page) a.classList.add('active-page');
+    });
+  })();
+  </script>
+
   <!-- Хлебные крошки -->
   <nav class="breadcrumbs" aria-label="Хлебные крошки">
     <ol class="breadcrumbs-list">
@@ -91,7 +101,7 @@
   </main>
 
   <!-- ФУТЕР -->
-  <footer class="footer">
+  <footer class="footer" style="opacity:0">
     <div class="footer-container">
       <div class="footer-subscribe">
         <div class="subscribe-title">Подпишитесь на наши обновления<br>и получайте советы и акции первыми</div>

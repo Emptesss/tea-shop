@@ -1279,7 +1279,7 @@ function openCancelOrderModal(orderId) {
     document.querySelectorAll('#cancelReasonOptions .cancel-reason-option').forEach(btn => {
         btn.classList.remove('selected');
     });
-    document.getElementById('cancelReasonCustom').value = '';
+    document.getElementById('cancelReasonCustomText').value = '';
     document.getElementById('cancelReasonCustom').style.display = 'none';
     
     document.getElementById('cancelOrderModal').classList.remove('hidden');
@@ -1304,10 +1304,10 @@ document.addEventListener('click', function(e) {
         const customInput = document.getElementById('cancelReasonCustom');
         if (reason === 'other') {
             customInput.style.display = 'block';
-            customInput.focus();
+            document.getElementById('cancelReasonCustomText').focus();
         } else {
             customInput.style.display = 'none';
-            customInput.value = '';
+            document.getElementById('cancelReasonCustomText').value = '';
         }
     }
 });
@@ -1322,7 +1322,7 @@ async function confirmCancelOrder() {
     
     if (selectedBtn) {
         if (selectedBtn.dataset.reason === 'other') {
-            reason = document.getElementById('cancelReasonCustom').value.trim();
+            reason = document.getElementById('cancelReasonCustomText').value.trim();
             if (!reason) {
                 alert('Укажите причину отмены');
                 return;
@@ -1331,7 +1331,7 @@ async function confirmCancelOrder() {
             reason = selectedBtn.textContent.trim();
         }
     } else {
-        reason = document.getElementById('cancelReasonCustom').value.trim();
+        reason = document.getElementById('cancelReasonCustomText').value.trim();
         if (!reason) {
             alert('Выберите причину или укажите свою');
             return;
